@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 60 (88103) - https://sketch.com -->
+    <title>cancel</title>
+    <desc>Created with Sketch.</desc>
+    <g id="👮-Admin" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Group-35" transform="translate(-216.000000, -32.000000)">
+            <g id="Atoms-/-Icon-/-Close" transform="translate(212.000000, 28.000000)">
+                <g id="cancel">
+                    <polygon id="Path" fill="#ACBADF" points="20 5.06666667 18.9333333 4 12 10.9333333 5.06666667 4 4 5.06666667 10.9333333 12 4 18.9333333 5.06666667 20 12 13.0666667 18.9333333 20 20 18.9333333 13.0666667 12"></polygon>
+                    <rect id="Rectangle" x="0" y="0" width="24" height="24"></rect>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

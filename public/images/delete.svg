@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="14px" height="7px" viewBox="0 0 14 7" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 60 (88103) - https://sketch.com -->
+    <title>Atoms / Icon / Arrow</title>
+    <desc>Created with Sketch.</desc>
+    <g id="👮-Admin" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Group-35" transform="translate(-229.000000, -498.000000)">
+            <g id="Group-38" transform="translate(0.000000, 479.000000)">
+                <g id="Group-31-Copy-6">
+                    <g id="Atoms-/-Icon-/-Arrow" transform="translate(228.000000, 14.000000)">
+                        <rect id="Rectangle" x="0" y="0" width="16" height="16"></rect>
+                        <polygon id="Path-4" fill="#253B78" points="1 6 2 5 8 10 14 5 15 6 8 12"></polygon>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

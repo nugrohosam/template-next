@@ -1,0 +1,25 @@
+.dashboard-hc {
+    &__card {
+        background-color: $white;
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    &__chart {
+        &-twm {
+            &--case {
+                height: 238px !important;
+                @media screen and (max-width: $tablet) {
+                    height: 100% !important;
+                }
+            }
+            &--distribution {
+                height: 478px !important;
+                @media screen and (max-width: $tablet) {
+                    height: 100% !important;
+                }
+            }
+        }
+    }
+}

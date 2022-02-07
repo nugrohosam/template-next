@@ -1,0 +1,44 @@
+.notification {
+    &__row {
+        &--text {
+            margin-top: 50px;
+            margin-bottom: 25px;
+        }
+        &--card {
+            margin-bottom: 10px;
+        }
+    }
+    &__title {
+        color: #2E384D;
+        font-size: 18px;
+        font-weight: 500;
+    }
+    &__link {
+        color: $blue;
+        font-weight: 500;
+    }
+    &__card {
+        background-color: $white;
+        padding: 12px 15px;
+        display: flex;
+        flex-direction: column;
+        &--unread {
+            background-color: #F6F1DD;
+        }
+        .card__title {
+            margin-bottom: 5px;
+            color: $blue;
+        }
+        .card__text {
+        font-size: 12px;
+        white-space: normal;
+        margin-bottom: 8px;
+        color: $black-50;
+        }
+        .card__time {
+            font-size: 12px;
+            color: #848587;
+        }
+    }
+
+}

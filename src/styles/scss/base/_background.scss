@@ -1,0 +1,32 @@
+.bg {
+  &-activation {
+    background: #f7f7f7;
+    padding: 40px 20px;
+    min-height: calc(100vh - 202px);
+    &__sidebar-inactive {
+      padding: 40px 0;
+    }
+  }
+  &-auth {
+    background: url('/images/bg-login.webp') #435585 center center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    height: 100vh;
+    min-height: calc(100vh - 202px);
+    @media screen and (max-width: $mobile) {
+      height: auto;
+    }
+  }
+  &-notification {
+    background-color: #f7f7f7;
+    min-height: calc(100vh - 202px);
+  }
+}
+
+.background {
+  width: 100%;
+  height: 100%;
+  &__black-50 {
+    background-color: $black-50;
+  }
+}

@@ -1,0 +1,447 @@
+div .tax-supplier-list {
+  color: $blue;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 22px;
+  .tax-supplier-list__item {
+    background-color: #f7f7f7;
+    border: 0;
+    padding-top: 0;
+    padding-left: 32px;
+  }
+  .tax-supplier-list__item--disabled {
+    color: $grey;
+  }
+  .tax-supplier-list__step {
+    height: 28px;
+    width: 28px;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    left: 0;
+    z-index: 1;
+    border-radius: 123123px;
+    background-color: #f8c301;
+    .tax-supplier-list__step--number {
+      color: #fff;
+    }
+  }
+  .tax-supplier-list__step--disabled {
+    background-color: $grey;
+  }
+}
+.tax__line-break {
+  border-bottom: 1px solid #d4daeb;
+}
+
+form {
+  &.form {
+    display: contents;
+  }
+  .form-supplier {
+    background-color: #fff;
+    padding: 40px;
+    &--card {
+      border: 2px dashed $blue-50;
+    }
+    &--title {
+      margin-bottom: 10px;
+      max-height: 25px;
+    }
+    &--subtitle {
+      text-align: center;
+      margin-left: 16px;
+      margin-top: 30px;
+      margin-bottom: 24px;
+      max-height: 25px;
+    }
+  }
+}
+
+.tax__data {
+  background-color: $white;
+  &--padding {
+    padding: 15px;
+  }
+  &--text {
+    width: 100%;
+    color: $blue;
+    font-size: 14px;
+    letter-spacing: 0.34px;
+  }
+  &--link {
+    color: $blue;
+    cursor: pointer;
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.ml-15 {
+  margin-left: 15rem !important;
+}
+
+.ml-345 {
+  margin-left: 345px !important;
+}
+
+.ml-130 {
+  margin-left: 130px !important;
+}
+
+.border--blue {
+  border: 1px solid $blue-50;
+}
+
+.tax-selector {
+  height: 42px;
+  &.vs--disabled {
+    background: #e9ecef;
+    opacity: 1;
+    .vs__dropdown-toggle {
+      background: #e9ecef;
+      opacity: 1;
+    }
+    .vs__open-indicator {
+      background: #e9ecef;
+    }
+    .vs__search {
+      background: #e9ecef;
+    }
+  }
+  .vs__search::placeholder,
+  .vs__dropdown-toggle,
+  .vs__dropdown-menu {
+    background: #fff;
+    border: none;
+    color: $blue;
+    text-transform: lowercase;
+    font-variant: small-caps;
+    border-radius: 0;
+  }
+  .vs__search {
+    &::placeholder {
+      font-size: 18px;
+      font-weight: 500;
+    }
+    :disabled {
+      background: #e9ecef;
+      &::placeholder  {
+        background: #e9ecef;
+      }
+    }
+  }
+
+  .vs__dropdown-menu {
+    overflow-x: hidden;
+    li {
+      max-width: 100%;
+      height: auto;
+      white-space: normal;
+      border-bottom: 1px solid $grey;
+      padding: 5px;
+    }
+  }
+
+  .vs__clear,
+  .vs__open-indicator {
+    fill: $blue;
+  }
+  .vs__selected-options {
+    max-height: 29px;
+    min-height: 15px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-right: 10px;
+  }
+  .vs__selected {
+    color: $blue;
+    font-family: "Poppins", sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 1px; 
+    white-space: nowrap;
+    width: 100%;
+    z-index: 1;
+    text-transform: uppercase;
+  }
+}
+
+.tax-data-selector {
+  height: 42px;
+  &.vs--disabled {
+    background: #e9ecef;
+    opacity: 1;
+    .vs__dropdown-toggle {
+      background: #e9ecef;
+      opacity: 1;
+    }
+    .vs__open-indicator {
+      background: #e9ecef;
+    }
+    .vs__search {
+      background: #e9ecef;
+      &::placeholder  {
+        background: #e9ecef !important;
+      }
+    }
+  }
+  .vs__search::placeholder,
+  .vs__dropdown-toggle,
+  .vs__dropdown-menu {
+    background: #fff;
+    border: none;
+    color: $blue;
+    text-transform: lowercase;
+    font-variant: small-caps;
+    border-radius: 0;
+  }
+  .vs__search {
+    padding: 0 7px;
+    margin: 0;
+    &::placeholder {
+      font-size: 18px;
+      font-weight: 500;
+    }
+    :disabled {
+      background: #e9ecef;
+      &::placeholder  {
+        background: #e9ecef;
+      }
+    }
+  }
+
+  .vs__dropdown-menu {
+    overflow-x: hidden;
+    li {
+      max-width: 100%;
+      height: auto;
+      white-space: normal;
+      border-bottom: 1px solid $grey;
+      padding: 5px;
+    }
+  }
+
+  .vs__clear,
+  .vs__open-indicator {
+    fill: $blue;
+  }
+  .vs__dropdown-toggle {
+    padding: 0;
+  }
+  .vs__selected-options {
+    max-height: 29px;
+    min-height: 21px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: auto;
+    margin-bottom: auto;
+    padding: 0;
+  }
+  .vs__selected {
+    color: $blue;
+    font-family: "Poppins", sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 1px; 
+    white-space: nowrap;
+    width: 100%;
+    margin: 0;
+    z-index: 1;
+  }
+}
+
+.btn-tax {
+  &--before {
+    padding: 10px 0 !important;
+  }
+  &--height {
+    padding: 5px 25px !important;
+    &:disabled {
+      background-color: $blue-50;
+      border-color: $blue-50;
+    }
+  }
+  &--draft {
+    padding: 10px 19px !important;
+  }
+  &--submission {
+    padding: 10px 12px !important;
+  }
+  &--responsive {
+    @media screen and (max-width: $tablet) {
+      margin-left: 10px;
+      margin-right: 10px;
+    }
+  }
+}
+
+@media (max-width: $tablet) {
+  .mx-sm-20 {
+    margin-left: 20px !important;
+    margin-right: 20px !important;
+  }
+  .mb-sm-20 {
+    margin-bottom: 20px !important;
+  }
+  .ml-sm-0-mod {
+    margin-left: 0 !important;
+  }
+  .border--blue {
+    min-width: 420px;
+    &-step-3 {
+      min-width: 670px !important;
+    }
+  }
+  .mw-sm-tax- {
+    &710 {
+      min-width: 710px !important;
+    }
+  }
+}
+
+.w-20 {
+    width: 116px;
+}
+
+
+.multiple-selector {
+  .vs__search::placeholder,
+  .vs__dropdown-toggle,
+  .vs__dropdown-menu {
+    background: #fff;
+    border: none;
+    color: $blue;
+    text-transform: lowercase;
+    font-variant: small-caps;
+    border-radius: 0;
+  }
+
+  .vs__search {
+    position: relative !important;
+    height: 18px !important;
+    &::placeholder {
+      font-size: 18px;
+      font-weight: 500;
+    }
+  }
+
+  .vs__dropdown-menu {
+    overflow-x: hidden;
+    li {
+      max-width: 100%;
+      height: auto;
+      white-space: normal;
+      border-bottom: 1px solid $grey;
+      padding: 5px;
+    }
+  }
+
+  .vs__clear,
+  .vs__open-indicator {
+    fill: $blue;
+  }
+  .vs__selected-options {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-right: 10px;
+    height: 100%;
+  }
+  .vs__selected {
+    color: $blue;
+    border-color: $blue-20;
+    background-color: $blue-20;
+    border-radius: 1px;
+    font-family: "Poppins", sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    margin: 3px 0 !important;
+    padding: 3px 5px !important;
+    min-width: 235px;
+    z-index: 1;
+  }
+  .vs__deselect {
+    margin-left: auto !important;
+    margin-right: 4px;
+  }
+}
+
+.split-selector {
+  height: 42px;
+  &.vs--disabled {
+    background: #e9ecef;
+    opacity: 1;
+    .vs__dropdown-toggle {
+      background: #e9ecef;
+      opacity: 1;
+    }
+    .vs__open-indicator {
+      background: #e9ecef;
+    }
+    .vs__search {
+      background: #e9ecef;
+    }
+  }
+  .vs__search::placeholder,
+  .vs__dropdown-toggle,
+  .vs__dropdown-menu {
+    background: #fff;
+    border: none;
+    color: $blue;
+    text-transform: lowercase;
+    font-variant: small-caps;
+    border-radius: 0;
+  }
+  .vs__dropdown-toggle {
+    max-height: 22px;
+  }
+  .vs__search {
+    width: 100% !important;
+    &::placeholder {
+      font-size: 14px;
+      font-weight: 400;
+    }
+    :disabled {
+      background: #e9ecef;
+      &::placeholder  {
+        background: #e9ecef;
+      }
+    }
+  }
+
+  .vs__dropdown-menu {
+    overflow-x: hidden;
+    li {
+      max-width: 100%;
+      height: auto;
+      white-space: normal;
+      border-bottom: 1px solid $grey;
+      padding: 5px;
+    }
+  }
+
+  .vs__clear,
+  .vs__open-indicator {
+    fill: $blue;
+  }
+  .vs__selected-options {
+    max-height: 29px;
+    min-height: 15px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-right: 10px;
+  }
+  .vs__selected {
+    color: $blue;
+    font-family: "Poppins", sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    width: 100%;
+    z-index: 1;
+  }
+}

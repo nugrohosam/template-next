@@ -1,0 +1,189 @@
+.dashboard-admin {
+  margin-top: 43px;
+  &__time {
+    color: $black-50;
+    font-size: 15px;
+  }
+  &__content {
+    margin-top: 30px;
+  }
+  &__card {
+    background-color: $white;
+    padding: 30px;
+    @media screen and (max-width: $tablet) {
+      padding: 15px;
+    }
+    &-activity {
+      padding: 0 15px 0 30px;
+      @media screen and (max-width: $tablet) {
+        padding-left: 15px;
+        padding-right: 15px;
+      }
+    }
+    &-chart {
+      padding: 0 15px;
+    }
+    &--total {
+      border-right: 1px solid $blue-20;
+      padding-right: 30px !important;
+      @media screen and (max-width: $tablet) {
+        padding-right: 15px !important;
+        padding-left: 15px !important;
+        border-right: none;
+        padding-bottom: 20px;
+      }
+    }
+    &--chart {
+      display: flex;
+      align-items: center;
+      @media screen and (max-width: $tablet) {
+        flex-wrap: wrap;
+      }
+    }
+  }
+  &-activity {
+    &--day {
+      margin-left: 25px;
+    }
+    &--week {
+      margin-left: 14px;
+    }
+    &--month {
+      margin-left: 14px;
+    }
+    &__filter {
+      width: 24px;
+      height: 24px;
+      background-color: $blue-20;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 3px;
+      color: $blue-80;
+      &--active {
+        background-color: $blue !important;
+        color: $white !important;
+      }
+    }
+  }
+  &__chart {
+    margin-right: auto;
+    margin-left: auto;
+    &--total-supplier {
+      width: 162px;
+      height: 162px;
+      margin-top: 37px;
+      position: relative;
+      .total-supplier__text {
+        position: absolute;
+        top: 52px;
+        left: 45px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+    &--activity-supplier {
+      height: 200px;
+      @media screen and (max-width: $tablet) {
+        width: auto !important;
+      }
+      canvas {
+        height: 200px !important;
+        margin-top: 37px;
+        @media screen and (max-width: $tablet) {
+          width: auto !important;
+        }
+      }
+    }
+    &--invoice {
+      height: 248px;
+      @media screen and (max-width: $tablet) {
+        width: auto !important;
+      }
+      canvas {
+        height: 248px !important;
+        margin-top: 100px;
+        @media screen and (max-width: $tablet) {
+          width: auto !important;
+          margin-top: 30px;
+        }
+      }
+    }
+    &-label {
+      margin-top: 19px;
+    }
+    &-legend {
+      width: 16px;
+      height: 16px;
+    }
+    &--red {
+      background-color: $red;
+    }
+    &--yellow {
+      background-color: $yellow;
+    }
+    &--blue {
+      background-color: $blue;
+    }
+  }
+  &__reminder {
+    padding: 5.3px 0;
+    display: flex;
+    align-items: center;
+    &-background {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      justify-content: center;
+      &--red {
+        background-color: #f2d5d6;
+      }
+      &--blue {
+        background-color: #d3d8e4;
+      }
+      &--orange {
+        background-color: #fef3cc;
+      }
+    }
+    &__image {
+      width: 20px;
+      height: auto;
+    }
+    &-data {
+      margin-left: 23px;
+    }
+    &-alert {
+      width: 11px;
+      height: 11px;
+      border-radius: 20px;
+      &--red {
+        background-color: $red;
+      }
+      &--blue {
+        background-color: $blue;
+      }
+      &--yellow {
+        background-color: $yellow;
+      }
+    }
+  }
+  &--spacing {
+    margin-bottom: 24px;
+  }
+}
+
+.dashboard-filter {
+  display: flex;
+  .custom-select {
+    background: url(/images/icons/arrow_down.svg) no-repeat right 0.75rem
+      center/15px 14px !important;
+    border: none;
+    font-size: 12px;
+    color: $black;
+    &:focus {
+      border-color: transparent !important;
+      box-shadow: none !important;
+    }
+  }
+}

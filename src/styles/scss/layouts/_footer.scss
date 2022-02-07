@@ -1,0 +1,9 @@
+footer {
+    background: #f7f7f7;
+    &.footer__pama {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 40px 40px;
+    }
+}

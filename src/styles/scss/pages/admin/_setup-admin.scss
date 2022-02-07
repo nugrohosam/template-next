@@ -1,0 +1,139 @@
+.setup-detail {
+    background-color: $white;
+    padding: 40px;
+    &__section {
+        @media screen and (max-width: $tablet) {
+            flex-direction: column;
+        }
+        &--button {
+            display: flex;
+            @media screen and (max-width: $tablet) {
+                width: 250px;
+                margin-top: 10px;
+                margin-left: 0 !important;
+            }
+            &-responsive {
+                @media screen and (max-width: $tablet) {
+                    width: auto;
+                    flex-direction: column; 
+                }
+            }
+        }
+    }
+    &__title {
+        color: #2E384D;
+    }
+    &__subtitle {
+        color: $blue-80;
+        letter-spacing: normal
+    }
+    &__button {
+        width: 160px;
+        padding: 11px 6px;
+    }
+    &__tax-data {
+        margin-top: 26px;
+        &-detail {
+            padding: 20px;
+            background-color: #F7F7F7;
+            &__title {
+                color: $blue;
+                font-weight: normal;
+                font-size: 12px;
+            }
+            &__subtitle {
+                color: #141414;
+                border-bottom: 1px solid #D4DAEB;
+                font-size: 12px;
+                letter-spacing: 1px;
+                font-weight: normal;
+            }
+        }
+    }
+    &__data {
+        margin-top: 26px;
+        &-detail {
+            padding: 20px;
+            background-color: #F7F7F7;
+            &__title {
+                color: $blue;
+            }
+            &__subtitle {
+                color: #141414;
+                border-bottom: 1px solid #D4DAEB;
+                font-size: 12px;
+                letter-spacing: 1px;
+                font-weight: normal;
+            }
+        }
+    }
+    &__taxform-table {
+        &-title {
+            &--1 {
+                margin-left: 28px;
+                margin-right: 90px;
+            }
+            &--2 {
+                margin-right: 370px;
+            }
+        }
+        &-data {
+            padding: 26px 28px;
+            border: 1px solid $blue-50;
+            &--1 {
+                width: 115px;
+            }
+            &--2 {
+                width: 435px;
+            }
+            &--3 {
+                width: 400px;
+            }
+        }
+        &__title {
+            color: $blue;
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 1.13px;
+            &--black {
+                color: $black !important;
+            }
+        }
+    }
+    &__ppnform-table {
+        &-title {
+            &--1 {
+                margin-left: 28px;
+                margin-right: 90px;
+            }
+            &--2 {
+                margin-right: 376px;
+            }
+        }
+        &-data {
+            padding: 26px 28px;
+            border: 1px solid $blue-50;
+            &--1 {
+                width: 115px;
+            }
+            &--2 {
+                width: 435px;
+            }
+            &--3 {
+                width: 400px;
+            }
+        }
+        &__title {
+            color: $blue;
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 1.13px;
+            &--black {
+                color: $black !important;
+            }
+            &--link {
+                text-decoration: underline;
+            }
+        }
+    }
+}

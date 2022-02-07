@@ -1,0 +1,44 @@
+.tab-vertical{
+    margin-right: -15px;
+    margin-left: -15px;
+    & > .col,
+    & > [class*="col-"]{
+        padding-right: 15px;
+        padding-left: 15px;
+    }
+    .nav-pills{
+        background: $white;
+        padding: 40px 0;
+        position: relative;
+        .nav-link{
+            color: $blue;
+            background-color: $white;
+            position: relative;
+            padding: 12px 24px;
+            font-size: 12px;
+            line-height: 1.67;
+            letter-spacing: 0.5px;
+        }
+        .nav-link.active,
+        .show > .nav-link {
+            &:before {
+                content: "";
+                height: 100%;
+                width: 5px;
+                background-color: #F8C301;
+                position: absolute;
+                left: 0;
+                top: 0;
+            }
+        }
+    }
+    .tab-content {
+        &> .tab-pane{
+            background: $white;
+            padding: 40px;
+            .profile-detail__info--subtitle{
+                margin-bottom: 15px;
+            }
+        }
+    }
+}

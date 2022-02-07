@@ -1,0 +1,56 @@
+.bg-notfound {
+    background-color: #f7f7f7;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.notfound {
+    &__container {
+        width: 560px;
+        margin-top: 48px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    &__text404 {
+        font-size: 230px;
+        color: $blue-20;
+    }
+    &__image {
+        position: relative;
+        margin-bottom: 96px;
+        &-images {
+            position: absolute;
+            top: -15px;
+            width: 200px;
+            transform: translateX(50%);
+        }
+    }
+    &__header {
+        margin-bottom: 24px;
+    }
+    &__paragraph {
+        margin-bottom: 32px;
+        font-weight: 400;
+    }
+    &__button {
+        border-color: $blue;
+        background-color: #f7f7f7;
+        color: $blue;
+        padding: 10px 35px;
+        font-size: 14px;
+        font-weight: 400;
+        letter-spacing: 0.34px;
+        line-height: 21px;
+        border-radius: 0;
+        &:hover {
+            border-color: $blue;
+            background-color: $blue;
+            color: $white;
+        }
+    }
+}

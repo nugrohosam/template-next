@@ -1,0 +1,143 @@
+h1 {
+  font-style: normal;
+  font-weight: bold;
+  font-size: 42px;
+  line-height: 68px;
+  letter-spacing: 0.5px;
+}
+
+h2 {
+  font-style: normal;
+  font-weight: 500;
+  font-size: 26px;
+  line-height: 38px;
+  letter-spacing: 0.470588px;
+}
+
+h3 {
+  font-style: normal;
+  font-weight: 500;
+  font-size: 20px;
+  line-height: 32px;
+  letter-spacing: 0.5px;
+}
+
+h4 {
+  font-style: normal;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 24px;
+  letter-spacing: 0.5px;
+}
+
+h5 {
+  font-style: normal;
+  font-weight: bold;
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 0.5px;
+}
+
+p {
+  font-style: normal;
+  font-weight: normal;
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 0.5px;
+}
+
+span {
+  font-size: 11px;
+  line-height: 18px;
+}
+
+.text {
+  &__yellow {
+    color: $yellow !important;
+  }
+  &__blue {
+    color: $blue !important;
+  }
+  &__blue-80 {
+    color: $blue-80 !important;
+  }
+  &__blue-50 {
+    color: $blue-50 !important;
+  }
+  &__blue-20 {
+    color: $blue-20 !important;
+  }
+  &__black {
+    color: $black !important;
+  }
+  &__black-50 {
+    color: $black-50 !important;
+  }
+  &__grey {
+    color: $grey !important;
+  }
+  &__grey-50 {
+    color: $grey-50 !important;
+  }
+  &__grey-20 {
+    color: $grey-20 !important;
+  }
+  &__white {
+    color: $white !important;
+  }
+  &__red {
+    color: $red !important;
+  }
+  &__orange {
+    color: $orange !important;
+  }
+  &__regular {
+    font-weight: 400;
+  }
+  &__bolder {
+    font-weight: 500;
+  }
+  &__bold {
+    font-weight: 600;
+  }
+}
+
+.caption {
+  font-style: normal;
+  font-weight: normal;
+  font-size: 11px;
+  line-height: 18px;
+  letter-spacing: 1px;
+  &__blue-light {
+    font-weight: 500;
+    letter-spacing: 1.13px;
+    color: $blue-50;
+  }
+  &__blue {
+    letter-spacing: 1.12px;
+    color: $blue-80;
+  }
+  &__blue-darker {
+    color: $blue;
+    letter-spacing: 1.12px;
+  }
+  &__grey {
+    letter-spacing: 1.12px;
+    color: $grey;
+    font-weight: 500;
+  }
+  &__grey-80 {
+    color: #848587;
+  }
+  &__bold {
+    font-weight: 500;
+  }
+}
+
+.paragraph {
+  font-style: normal;
+  font-weight: normal;
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 0.5px;
+}

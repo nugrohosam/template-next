@@ -1,0 +1,631 @@
+.img-profile {
+  width: 100px;
+  height: 100px;
+  border-radius: 100%;
+  object-fit: cover;
+}
+
+.form-disabled {
+  color: rgb(84, 84, 84);
+  cursor: default;
+  background-color: rgb(235, 235, 228);
+  .input-group-append span {
+    background: transparent !important;
+  }
+  .input-group-prepend span {
+    background: transparent !important;
+  }
+}
+
+.input-group-prepend {
+  margin-right: 1px;
+}
+
+.input-group-text {
+  padding-left: 12px;
+}
+
+ul.ti-tags {
+  flex-wrap: nowrap !important;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+ul.ti-tags {
+  display: block !important;
+}
+
+li.ti-tag.ti-valid {
+  width: 275px;
+  @media screen and (max-width: $tablet) {
+    width: 190px;
+  }
+}
+
+.ti-content {
+  width: 245px;
+  @media screen and (max-width: $tablet) {
+    width: 160px;
+  }
+}
+
+.ti-tag-center {
+  width: 235px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  @media screen and (max-width: $tablet) {
+    width: 205px;
+  }
+}
+
+.form-control.vue-tags-input .ti-input .ti-tag,
+.custom-file.vue-tags-input .ti-input .ti-tag {
+  padding: 3px 5px !important;
+  margin: 2px !important;
+  margin-top: 5px !important;
+}
+
+.ti-new-tag-input {
+  color: $blue !important;
+  @extend p;
+  &::placeholder {
+    color: $black-50 !important;
+  }
+}
+
+.custom-file-label {
+  border: none;
+  margin-bottom: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 6px 140px 6px 42px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: auto;
+  height: 32px;
+  color: $blue;
+  &:after {
+    border-radius: 2px !important;
+    background-color: $blue;
+    padding: 8px 20px;
+    color: $white;
+    border-radius: 0;
+    right: 10px;
+    height: auto;
+  }
+}
+
+.form-control,
+.custom-file {
+  border: 1px solid $blue-50;
+  border-radius: 0;
+  height: auto;
+  padding: 12px 12px;
+  color: $blue;
+  @extend p;
+  &:hover,
+  &:focus {
+    border: 1px solid $blue;
+    color: $blue;
+    transition: none;
+    & ~ .input-group-append span {
+      border: 1px solid $blue !important;
+      color: $blue;
+      border-right: 0 !important;
+      .ic_lock,
+      .ic_user,
+      .ic_mail,
+      .ic_information,
+      .ic_attach,
+      .ic_search,
+      .ic_eye,
+      .ic_hide {
+        background-color: $blue;
+      }
+    }
+    & ~ .input-group-prepend span {
+      border: 1px solid $blue !important;
+      color: $blue;
+      border-left: 0 !important;
+      &.spinner-border {
+        display: inline-block;
+        width: 1rem;
+        height: 1rem;
+        vertical-align: text-bottom;
+        border: 0.25em solid currentColor;
+        border-right-color: transparent;
+        border-radius: 50%;
+      }
+      .ic_lock,
+      .ic_user,
+      .ic_mail,
+      .ic_information,
+      .ic_attach,
+      .ic_search,
+      .ic_eye,
+      .ic_hide {
+        background-color: $blue;
+      }
+    }
+  }
+  &.vue-tags-input {
+    .ti-input {
+      border: none;
+      padding: 0;
+      .ti-new-tag-input-wrapper {
+        padding: 0;
+        margin: 0;
+        .ti-new-tag-input {
+          @extend p;
+          letter-spacing: 0.34px;
+          color: $blue-50;
+        }
+      }
+      .ti-tag {
+        padding: 0 5px;
+        margin: 0 7px 0 2px;
+        border-radius: 0;
+        background: $blue-20;
+        color: $blue;
+        font-size: 12px;
+        letter-spacing: 0.75px;
+        line-height: 18px;
+        position: relative;
+        span {
+          background: $blue-20;
+          color: $blue;
+          font-size: 12px;
+          letter-spacing: 0.75px;
+          line-height: 18px;
+          border: none;
+          padding: 0px 10px;
+        }
+        i {
+          background: $blue-20;
+          color: $blue;
+          font-size: 14px;
+          letter-spacing: 0.75px;
+          z-index: 1;
+        }
+        &:before {
+          background: $blue-20;
+          display: block;
+          position: absolute;
+          top: -5px;
+          bottom: -5px;
+          left: 0;
+          right: 0;
+        }
+      }
+    }
+  }
+}
+
+.datepicker {
+  .form-control[readonly] {
+    background-color: inherit;
+    opacity: unset;
+  }
+  .form-control[disabled] {
+    background-color: #e9ecef;
+    opacity: 1;
+  }
+  &--offset {
+    .vdp-datepicker__calendar {
+      left: -55px;
+    }
+  }
+  &--offset-npwp {
+    .vdp-datepicker__calendar {
+      left: -113px;
+    }
+  }
+  .vdp-datepicker__clear-button {
+    position: absolute;
+    right: 15px;
+    top: 15px;
+    span {
+      font-size: 15px;
+    }
+  }
+}
+
+.react-datepicker-popper {
+  z-index: 1001 !important;
+}
+
+.ic_lock,
+.ic_user,
+.ic_mail,
+.ic_information,
+.ic_attach {
+  height: 16px;
+  width: 16px;
+  background-color: $blue-50;
+}
+
+.ic_eye,
+.ic_hide {
+  height: 22px;
+  width: 22px;
+  background-color: $blue-50;
+}
+
+.ic {
+  &_search {
+    height: 21px;
+    width: 21px;
+    background-color: $blue-50;
+  }
+  &_lock {
+    mask: url(/images/icons/ic_lock.svg) no-repeat center;
+  }
+  &_user {
+    mask: url(/images/icons/ic_user.svg) no-repeat center;
+  }
+  &_mail {
+    mask: url(/images/icons/ic_mail.svg) no-repeat center;
+  }
+  &_information {
+    mask: url(/images/icons/ic_information.svg) no-repeat center;
+  }
+  &_attach {
+    mask: url(/images/icons/ic_attach.svg) no-repeat center;
+  }
+  &_invoice_list {
+    mask: url(/images/icons/ic_invoice_list.svg) no-repeat center;
+  }
+  &_notification {
+    mask: url(/images/icons/ic_notification.svg) no-repeat center;
+  }
+  &_invite_sales {
+    mask: url(/images/icons/ic_invite_sales.svg) no-repeat center;
+  }
+  &_approval_finance {
+    mask: url(/images/icons/ic_approval_finance.svg) no-repeat center;
+  }
+  &_search {
+    mask: url(/images/icons/ic_search.svg) no-repeat center;
+  }
+  &_eye {
+    mask: url(/images/icons/ic_eye.svg) no-repeat center;
+  }
+  &_hide {
+    mask: url(/images/icons/ic_hide.svg) no-repeat center;
+  }
+}
+
+.form-group {
+  margin-bottom: 15px;
+  &.form-group--icon {
+    &.has-error {
+      border-left: 0 !important;
+    }
+    &.only--prepend {
+      .form-control,
+      .custom-file {
+        border-left: 1px solid $blue-50;
+        padding: 12px 42px 12px 12px;
+        &:hover,
+        &:focus {
+          border: 1px solid $blue;
+          color: $blue;
+          transition: none;
+        }
+        .custom-file {
+          padding: 5px 12px;
+        }
+      }
+    }
+    .form-control,
+    .custom-file {
+      border-left: 0;
+      padding: 12px 12px 12px 42px;
+    }
+    .custom-file {
+      padding: 5px 12px 5px 42px;
+    }
+    .input-group-append {
+      position: absolute;
+      z-index: 3;
+      top: 0;
+      bottom: 0;
+      span {
+        border-radius: 0;
+        border: 1px solid $blue-50;
+        background: $white;
+        border-right: 0;
+        padding-right: 0;
+      }
+    }
+    .input-group-prepend {
+      position: absolute;
+      z-index: 3;
+      top: 0;
+      bottom: 0;
+      right: 0;
+      span {
+        border-radius: 0;
+        border: 1px solid $blue-50;
+        background: $white;
+        border-left: 0;
+        &.spinner-border {
+          display: inline-block;
+          width: 1rem;
+          height: 1rem;
+          vertical-align: text-bottom;
+          border: 0.25em solid currentColor;
+          border-right-color: transparent;
+          border-radius: 50%;
+        }
+      }
+    }
+  }
+  &.has-error {
+    .form-control,
+    .custom-file {
+      border: 1px solid $danger !important;
+      color: $danger !important;
+      border-left: 1px solid $danger !important;
+      &:hover,
+      &:focus {
+        border: 1px solid $danger;
+        color: $danger;
+        & ~ .input-group-append span {
+          border: 1px solid $danger !important;
+          color: $danger;
+          border-right: 0 !important;
+          .ic_lock,
+          .ic_user,
+          .ic_mail,
+          .ic_information,
+          .ic_attach,
+          .ic_search,
+          .ic_eye,
+          .ic_hide {
+            background-color: $danger;
+          }
+        }
+        & ~ .input-group-prepend span {
+          border: 1px solid $danger !important;
+          color: $danger;
+          border-left: 0 !important;
+          &.spinner-border {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            vertical-align: text-bottom;
+            border: 0.25em solid currentColor;
+            border-right-color: transparent;
+            border-radius: 50%;
+            margin-top: 0.2rem;
+            margin-right: 0.2rem;
+          }
+          .ic_lock,
+          .ic_user,
+          .ic_mail,
+          .ic_information,
+          .ic_attach,
+          .ic_search,
+          .ic_eye,
+          .ic_hide {
+            background-color: $danger;
+          }
+        }
+      }
+    }
+    .group_select .vs__dropdown-toggle {
+      border: 1px solid $danger;
+      color: $danger;
+    }
+    span {
+      border: 1px solid $danger !important;
+      border-right: 0 !important;
+      &.vs__selected {
+        border: none !important;
+      }
+    }
+    .ic_lock,
+    .ic_user,
+    .ic_mail,
+    .ic_information,
+    .ic_attach,
+    .ic_search,
+    .ic_eye,
+    .ic_hide {
+      background-color: $danger;
+    }
+  }
+  &.has-notif {
+    .form-control,
+    .custom-file {
+      border: 1px solid $blue;
+      color: $blue;
+      &:hover,
+      &:focus {
+        border: 1px solid $blue;
+        color: $blue;
+        & ~ .input-group-append span {
+          border: 1px solid $blue !important;
+          color: $blue;
+          border-right: 0 !important;
+          .ic_lock,
+          .ic_user,
+          .ic_mail,
+          .ic_information,
+          .ic_attach,
+          .ic_search,
+          .ic_eye,
+          .ic_hide {
+            background-color: $blue;
+          }
+        }
+        & ~ .input-group-prepend span {
+          border: 1px solid $blue !important;
+          color: $blue;
+          border-left: 0 !important;
+          &.spinner-border {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            vertical-align: text-bottom;
+            border: 0.25em solid currentColor;
+            border-right-color: transparent;
+            border-radius: 50%;
+            margin-top: 0.2rem;
+            margin-right: 0.2rem;
+          }
+          .ic_lock,
+          .ic_user,
+          .ic_mail,
+          .ic_information,
+          .ic_attach,
+          .ic_search,
+          .ic_eye,
+          .ic_hide {
+            background-color: $blue;
+          }
+        }
+      }
+    }
+    .group_select .vs__dropdown-toggle {
+      border: 1px solid $blue;
+      color: $blue;
+    }
+    span {
+      border: 1px solid $blue !important;
+      border-right: 0 !important;
+    }
+    .ic_lock,
+    .ic_user,
+    .ic_mail,
+    .ic_information,
+    .ic_attach,
+    .ic_search,
+    .ic_eye,
+    .ic_hide {
+      background-color: $blue;
+    }
+  }
+}
+
+.dropdown-menu {
+  &--style {
+    border-radius: 4px;
+    background-color: $blue;
+    box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.35);
+    padding: 15px 15px;
+    min-width: 215px;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 10px;
+    &:after {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      top: -10px;
+      width: 0;
+      height: 0;
+      content: '';
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+      border-bottom: 10px solid $blue;
+    }
+  }
+}
+
+.notification-popup {
+  top: 15px;
+  right: 15px;
+}
+
+// DATEPICKER
+
+.vdp-datepicker {
+  input.form-control {
+    background: url(/images/icons/calendar.svg) no-repeat left;
+    background-size: 16px;
+    background-position: left 10px center;
+    padding-left: 36px;
+    &.has-error {
+      border: 1px solid $danger;
+      color: $danger;
+      &:hover,
+      &:focus {
+        border: 1px solid $danger;
+        color: $danger;
+      }
+    }
+  }
+}
+
+.v-select {
+  height: 42px;
+}
+.vs--searchable {
+  .vs__dropdown-toggle {
+    height: 100% !important;
+  }
+}
+.vs__search {
+  position: absolute;
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0;
+}
+.vs__dropdown-toggle {
+  display: flex;
+  align-items: center;
+}
+.vs__actions {
+  height: 100%;
+  padding: 4px 6px 4px 3px !important;
+}
+.vs--disabled {
+  background: #e9ecef;
+  opacity: 1;
+  .vs__dropdown-toggle {
+    background: #e9ecef !important;
+    opacity: 1;
+  }
+  .vs__open-indicator {
+    background: #e9ecef;
+  }
+  .vs__search {
+    background: #e9ecef;
+    &::placeholder {
+      background: #e9ecef !important;
+    }
+  }
+  .vs__dropdown-toggle {
+    padding: 0;
+  }
+  .vs__selected-options {
+    margin-top: auto;
+    margin-bottom: auto;
+    padding: 0;
+  }
+  .vs__selected {
+    z-index: 1;
+    margin: 0;
+  }
+}
+
+// ERRORS LINE
+.errors-feedback {
+  display: none;
+  padding: 0;
+  margin: 0;
+  &__list {
+    display: none;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 80%;
+    color: #dc3545;
+  }
+}

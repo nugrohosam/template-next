@@ -1,0 +1,22 @@
+// USAGE MIXIN // 
+// @include button(color, background-color, border-color, hover-color, hover-background-color, hover-border-color, disabled-color, disabled-background-color, disabled-border-color)
+
+.btn {
+  border-radius: 2px !important;
+  padding: 12px 24px;
+  &-orange {
+    @include button($white, $yellow, $yellow, $white, $yellow-darken, $yellow-darken, $white, $yellow-lighten, $yellow-lighten);
+  }
+  &-white {
+    @include button($blue, $white, $blue, $white, $blue, $blue, $blue-50, $white, $blue-50);
+  }
+  &-green {
+    @include button($white, $green, $green, $white, $green-darken, $green-darken, $white, $green-lighten, $green-lighten);
+  }
+  &-red {
+    @include button($white, $red, $red, $white, $red-darken, $red-darken, $white, $red-lighten, $red-lighten);
+  }
+  &-primary {
+    @include button($white, $blue, $blue, $white, $blue-darken, $blue-darken, $white, $blue-80, $blue-80);
+  }
+}

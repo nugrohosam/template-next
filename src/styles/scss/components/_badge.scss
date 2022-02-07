@@ -1,0 +1,47 @@
+.badge {
+    &--status {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+        font-size: 12px;
+        padding: 8px 20px;
+        font-weight: bold;
+        &-green {
+            background-color: #02AF6C30;
+            color: $black;
+        }
+        &-blue-sea {
+            background-color: #46B3E630;
+            color: $black;
+        }
+        &-blue {
+            background-color: #253B7830;
+            color: $black;
+        }
+        &-yellow {
+            background-color: #F8C30130;
+            color: $black;
+        }
+        &-black-50 {
+            background-color: #84858730;
+            color: $black;
+        }
+        &-red {
+            background-color: #BF2F3030;
+            color: $black;
+        }
+        &-orange {
+            background-color: #FF731530;
+            color: $black;
+        }
+        &-choco {
+            background-color: #A3563830;
+            color: $black;
+        }
+        &-pink {
+            background-color: #CC006630;
+            color: $black;
+        }
+    }
+}

@@ -1,0 +1,40 @@
+.page-item {
+  &:first-child .page-link span {
+    font-size: 25px !important;
+    padding-top: 0.45rem;
+    padding-bottom: 0.45rem;
+  }
+  &:last-child .page-link span {
+    font-size: 25px !important;
+    padding-top: 0.45rem;
+    padding-bottom: 0.45rem;
+  }
+  &:nth-child(2) .page-link span {
+    font-size: 25px;
+    padding-top: 0.45rem;
+    padding-bottom: 0.45rem;
+  }
+  &:nth-last-child(2) .page-link span {
+    font-size: 25px;
+    padding-top: 0.45rem;
+    padding-bottom: 0.45rem;
+  }
+  &.disabled {
+    .page-link {
+      color: $blue-50 !important;
+    }
+  }
+  &.active {
+    .page-link {
+      color: $blue;
+      background-color: $blue-20;
+    }
+  }
+}
+
+.page-link {
+  border: none !important;
+  padding: 0.85rem;
+  font-size: 15px !important;
+  color: $blue;
+}

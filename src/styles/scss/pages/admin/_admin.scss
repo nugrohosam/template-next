@@ -1,0 +1,169 @@
+.bg-admin {
+  padding: 5px 20px 40px 20px;
+  background-color: #f7f7f7;
+  min-height: calc(100vh - 202px);
+  @media screen and (max-width: $notebook) {
+    padding: 5px 0px 40px 0px;
+  }
+  &__sidebar-inactive {
+    padding: 5px 0 40px 0;
+  }
+}
+
+.header__admin {
+  margin: 40px 0 20px 0;
+  &--title {
+    color: #2e384d;
+  }
+}
+
+.section-admin {
+  padding: 0 25px !important;
+  &__approval-badge {
+    padding: 7px 17px;
+    font-size: 12px;
+    font-weight: normal;
+    letter-spacing: 1px;
+    &--green {
+      background-color: #cef0e3;
+      color: #02af6c;
+    }
+    &--red {
+      color: #bf2f30;
+      background-color: #f3d7d7;
+    }
+    &--orange {
+      color: #c89d01;
+      background-color: #fef4ce;
+    }
+  }
+}
+
+.admin__filter {
+  &--padding {
+    padding: 9.5px 13.5px 9.5px 23px;
+  }
+  &--title {
+    color: #8798ad;
+  }
+}
+
+.admin__search {
+  background-color: $white;
+  height: 59px;
+  &--padding {
+    padding: 10px;
+  }
+  &--field {
+    width: 278px;
+    &::placeholder {
+      color: $blue-50;
+    }
+  }
+}
+
+.admin__data {
+  background-color: $white;
+  &--active {
+    background-color: $blue-20;
+  }
+  @media screen and (max-width: $tablet) {
+    width: 1150px;
+  }
+  &--padding {
+    padding: 15px;
+  }
+  &--text {
+    color: $blue;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 1.13px;
+  }
+  &--text-80 {
+    color: $blue-80;
+    font-weight: normal;
+    font-size: 11px;
+  }
+  &--text-black {
+    color: $black;
+    font-weight: normal;
+    font-size: 11px;
+  }
+  &--sub-text {
+    color: $blue-80;
+    font-weight: 500;
+    font-size: 11px;
+    letter-spacing: 1.13px;
+  }
+}
+
+@media (max-width: $tablet) {
+  .mw-sm- {
+    &section__admin {
+      min-width: 1160px;
+    }
+    &section-detail {
+      min-width: 1115px;
+    }
+    &section__data {
+      min-width: 1200px;
+    }
+  }
+}
+
+.button-invitation {
+  margin-left: 33px;
+  padding: 9px 8px;
+}
+
+// Notification
+
+.notification-admin {
+  .dropdown-menu {
+    width: 421px;
+    right: 0;
+    border-radius: 0;
+    box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.16);
+    border: 1px solid $blue-20;
+    padding: 0;
+    border: 0;
+    @media screen and (max-width: 768px) {
+      position: absolute;
+      width: 295px;
+      right: -45px;
+    }
+  }
+  .dropdown-header {
+    background-color: $white;
+    color: $blue;
+  }
+  .dropdown-wrapper {
+    max-height: 420px;
+    overflow: auto;
+  }
+  .dropdown-item {
+    background-color: #eeeeee;
+    white-space: normal !important;
+  }
+}
+
+// Filter Data
+
+.data-filter {
+  display: flex;
+  align-items: center;
+  width: 19%;
+  .custom-select {
+    background: url(/images/icons/arrow_down.svg) no-repeat right 0.75rem
+      center/10px 14px !important;
+    border: none;
+    font-size: 12px;
+    color: $black;
+    background-color: $white !important;
+    width: 60px;
+    &:focus {
+      border-color: transparent !important;
+      box-shadow: none !important;
+    }
+  }
+}

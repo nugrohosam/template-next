@@ -1,0 +1,137 @@
+.breadcrumb-triangle {
+  list-style: none;
+  overflow: hidden;
+  padding: 0;
+  margin-bottom: 24px;
+  &-fivestep {
+    li {
+      width: 20% !important;
+    }
+  }
+  li {
+    width: 25%;
+    float: left;
+    a {
+      color: $black-50;
+      text-decoration: none;
+      padding: 17px 0 17px 55px;
+      background: $grey-20;
+      position: relative;
+      display: block;
+      font-size: 18px;
+      span {
+        font-size: 12px;
+        display: block;
+      }
+      &:after {
+        content: ' ';
+        display: block;
+        width: 0;
+        height: 0;
+        border-top: 50px solid transparent; /* Go big on the size, and let overflow hide */
+        border-bottom: 50px solid transparent;
+        border-left: 30px solid $grey-20;
+        position: absolute;
+        top: 50%;
+        margin-top: -50px;
+        left: 100%;
+        z-index: 2;
+      }
+      &:before {
+        content: ' ';
+        display: block;
+        width: 0;
+        height: 0;
+        border-top: 50px solid transparent; /* Go big on the size, and let overflow hide */
+        border-bottom: 50px solid transparent;
+        border-left: 30px solid $white;
+        position: absolute;
+        top: 50%;
+        margin-top: -50px;
+        margin-left: 3px;
+        left: 100%;
+        z-index: 1;
+      }
+      &.after-active {
+        color: $blue;
+        background: $blue-20;
+        &:after {
+          border-left-color: $blue-20;
+        }
+        &:not([href]):not([tabindex]):hover,
+        &:not([href]):not([tabindex]):focus {
+          color: $blue;
+        }
+      }
+      &.active {
+        color: $white;
+        background: $blue;
+        &:after {
+          border-left-color: $blue;
+        }
+        &:not([href]):not([tabindex]):hover,
+        &:not([href]):not([tabindex]):focus {
+          color: $white;
+        }
+      }
+    }
+    &:first-child {
+      a {
+        padding-left: 24px;
+      }
+    }
+    &:last-child {
+      a {
+        &:before,
+        &:after {
+          content: unset;
+          border: 0;
+        }
+      }
+    }
+  }
+}
+
+.breadcrumb-menu {
+  background-color: transparent;
+  li {
+    &::before {
+      color: $grey !important;
+      font-size: 12px;
+      line-height: 16px;
+    }
+    a {
+      color: $grey;
+      font-style: normal;
+      font-weight: normal;
+      font-size: 12px;
+      line-height: 16px;
+      letter-spacing: 0.5px;
+    }
+  }
+}
+
+nav {
+  .breadcrumb {
+    background-color: transparent;
+    align-items: center;
+    &--item {
+      &::before {
+        color: $grey !important;
+        font-size: 12px;
+        line-height: 16px;
+      }
+      &.active {
+        font-size: 12px !important;
+      }
+      a {
+        color: $grey;
+        font-style: normal;
+        font-weight: normal;
+        font-size: 12px;
+        line-height: 16px;
+        letter-spacing: 0.5px;
+      }
+    }
+  }
+}

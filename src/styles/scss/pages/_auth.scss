@@ -1,0 +1,194 @@
+.form-activation {
+    padding: 60px 100px;
+    background-color: $white;
+    &--title {
+        text-align: center;
+        margin-bottom: 45px;
+    }
+    &--description {
+        letter-spacing: 0.5px;
+        text-align: center;
+        margin-bottom: 40px;
+    }
+    &--link-orange {
+        color: $yellow;
+        font-weight: 500;
+        border-bottom: 1px solid $yellow;
+        &:hover {
+            color: $yellow;
+            text-decoration: none;
+        }
+    }
+    &__button-login {
+        width: 200px;
+    }
+    &--success {
+        margin: 40px 0;
+    }
+    .btn-orange {
+        padding: 10px 55px;
+        margin: 15px auto 60px;
+    }
+    .information {
+        &--help {
+            color: #2E384D;
+            letter-spacing: 0.5px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        &--suggest {
+            color: $black-50;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+            line-height: 22px;
+            text-align: center;
+            margin-bottom: 28px;
+        }
+        &--email {
+            @extend p;
+            color: $blue;
+            font-weight: 500;
+            text-align: center;
+            text-decoration: none;
+        }
+    }
+    @media screen and (max-width: $mobile) {
+        padding: 30px 35px;
+    }
+}
+
+.form-login {
+    padding: 45px 50px;
+    background: $white;
+    margin: 0 30px;
+    &--subtitle {
+        letter-spacing: 0.44px;
+        margin-bottom: 7px;
+        font-weight: normal;
+    }
+    &--title {
+        color: $blue;
+        font-size: 24px;
+        font-weight: 600;
+        letter-spacing: 0.59px;
+        line-height: 35px;
+        margin-bottom: 40px;
+    }
+    @media screen and (max-width: $mobile) {
+        margin: 0 0 30px;
+        padding: 35px;
+    }
+}
+
+.auth {
+    padding: 0 150px 0 30px;
+    .logo{
+        margin-top: 40px;
+        object-fit: unset;
+        width: 90px;
+        height: 100%;
+        @media screen and (max-width: $netbook) {
+            display: flex;
+            margin: auto;
+        }
+        @media screen and (max-width: $mobile) {
+            margin-top: 30px;
+        }
+    }
+    &-title {
+        margin: 50px 0 25px;
+        color: $white;
+        font-size: 48px;
+        font-weight: bold;
+        letter-spacing: 1.18px;
+        line-height: 57px;
+    }
+    &-description {
+        color: #ffffff;
+        font-size: 16px;
+        letter-spacing: 0.39px;
+        line-height: 25px;
+        @media screen and (max-width: $netbook) {
+            margin-bottom: 50px;
+        }
+    }
+    @media screen and (max-width: $netbook) {
+        padding: 0 30px;
+    }
+    @media screen and (max-width: $mobile) {
+        padding: 0 15px;
+    }
+}
+
+.action-margin {
+    margin: 30px 0 0;
+    .forgot-password {
+        color: #adb3c4;
+        font-size: 14px;
+        letter-spacing: 0.34px;
+        line-height: 21px;
+        text-decoration: underline;
+    }
+}
+
+.supplier-text {
+    display: block;
+    position: relative;
+    color: #adb3c4;
+    font-size: 12px;
+    letter-spacing: 0.29px;
+    line-height: 18px;
+    text-align: center;
+    &::after,
+    &::before {
+        content: "";
+        border: 1px dashed #d4daeb;
+        width: calc(50% - 50px);
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+    &::before {
+        left: 0;
+    }
+    &::after {
+        right: 0;
+    }
+}
+.supplier-margin {
+    margin: 30px 0;
+}
+.example-email{
+    padding: 7px 8.5px;
+    border: 1px solid $blue-20;
+    background-color: $white;
+    margin-bottom: 15px;
+    ul{
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        li{
+            display: inline-block;
+            img{
+                width: 12px;
+                height: auto;
+            }
+            &.email,
+            &.email-submit{
+                font-size: 8px;
+                letter-spacing: 0.5px;
+                line-height: 12px;
+                color: $blue;
+                padding: 2px 0;
+            }
+            &.email-submit{
+                background-color: $blue-20;
+                margin-left: 7px;
+            }
+            &.email{
+                margin-left: 8px;
+                border-right: 1px solid $blue;
+            }
+        }
+    }
+}

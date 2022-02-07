@@ -1,0 +1,275 @@
+// DEFAULT HEADER MODAL
+.modal {
+  .modal-content{
+    border: 0;
+    border-radius: 0;
+    .modal-header {
+      border: 0;
+      border-radius: 0;
+      padding: 16px 40px;
+      align-items: center;
+      background: transparent;
+      .modal-title {
+        font-style: normal;
+        font-weight: 500;
+        font-size: 16px;
+        line-height: 24px;
+        letter-spacing: 0.5px;
+        color: $blue;
+      }
+    }
+    .modal-body {
+      padding: 24px 40px;
+      @media screen and (max-width: $tablet) {
+        padding: 16px 30px;
+      }
+      .nav-tabs .nav-link {
+        font-size: 14px;
+        font-weight: 500;
+        color: $blue-50;
+        padding: 0.5rem 1rem 1rem 1rem;
+        border: none;
+        background-color: transparent;
+        &.active {
+          color: $blue;
+          border-bottom: 3px solid $yellow;
+          background-color: transparent !important;
+        }
+      }
+    }
+  }
+  .modal-warning {
+    p {
+      padding: 0px 65px;
+    }
+  } 
+  .modal-supplier{
+    .step-progress {
+      height: 5px;
+      background-color: #e2e8f9;
+      &--active {
+        background-color: $yellow !important;
+        &:after {
+          content: "";
+          width: 18px !important;
+          height: 18px !important;
+          background-color: $yellow !important;
+        }
+      }
+      &:after {
+        content: "";
+        width: 18px;
+        height: 18px;
+        background-color: #e2e8f9;
+        position: absolute;
+        border-radius: 2132px;
+        top: -7px;
+        right: -1px;
+      }
+    }
+    .detail-tax {
+      margin-top: 40px;
+      &__text {
+        padding-bottom: 10px;
+        border-bottom: 1px solid #d4daeb;
+      }
+    }
+    .tax-form {
+      margin-top: 30px;
+      &--next {
+        padding: 4px !important;
+      }
+      &__list {
+        background-color: #f0f3fc;
+        padding: 16px;
+        &-title {
+          color: $blue-80;
+          font-weight: normal;
+          font-size: 14px;
+        }
+        &-text {
+          color: $blue;
+          font-weight: normal;
+          font-size: 14px;
+        }
+        &--margin {
+          width: 310px !important;
+        }
+      }
+    }
+    .ppn-detail {
+      margin-top: 40px;
+      &__list {
+        background-color: #f0f3fc;
+        padding: 16px;
+        &-title {
+          color: $blue-80;
+          font-weight: normal;
+          font-size: 14px;
+        }
+        &-text {
+          color: $blue;
+          font-weight: normal;
+          font-size: 14px;
+        }
+        &--margin {
+          width: 310px !important;
+        }
+      }
+      &__next {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        cursor: pointer;
+      }
+      &__step {
+        display: flex;
+        margin-bottom: 24px;
+        &__stepper {
+          width: 16px;
+          height: 16px;
+          background-color: $blue;
+          border-radius: 100px;
+          &--yellow {
+            background-color: $yellow;
+          }
+        }
+        &__line {
+          height: 46px;
+          width: 1px;
+          border: 1px dashed $blue-50;
+          position: absolute;
+          bottom: -38px;
+        }
+      }
+    }
+  }
+}
+
+// ADMIN
+
+.modal {
+  .modal__invitation {
+    padding: 0 0 30px 0;
+    &--title {
+      margin-bottom: 20px;
+    }
+    &--subtitle {
+      padding: 0px 65px;
+      text-align: center;
+      color: $blue-80;
+    }
+    &__button {
+      padding: 6px 11px;
+      width: 116px;
+    }
+    &--margin {
+      margin-right: 15px;
+    }
+  }
+  .modal__invitation-fa {
+    padding: 40px 0;
+    &--title {
+      margin-bottom: 20px;
+    }
+    &--subtitle {
+      padding: 0px 65px;
+      text-align: center;
+      color: $blue-80;
+    }
+    &__button {
+      padding: 6px 11px;
+      width: 116px;
+    }
+    &--margin {
+      margin-right: 15px;
+    }
+  }
+  .modal__approval-supplier {
+    padding: 20px 0 40px 0;
+  }
+}
+
+////WHT
+.modal {
+  button.close {
+    font-weight: 100;
+    font-size: 40px;
+  }
+  .button--grouping {
+    margin-top: 115px;
+  }
+  .btn__wht {
+    padding: 11px 38px;
+    @media screen and (max-width: $tablet) {
+      padding: 11px 26px;
+    }
+  }
+  &#invoice-wht {
+    .modal-header {
+      border-bottom: 0;
+      // padding: 40px;
+      align-items: center !important;
+    }
+    .modal-title {
+      font-style: normal;
+      font-weight: 500;
+      font-size: 16px;
+      line-height: 24px;
+      letter-spacing: 0.5px;
+      color: $blue;
+    }
+    button.close {
+      font-weight: 100;
+      font-size: 40px;
+    }
+    .modal-body {
+      padding: 16px 40px;
+    }
+    .button--grouping {
+      margin-top: 115px;
+    }
+    .btn__wht {
+      padding: 11px 38px;
+      @media screen and (max-width: $tablet) {
+        padding: 11px 26px;
+      }
+    }
+  }
+}
+
+//// VALIDATION
+.modal {
+  &#error-modal {
+    .modal-header {
+      border-bottom: 0;
+      padding: 20px 40px;
+      align-items: center !important;
+    }
+    .modal-error {
+      &__text {
+        padding: 0 15px;
+        text-align: center;
+        color: $blue-80;
+      }
+    }
+  }
+}
+
+//// PAYMENT
+.modal {
+  &#mt-940 {
+    .modal-header {
+      border-bottom: 0;
+      padding: 16px 40px;
+      align-items: center !important;
+    }
+    .modal-body {
+      padding: 16px 40px;
+      @media screen and (max-width: $tablet) {
+        padding: 16px 32px;
+      }
+    }
+  }
+}

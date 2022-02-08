@@ -43,6 +43,7 @@ function Input<T>({
         control={control}
         defaultValue={defaultValue}
         render={({ field }) => (
+          // @ts-ignore
           <FormControl
             type={type}
             as={as}

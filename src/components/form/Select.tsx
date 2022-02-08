@@ -39,6 +39,7 @@ function Select<T>({
         control={control}
         defaultValue={defaultValue}
         render={({ field }) => (
+          // @ts-ignore
           <FormControl
             as="select"
             placeholder={placeholder}

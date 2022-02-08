@@ -1,7 +1,7 @@
 stages:
 - test
 
-test_develop:lint-and-build:
+test:lint-and-build:
   stage: test
   image: node:14.17.5
   tags: [dot]

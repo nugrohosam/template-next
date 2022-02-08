@@ -1,6 +1,6 @@
 ---
 - name: Deploy to PAMA Development Server
-  hosts: develop
+  hosts: pama-development
   remote_user: pama
   gather_facts: no
   vars:

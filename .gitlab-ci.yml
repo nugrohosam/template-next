@@ -1,0 +1,18 @@
+stages:
+- test
+
+test_develop:lint-and-build:
+  stage: test
+  image: node:14.17.5
+  tags: [dot]
+  cache:
+    paths:
+    - node_modules
+  rules:
+  - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^dev$|^develop$|^development$|^staging$|^master$|^main$|^dev-.*$|^develop-.*$|^development-.*$|^staging-.*$/i'
+  before_script:
+  - cp .env.example .env.local
+  - npm install
+  script:
+  - npm run lint
+  - npm run build

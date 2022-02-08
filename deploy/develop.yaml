@@ -1,0 +1,52 @@
+---
+- name: Deploy to PAMA Development Server
+  hosts: develop
+  remote_user: pama
+  gather_facts: no
+  vars:
+    deploy_path: /home/pama/capex-dev/capex-frontend
+    node_version: v14.17.5
+    git_repo: git@gitlab.com:pt-dot-internal/pama/capex-frontend.git
+    git_identity_key: /home/pama/.ssh/id_rsa
+    new_release: "{{ lookup('env', 'CI_COMMIT_SHA') | default('develop', true) }}"
+
+  tasks:
+  - name: Update remote repository using SSH key
+    ansible.builtin.git:
+      repo: "{{ git_repo }}"
+      dest: "{{ deploy_path }}"
+      version: "{{ new_release }}"
+      accept_hostkey: true
+      update: yes
+      force: yes
+      recursive: yes
+      key_file: "{{ git_identity_key }}"
+    when: git_identity_key|trim != ''
+
+  - name: Running NPM install
+    ansible.builtin.shell:
+      cmd: |
+        . ~/.nvm/nvm.sh
+        nvm use {{ node_version }}
+        npm install
+      chdir: "{{ deploy_path }}"
+
+  - name: Running NPM scripts
+    ansible.builtin.shell:
+      cmd: |
+        . ~/.nvm/nvm.sh
+        nvm use {{ node_version }}
+        npm run {{ item }}
+      chdir: "{{ deploy_path }}"
+    with_items:
+    - build
+
+  - name: Restart PM2 process
+    ansible.builtin.shell:
+      cmd: |
+        . ~/.nvm/nvm.sh
+        nvm use {{ node_version }}
+        pm2 start ecosystem.config.js --only {{ item }}
+      chdir: "{{ deploy_path }}"
+    with_items:
+    - capex-frontend-dev

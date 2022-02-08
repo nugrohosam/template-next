@@ -16,3 +16,17 @@ test:lint-and-build:
   script:
   - npm run lint
   - npm run build
+
+deploy_develop:
+  stage: deploy
+  image: quay.io/kudaliar032/ansible:2.9.21
+  tags: [dot]
+  only: [develop]
+  when: manual
+  environment:
+    name: develop
+    url: http://pamacapex-dev.dot.co.id
+  before_script:
+  - chmod 600 $ANSIBLE_KEY_FILE
+  script:
+  - ansible-playbook --private-key $ANSIBLE_KEY_FILE -i deploy/hosts -v deploy/develop.yaml

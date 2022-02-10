@@ -271,7 +271,7 @@ export default DataTable;
 type UsePaginateParamsReturn = {
   params: PaginateParams;
   setPageNumber: Dispatch<SetStateAction<number | string | undefined>>;
-  setPageSize: Dispatch<SetStateAction<number | undefined>>;
+  setPageSize: Dispatch<SetStateAction<number>>;
   setSearch: Dispatch<SetStateAction<string>>;
   setFilters: Dispatch<SetStateAction<Record<string, any> | undefined>>;
   setSortingRules: (sortingRules: SortingRule<unknown>[]) => void;
@@ -280,7 +280,7 @@ type UsePaginateParamsReturn = {
 
 export const usePaginateParams = (): UsePaginateParamsReturn => {
   const [pageNumber, setPageNumber] = useState<number | string>();
-  const [pageSize, setPageSize] = useState<number>();
+  const [pageSize, setPageSize] = useState<number>(10);
   const [search, setSearch] = useState<string>('');
   const [order, setOrder] = useState<string>();
   const [orderBy, setOrderBy] = useState<'asc' | 'desc'>();

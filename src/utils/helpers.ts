@@ -26,7 +26,7 @@ export const setValidationError = (
     console.log(validationMessages);
     if (validationMessages) {
       for (const key in validationMessages) {
-        setError(key as any, {
+        setError(snakeCaseToCamelCase(key) as string, {
           type: 'server',
           message: validationMessages[key],
         });
@@ -69,4 +69,13 @@ export const parseUndescoreString = (text: string) => {
 export const parseMenuToUrl = (menu: string) => {
   const url = menu === 'asset group' ? '/asset-group' : '/';
   return url;
+};
+
+// Ex: hello_world -> helloWorld
+export const snakeCaseToCamelCase = (str: string) => {
+  return str
+    .toLowerCase()
+    .replace(/([-_][a-z])/g, (group) =>
+      group.toUpperCase().replace('-', '').replace('_', '')
+    );
 };

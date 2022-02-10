@@ -42,16 +42,6 @@ export const updateAssetGroup = async (
   );
   return result.data.data;
 };
-// export const updateAssetGroup = async (
-//   idAssetGroup: string,
-//   data: AssetGroupForm
-// ): Promise<CoaHeader> => {
-//   const result = await axios.put<ResponseData<CoaHeader>>(
-//     `v1/coaheader/${coaHeaderId}`,
-//     data
-//   );
-//   return result.data.data;
-// };
 
 export const deleteAssetGroups = async (
   idAssetGroups: string[]

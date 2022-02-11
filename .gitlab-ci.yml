@@ -1,6 +1,6 @@
 stages:
-- test
-- deploy
+  - test
+  - deploy
 
 test:lint-and-build:
   stage: test
@@ -8,15 +8,15 @@ test:lint-and-build:
   tags: [dot]
   cache:
     paths:
-    - node_modules
+      - node_modules
   rules:
-  - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^dev$|^develop$|^development$|^staging$|^master$|^main$|^dev-.*$|^develop-.*$|^development-.*$|^staging-.*$/i'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME =~ /^dev$|^develop$|^development$|^staging$|^master$|^main$|^dev-.*$|^develop-.*$|^development-.*$|^staging-.*$/i'
   before_script:
-  - cp .env.example .env.local
-  - npm install
+    - cp .env.development .env.local
+    - npm install
   script:
-  - npm run lint
-  - npm run build
+    - npm run lint
+    - npm run build
 
 deploy_develop:
   stage: deploy
@@ -28,6 +28,6 @@ deploy_develop:
     name: develop
     url: http://pamacapex-dev.dot.co.id
   before_script:
-  - chmod 600 $ANSIBLE_KEY_FILE
+    - chmod 600 $ANSIBLE_KEY_FILE
   script:
-  - ansible-playbook --private-key $ANSIBLE_KEY_FILE -i deploy/hosts -v deploy/develop.yaml
+    - ansible-playbook --private-key $ANSIBLE_KEY_FILE -i deploy/hosts -v deploy/develop.yaml

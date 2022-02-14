@@ -67,7 +67,12 @@ export const parseUndescoreString = (text: string) => {
 };
 
 export const parseMenuToUrl = (menu: string) => {
-  const url = menu === 'asset group' ? '/asset-group' : '/';
+  const url =
+    menu === 'asset groups'
+      ? '/master-capex/asset-groups'
+      : menu === 'catalogs'
+      ? '/master-capex/catalogs'
+      : '/';
   return url;
 };
 

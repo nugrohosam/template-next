@@ -30,7 +30,7 @@ import * as yup from 'yup';
 const breadCrumb: PathBreadcrumb[] = [
   {
     label: 'Asset Group',
-    link: '/asset-group',
+    link: '/master-capex/asset-groups',
   },
   {
     label: 'Create',
@@ -77,7 +77,7 @@ const CreatePeriodActual: NextPage = () => {
       },
       {
         onSuccess: () => {
-          router.push('/asset-group');
+          router.push('/master-capex/asset-groups');
           toast('Data created!');
         },
         onError: (error) => {
@@ -115,7 +115,7 @@ const CreatePeriodActual: NextPage = () => {
   return (
     <DetailLayout
       paths={breadCrumb}
-      backButtonClick={() => router.replace(`/asset-group`)}
+      backButtonClick={() => router.replace(`/master-capex/asset-groups`)}
       title="Create Asset Group"
     >
       <Panel>

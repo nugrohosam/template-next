@@ -33,7 +33,7 @@ import * as yup from 'yup';
 const breadCrumb: PathBreadcrumb[] = [
   {
     label: 'Asset Group',
-    link: '/asset-group',
+    link: '/master-capex/asset-groups',
   },
   {
     label: 'Edit',
@@ -97,7 +97,7 @@ const EditPeriodActual: NextPage = () => {
         setMyPics(result);
       }
     })();
-  }, [dataHookAssetGroupDetail]);
+  }, [dataHookAssetGroupDetail, reset]);
 
   const mutation = useUpdateAssetGroup();
   const handleSubmitForm = (data: AssetGroupForm) => {
@@ -116,7 +116,7 @@ const EditPeriodActual: NextPage = () => {
       },
       {
         onSuccess: () => {
-          router.push('/asset-group');
+          router.push('/master-capex/asset-groups');
           toast('Data updated!');
         },
         onError: (error) => {
@@ -152,7 +152,7 @@ const EditPeriodActual: NextPage = () => {
   return (
     <DetailLayout
       paths={breadCrumb}
-      backButtonClick={() => router.replace(`/asset-group`)}
+      backButtonClick={() => router.replace(`/master-capex/asset-groups`)}
       title="Edit Asset Group"
     >
       {JSON.stringify(myPics)}

@@ -79,10 +79,16 @@ const AssetGroups: NextPage = () => {
         Cell: ({ cell }: CellProps<AssetGroup>) => {
           return (
             <div className="d-flex flex-column">
-              <Link href={`/asset-group/${cell.row.values.id}/detail`} passHref>
+              <Link
+                href={`/master-capex/asset-groups/${cell.row.values.id}/detail`}
+                passHref
+              >
                 <Button className="mb-1">Detail</Button>
               </Link>
-              <Link href={`/asset-group/${cell.row.values.id}/edit`} passHref>
+              <Link
+                href={`/master-capex/asset-groups/${cell.row.values.id}/edit`}
+                passHref
+              >
                 <Button className="mb-1">Edit</Button>
               </Link>
               <Button
@@ -101,9 +107,9 @@ const AssetGroups: NextPage = () => {
 
   return (
     <ContentLayout
-      title="Asset Group"
+      title="Asset Groups"
       controls={
-        <Link href={`/asset-group/create`} passHref>
+        <Link href={`/master-capex/asset-groups/create`} passHref>
           <Button>+ Create</Button>
         </Link>
       }

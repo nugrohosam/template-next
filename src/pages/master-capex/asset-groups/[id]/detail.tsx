@@ -15,7 +15,7 @@ import { Column } from 'react-table';
 const breadCrumb: PathBreadcrumb[] = [
   {
     label: 'Asset Group',
-    link: '/asset-group',
+    link: '/master-capex/asset-groups',
   },
   {
     label: 'Detail',
@@ -37,7 +37,7 @@ const DetailAccruedLastMonth: NextPage = () => {
   return (
     <DetailLayout
       paths={breadCrumb}
-      backButtonClick={() => router.replace('/asset-group')}
+      backButtonClick={() => router.replace('/master-capex/asset-groups')}
       title="Detail Asset Group"
     >
       <Panel>
@@ -74,7 +74,7 @@ const DetailAccruedLastMonth: NextPage = () => {
         <br />
         <Row>
           <Col lg={12}>
-            <Link href={`/asset-group/${id}/edit`} passHref>
+            <Link href={`/master-capex/asset-groups/${id}/edit`} passHref>
               <Button variant="primary" className="float-right">
                 Edit
               </Button>

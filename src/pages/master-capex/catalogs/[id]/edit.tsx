@@ -8,7 +8,7 @@ import DetailLayout from 'components/ui/DetailLayout';
 import { currencyOptions } from 'constants/currency';
 import { CatalogForm } from 'modules/catalog/entities';
 import { useFetchCatalogDetail, useUpdateCatalog } from 'modules/catalog/hook';
-import { useAssetGroupOtions } from 'modules/custom/useAssetGroupOptions';
+import { useAssetGroupOptions } from 'modules/custom/useAssetGroupOptions';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -39,7 +39,7 @@ const schema = yup.object().shape({
 });
 
 const EditCatalog: NextPage = () => {
-  const [assetGroupOtions] = useAssetGroupOtions();
+  const [assetGroupOptions] = useAssetGroupOptions();
 
   const router = useRouter();
   const id = router.query.id as string;
@@ -119,7 +119,7 @@ const EditCatalog: NextPage = () => {
                   name="assetGroupId"
                   control={control}
                   placeholder="Select Asset Group"
-                  options={assetGroupOtions}
+                  options={assetGroupOptions}
                   error={errors.assetGroupId?.message}
                 />
               </FormGroup>

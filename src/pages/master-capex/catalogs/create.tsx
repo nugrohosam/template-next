@@ -8,7 +8,7 @@ import DetailLayout from 'components/ui/DetailLayout';
 import { currencyOptions } from 'constants/currency';
 import { CatalogForm } from 'modules/catalog/entities';
 import { useCreateCatalog } from 'modules/catalog/hook';
-import { useAssetGroupOtions } from 'modules/custom/useAssetGroupOptions';
+import { useAssetGroupOptions } from 'modules/custom/useAssetGroupOptions';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
@@ -39,7 +39,7 @@ const schema = yup.object().shape({
 });
 
 const CreateCatalog: NextPage = () => {
-  const [assetGroupOtions] = useAssetGroupOtions();
+  const [assetGroupOptions] = useAssetGroupOptions();
 
   const router = useRouter();
   const {
@@ -100,7 +100,7 @@ const CreateCatalog: NextPage = () => {
                   defaultValue=""
                   control={control}
                   placeholder="Select Asset Group"
-                  options={assetGroupOtions}
+                  options={assetGroupOptions}
                   error={errors.assetGroupId?.message}
                 />
               </FormGroup>
@@ -150,28 +150,33 @@ const CreateCatalog: NextPage = () => {
           </Row>
           <Row>
             <Col lg={6}>
-              <FormLabel>Price (IDR)</FormLabel>
-              <Input
-                name="priceInIdr"
-                control={control}
-                defaultValue=""
-                type="number"
-                placeholder="Price (IDR)"
-                error={errors.priceInIdr?.message}
-                disabled={idrDisabled}
-              />
+              <FormGroup>
+                <FormLabel>Price (IDR)</FormLabel>
+                <Input
+                  name="priceInIdr"
+                  control={control}
+                  defaultValue=""
+                  type="number"
+                  placeholder="Price (IDR)"
+                  error={errors.priceInIdr?.message}
+                  disabled={idrDisabled}
+                  // onChange={handleIdrPrice}
+                />
+              </FormGroup>
             </Col>
             <Col lg={6}>
-              <FormLabel>Price (USD)</FormLabel>
-              <Input
-                name="priceInUsd"
-                control={control}
-                defaultValue="10"
-                type="number"
-                placeholder="Price (USD)"
-                error={errors.priceInUsd?.message}
-                disabled={usdDisabled}
-              />
+              <FormGroup>
+                <FormLabel>Price (USD)</FormLabel>
+                <Input
+                  name="priceInUsd"
+                  control={control}
+                  defaultValue="10"
+                  type="number"
+                  placeholder="Price (USD)"
+                  error={errors.priceInUsd?.message}
+                  disabled={usdDisabled}
+                />
+              </FormGroup>
             </Col>
           </Row>
 

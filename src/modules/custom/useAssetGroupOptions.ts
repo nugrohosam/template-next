@@ -2,7 +2,7 @@ import { SelectOption } from 'components/form/SingleSelect';
 import { useFetchAssetGroups } from 'modules/assetGroup/hook';
 import { useEffect, useMemo, useState } from 'react';
 
-export const useAssetGroupOtions = () => {
+export const useAssetGroupOptions = () => {
   const [selectOptions, setSelectOptions] = useState<SelectOption[]>([]);
 
   const assetGroupHook = useFetchAssetGroups({

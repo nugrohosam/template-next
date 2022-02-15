@@ -7,12 +7,11 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { Button, Col, Row } from 'react-bootstrap';
-import { Column } from 'react-table';
 
 const breadCrumb: PathBreadcrumb[] = [
   {
     label: 'Catalog',
-    link: '/catalog',
+    link: '/master-capex/catalogs',
   },
   {
     label: 'Detail',
@@ -32,7 +31,7 @@ const CatalogDetail: NextPage = () => {
   return (
     <DetailLayout
       paths={breadCrumb}
-      backButtonClick={() => router.replace('/catalog')}
+      backButtonClick={() => router.replace('/master-capex/catalogs')}
       title="Detail Catalog"
     >
       <Panel>
@@ -88,7 +87,7 @@ const CatalogDetail: NextPage = () => {
         <br />
         <Row>
           <Col lg={12}>
-            <Link href={`/catalog/${id}/edit`} passHref>
+            <Link href={`/master-capex/catalogs/${id}/edit`} passHref>
               <Button variant="primary" className="float-right">
                 Edit
               </Button>

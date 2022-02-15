@@ -5,12 +5,13 @@ import SingleSelect from 'components/form/SingleSelect';
 import { PathBreadcrumb } from 'components/ui/Breadcrumb';
 import LoadingButton from 'components/ui/Button/LoadingButton';
 import DetailLayout from 'components/ui/DetailLayout';
+import { currencyOptions } from 'constants/currency';
 import { CatalogForm } from 'modules/catalog/entities';
-import { useFetchCatalogDetail, useUpdateCatalog } from 'modules/catalog/hook';
+import { useCreateCatalog } from 'modules/catalog/hook';
 import { useAssetGroupOtions } from 'modules/custom/useAssetGroupOptions';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
-import { useEffect } from 'react';
+import { useState } from 'react';
 import { Col, Form, FormGroup, FormLabel, Row } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
@@ -20,10 +21,10 @@ import * as yup from 'yup';
 const breadCrumb: PathBreadcrumb[] = [
   {
     label: 'Catalog',
-    link: '/catalog',
+    link: '/master-capex/catalogs',
   },
   {
-    label: 'Edit',
+    label: 'Create',
     active: true,
   },
 ];
@@ -37,61 +38,56 @@ const schema = yup.object().shape({
   priceInUsd: yup.mixed().required(),
 });
 
-const EditCatalog: NextPage = () => {
+const CreateCatalog: NextPage = () => {
   const [assetGroupOtions] = useAssetGroupOtions();
 
   const router = useRouter();
-  const id = router.query.id as string;
-
   const {
     handleSubmit,
     control,
     setError,
-    setValue,
     formState: { errors, isValid },
   } = useForm<CatalogForm>({
     mode: 'onChange',
     resolver: yupResolver(schema),
-    delayError: 500,
   });
 
-  const dataHook = useFetchCatalogDetail(id);
+  const mutation = useCreateCatalog();
 
-  useEffect(() => {
-    setTimeout(() => {
-      setValue('assetGroupId', dataHook?.data?.assetGroup.id as string);
-      setValue('primaryCurrency', dataHook?.data?.primaryCurrency as string);
-    }, 100);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dataHook?.data?.primaryCurrency]);
-
-  const mutation = useUpdateCatalog();
   const handleSubmitForm = (data: CatalogForm) => {
-    console.log(data);
-    mutation.mutate(
-      { idCatalog: id, data },
-      {
-        onSuccess: () => {
-          // router.push(`/catalog/${id}/detail`);
-          console.log('updated', data);
-          toast('Data Updated!');
-        },
-        onError: (error) => {
-          console.log('Failed to update data', error);
-          setValidationError(error, setError);
-          toast(error.message, { autoClose: false });
-          showErrorMessage(error);
-        },
-      }
-    );
+    mutation.mutate(data, {
+      onSuccess: () => {
+        router.push(`/master-capex/catalogs`);
+        toast('Data Created!');
+      },
+      onError: (error) => {
+        console.log('Failed to create data', error);
+        setValidationError(error, setError);
+        toast(error.message, { autoClose: false });
+        showErrorMessage(error);
+      },
+    });
+  };
+
+  const [idrDisabled, setIdrDisabled] = useState(false);
+  const [usdDisabled, setUsdDisabled] = useState(true);
+
+  const handleCurrencyChange = (value: string | number | boolean) => {
+    if (value == 'USD') {
+      setUsdDisabled(false);
+      setIdrDisabled(true);
+    } else {
+      setUsdDisabled(true);
+      setIdrDisabled(false);
+    }
+    return currencyOptions;
   };
 
   return (
     <DetailLayout
       paths={breadCrumb}
-      backButtonClick={() => router.replace(`/catalog`)}
-      title="Edit Catalog"
-      loading={dataHook.isLoading}
+      backButtonClick={() => router.replace(`/master-capex/catalogs`)}
+      title="Create Catalog"
     >
       <Panel>
         <Form onSubmit={handleSubmit(handleSubmitForm)}>
@@ -100,8 +96,8 @@ const EditCatalog: NextPage = () => {
               <FormGroup>
                 <FormLabel>Asset Group</FormLabel>
                 <SingleSelect
-                  defaultValue={dataHook.data?.assetGroup.id}
                   name="assetGroupId"
+                  defaultValue=""
                   control={control}
                   placeholder="Select Asset Group"
                   options={assetGroupOtions}
@@ -115,7 +111,7 @@ const EditCatalog: NextPage = () => {
                 <Input
                   name="detail"
                   control={control}
-                  defaultValue={dataHook?.data?.detail}
+                  defaultValue=""
                   type="text"
                   placeholder="Detail"
                   error={errors.detail?.message}
@@ -130,12 +126,10 @@ const EditCatalog: NextPage = () => {
                 <SingleSelect
                   name="primaryCurrency"
                   control={control}
-                  defaultValue={dataHook?.data?.primaryCurrency}
-                  options={[
-                    { label: 'IDR', value: 'IDR' },
-                    { label: 'USD', value: 'USD' },
-                  ]}
-                  placeholder="PrimaruCurrency"
+                  defaultValue="IDR"
+                  options={currencyOptions}
+                  placeholder="Primary Currency"
+                  onChange={(e) => handleCurrencyChange(e.value)}
                 />
               </FormGroup>
             </Col>
@@ -143,7 +137,7 @@ const EditCatalog: NextPage = () => {
               <FormGroup>
                 <FormLabel>Currency Rate</FormLabel>
                 {/* <Input
-                  name="currencyRate"
+                  name=""
                   control={control}
                   // TODO: get from API
                   defaultValue="14000"
@@ -160,10 +154,11 @@ const EditCatalog: NextPage = () => {
               <Input
                 name="priceInIdr"
                 control={control}
-                defaultValue={dataHook?.data?.priceInIdr}
+                defaultValue=""
                 type="number"
                 placeholder="Price (IDR)"
                 error={errors.priceInIdr?.message}
+                disabled={idrDisabled}
               />
             </Col>
             <Col lg={6}>
@@ -171,22 +166,23 @@ const EditCatalog: NextPage = () => {
               <Input
                 name="priceInUsd"
                 control={control}
-                defaultValue={dataHook?.data?.priceInUsd}
+                defaultValue="10"
                 type="number"
                 placeholder="Price (USD)"
                 error={errors.priceInUsd?.message}
+                disabled={usdDisabled}
               />
             </Col>
           </Row>
 
-          <Col lg={12} className="d-flex pr-sm-0 justify-content-end">
+          <Col lg={12} className="d-flex pr-sm-0 mt-4 justify-content-end">
             <LoadingButton
               variant="primary"
               type="submit"
               disabled={!isValid || mutation.isLoading}
               isLoading={mutation.isLoading}
             >
-              Update
+              Create
             </LoadingButton>
           </Col>
         </Form>
@@ -195,4 +191,4 @@ const EditCatalog: NextPage = () => {
   );
 };
 
-export default EditCatalog;
+export default CreateCatalog;

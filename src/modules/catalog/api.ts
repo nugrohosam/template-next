@@ -22,7 +22,7 @@ export const fetchCatalogDetail = async (
   idCatalog: string
 ): Promise<Catalog> => {
   const result = await axios.get<ResponseData<Catalog>>(
-    `v1/catalogs/${idCatalog}/detail`
+    `v1/catalogs/${idCatalog}`
   );
   return result.data.data;
 };
@@ -38,9 +38,9 @@ export const updateCatalog = async (
   return result.data.data;
 };
 
-export const deleteCatalogs = async (idCatalog: string[]): Promise<null> => {
+export const deleteCatalogs = async (idCatalogs: string[]): Promise<null> => {
   const result = await axios.patch<ResponseData<null>>(`v1/catalogs`, {
-    idCatalog,
+    idCatalogs,
   });
   return result.data.data;
 };

@@ -1,7 +1,6 @@
 import LoadingButton from 'components/ui/Button/LoadingButton';
 import ContentLayout from 'components/ui/ContentLayout';
 import DataTable, { usePaginateParams } from 'components/ui/Table/DataTable';
-import { AssetGroup } from 'modules/assetGroup/entities';
 import { Catalog } from 'modules/catalog/entities';
 import { useDeleteCatalogs, useFetchCatalogs } from 'modules/catalog/hook';
 import { NextPage } from 'next';
@@ -29,7 +28,6 @@ const CatalogsIndex: NextPage = () => {
         setSelectedRow({});
         dataHook.refetch();
         toast('Data Deleted!');
-        console.log('delete', ids);
       },
       onError: (error) => {
         console.log('Failed to delete data', error);
@@ -41,8 +39,10 @@ const CatalogsIndex: NextPage = () => {
 
   const handleMultipleDeleteCatalogs = () => {
     const ids = getAllIds(selectedRow, dataHook.data) as string[];
-    if (ids?.length > 0 && confirm('Delete selected data?')) {
-      deleteCatalog(ids);
+    if (confirm('Delete selected data?')) {
+      if (ids?.length > 0) {
+        deleteCatalog(ids);
+      }
     }
   };
 
@@ -93,10 +93,16 @@ const CatalogsIndex: NextPage = () => {
         Cell: ({ cell }: CellProps<Catalog>) => {
           return (
             <div className="d-flex flex-column">
-              <Link href={`/catalog/${cell.row.values.id}/detail`} passHref>
+              <Link
+                href={`/master-capex/catalogs/${cell.row.values.id}/detail`}
+                passHref
+              >
                 <Button className="mb-1">Detail</Button>
               </Link>
-              <Link href={`/catalog/${cell.row.values.id}/edit`} passHref>
+              <Link
+                href={`/master-capex/catalogs/${cell.row.values.id}/edit`}
+                passHref
+              >
                 <Button className="mb-1">Edit</Button>
               </Link>
               <Button
@@ -122,7 +128,7 @@ const CatalogsIndex: NextPage = () => {
     <ContentLayout
       title="Catalog"
       controls={
-        <Link href={`/catalog/create`} passHref>
+        <Link href={`/master-capex/catalogs/create`} passHref>
           <Button>+ Create</Button>
         </Link>
       }

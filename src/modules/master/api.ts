@@ -1,6 +1,7 @@
 import { Paginate, PaginateParams, ResponseData } from 'modules/common/types';
 import axios from 'utils/axios';
 import axiosEwgp from 'utils/axiosEwgp';
+import axiosNfs from 'utils/axiosNfs';
 
 import { District, ExpenseElement } from './entities';
 
@@ -21,7 +22,7 @@ export const fetchExpenseElements = async (
 export const fetchDistricts = async (
   params: PaginateParams
 ): Promise<Paginate<District>> => {
-  const result = await axiosEwgp.get<ResponseData<Paginate<District>>>(
+  const result = await axiosNfs.get<ResponseData<Paginate<District>>>(
     `v1/districts`,
     {
       params,
@@ -33,7 +34,7 @@ export const fetchDistricts = async (
 export const fetchDepartments = async (
   params: PaginateParams
 ): Promise<Paginate<District>> => {
-  const result = await axios.get<ResponseData<Paginate<District>>>(
+  const result = await axiosNfs.get<ResponseData<Paginate<District>>>(
     `v1/departments`,
     {
       params,

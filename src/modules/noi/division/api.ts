@@ -1,5 +1,4 @@
 import { Paginate, PaginateParams, ResponseData } from 'modules/common/types';
-import axios from 'utils/axios';
 import axiosNfs from 'utils/axiosNfs';
 
 import { NoiDivision } from './entities';

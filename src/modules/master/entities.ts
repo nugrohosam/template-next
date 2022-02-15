@@ -5,7 +5,15 @@ export type ExpenseElement = {
 };
 
 export type District = {
-  districtCode: string;
+  id: string;
+  address: string;
+  area: string;
+  autoApproveHc: boolean;
+  code: string;
+  districtName: string;
+  group: string;
+  status: string;
+  createdAt: string;
 };
 
 export type Department = {

@@ -6,12 +6,11 @@ import { PathBreadcrumb } from 'components/ui/Breadcrumb';
 import LoadingButton from 'components/ui/Button/LoadingButton';
 import DetailLayout from 'components/ui/DetailLayout';
 import { periodeTypeOptions, periodeYearOptions } from 'constants/period';
-import { BudgetPlanForm } from 'modules/budget-plan/entities';
+import { BudgetPlanForm } from 'modules/budgetPlan/entities';
 import {
-  useCreateBudgetPlan,
   useFetchBudgetPlanDetail,
   useUpdateBudgetPlan,
-} from 'modules/budget-plan/hook';
+} from 'modules/budgetPlan/hook';
 import { useDecodeToken } from 'modules/custom/useDecodeToken';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';

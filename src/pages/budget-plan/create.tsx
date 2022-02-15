@@ -6,8 +6,8 @@ import { PathBreadcrumb } from 'components/ui/Breadcrumb';
 import LoadingButton from 'components/ui/Button/LoadingButton';
 import DetailLayout from 'components/ui/DetailLayout';
 import { periodeTypeOptions, periodeYearOptions } from 'constants/period';
-import { BudgetPlanForm } from 'modules/budget-plan/entities';
-import { useCreateBudgetPlan } from 'modules/budget-plan/hook';
+import { BudgetPlanForm } from 'modules/budgetPlan/entities';
+import { useCreateBudgetPlan } from 'modules/budgetPlan/hook';
 import { useDecodeToken } from 'modules/custom/useDecodeToken';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
@@ -90,13 +90,27 @@ const CreatePeriodActual: NextPage = () => {
           <Row>
             <Col lg={6}>
               <FormGroup>
-                <FormLabel>Division</FormLabel>
+                <FormLabel>District</FormLabel>
+                <Input
+                  name="districtCode"
+                  control={control}
+                  defaultValue=""
+                  type="text"
+                  placeholder="District"
+                  disabled
+                  error={errors.districtCode?.message}
+                />
+              </FormGroup>
+            </Col>
+            <Col lg={6}>
+              <FormGroup>
+                <FormLabel>Divisi</FormLabel>
                 <Input
                   name="divisionCode"
                   control={control}
                   defaultValue=""
                   type="text"
-                  placeholder="Division"
+                  placeholder="Divisi"
                   disabled
                   error={errors.divisionCode?.message}
                 />
@@ -116,33 +130,9 @@ const CreatePeriodActual: NextPage = () => {
                 />
               </FormGroup>
             </Col>
-            <Col lg={6}>
-              <FormGroup>
-                <FormLabel>District</FormLabel>
-                <Input
-                  name="districtCode"
-                  control={control}
-                  defaultValue=""
-                  type="text"
-                  placeholder="District"
-                  disabled
-                  error={errors.districtCode?.message}
-                />
-              </FormGroup>
-            </Col>
-            <Col lg={6}>
-              <FormGroup>
-                <FormLabel>Periode</FormLabel>
-                <SingleSelect
-                  name="periodType"
-                  control={control}
-                  defaultValue=""
-                  placeholder="Periode"
-                  options={periodeTypeOptions}
-                  error={errors.periodType?.message}
-                />
-              </FormGroup>
-            </Col>
+          </Row>
+
+          <Row>
             <Col lg={6}>
               <FormGroup>
                 <FormLabel>Tahun</FormLabel>
@@ -153,6 +143,19 @@ const CreatePeriodActual: NextPage = () => {
                   placeholder="Year"
                   options={periodeYearOptions}
                   error={errors.periodYear?.message}
+                />
+              </FormGroup>
+            </Col>
+            <Col lg={6}>
+              <FormGroup>
+                <FormLabel>Semester</FormLabel>
+                <SingleSelect
+                  name="periodType"
+                  control={control}
+                  defaultValue=""
+                  placeholder="Semester"
+                  options={periodeTypeOptions}
+                  error={errors.periodType?.message}
                 />
               </FormGroup>
             </Col>

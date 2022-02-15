@@ -152,80 +152,80 @@ const CreatePeriodActual: NextPage = () => {
           <br />
           <Row className="mb-3">
             <Col lg={12}>
-              <Row>
-                <Table className="table-admin table-inherit" responsive>
-                  <thead>
-                    <tr>
-                      <th>District</th>
-                      <th>Departement</th>
-                      <th>Action</th>
+              <Table className="table-admin table-inherit" responsive>
+                <thead>
+                  <tr>
+                    <th>District</th>
+                    <th>Departement</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {myPics.map((myPic, index) => (
+                    <tr key={index}>
+                      <td>
+                        <Select
+                          instanceId="districtCode"
+                          placeholder="Choose District"
+                          options={districtOptions}
+                          value={districtOptions.find(
+                            (val) => val.value === myPic.districtCode
+                          )}
+                          styles={{
+                            ...customStyles(),
+                            menu: () => ({
+                              zIndex: 99,
+                            }),
+                          }}
+                          onChange={(val) =>
+                            districtChoosed(val?.value as string, index)
+                          }
+                        />
+                      </td>
+                      <td>
+                        <Select
+                          instanceId="departementCode"
+                          placeholder="Choose Departement"
+                          options={myPic.options}
+                          value={myPic.options.find(
+                            (val) => val.value === myPic.departementCode
+                          )}
+                          styles={{
+                            ...customStyles(),
+                            menu: () => ({
+                              zIndex: 99,
+                            }),
+                          }}
+                          onChange={(val) => {
+                            setMyPics((prev) => {
+                              prev[index].departementCode =
+                                (val?.value as string) || '';
+                              return prev;
+                            });
+                          }}
+                        />
+                      </td>
+                      <td>
+                        <Button
+                          variant="red"
+                          size="sm"
+                          className="w-100"
+                          onClick={() =>
+                            setMyPics((prev) =>
+                              prev.filter((item, i) => i !== index)
+                            )
+                          }
+                        >
+                          Delete
+                        </Button>
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {myPics.map((myPic, index) => (
-                      <tr key={index}>
-                        <td>
-                          <Select
-                            instanceId="districtCode"
-                            placeholder="Choose District"
-                            options={districtOptions}
-                            value={districtOptions.find(
-                              (val) => val.value === myPic.districtCode
-                            )}
-                            styles={{
-                              ...customStyles(),
-                              menu: () => ({
-                                zIndex: 99,
-                              }),
-                            }}
-                            onChange={(val) =>
-                              districtChoosed(val?.value as string, index)
-                            }
-                          />
-                        </td>
-                        <td>
-                          <Select
-                            instanceId="departementCode"
-                            placeholder="Choose Departement"
-                            options={myPic.options}
-                            value={myPic.options.find(
-                              (val) => val.value === myPic.departementCode
-                            )}
-                            styles={{
-                              ...customStyles(),
-                              menu: () => ({
-                                zIndex: 99,
-                              }),
-                            }}
-                            onChange={(val) => {
-                              setMyPics((prev) => {
-                                prev[index].departementCode =
-                                  (val?.value as string) || '';
-                                return prev;
-                              });
-                            }}
-                          />
-                        </td>
-                        <td>
-                          <Button
-                            variant="red"
-                            size="sm"
-                            className="w-100"
-                            onClick={() =>
-                              setMyPics((prev) =>
-                                prev.filter((item, i) => i !== index)
-                              )
-                            }
-                          >
-                            Delete
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </Table>
-              </Row>
+                  ))}
+                </tbody>
+              </Table>
+            </Col>
 
+            <Col lg={12}>
               <Button
                 variant="primary"
                 className="mt-4"

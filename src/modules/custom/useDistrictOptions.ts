@@ -13,8 +13,8 @@ export const useDistrictOptions = () => {
   const districtOptions = useMemo<SelectOption[]>(
     () =>
       districtHook.data?.items.map((item) => ({
-        value: item.districtCode,
-        label: item.districtCode,
+        value: item.code,
+        label: item.districtName,
       })) || [],
     [districtHook.data?.items]
   );

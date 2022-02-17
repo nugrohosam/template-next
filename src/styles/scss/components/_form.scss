@@ -629,3 +629,12 @@ li.ti-tag.ti-valid {
     color: #dc3545;
   }
 }
+
+.required {
+  color: #212529;
+  font-size: 16px;
+  &:after {
+    content: ' *';
+    color: red;
+  }
+}

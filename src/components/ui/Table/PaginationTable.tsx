@@ -47,11 +47,11 @@ const PaginationTable: React.FC<Props> = ({
           <div className="ml-auto d-flex d-md-block">
             <Pagination className="mb-0 mx-auto">
               <Pagination.First
-                disabled={search.pageNumber === 1}
+                disabled={paging.totalPages === 1 || paging.pageNumber === 1}
                 onClick={() => onChangePage(1)}
               />
               <Pagination.Prev
-                disabled={search.pageNumber === 1}
+                disabled={paging.totalPages === 1 || paging.pageNumber === 1}
                 onClick={() =>
                   onChangePage(((search.pageNumber as number) || 1) - 1)
                 }
@@ -65,7 +65,7 @@ const PaginationTable: React.FC<Props> = ({
                   return (
                     <Pagination.Item
                       key={index}
-                      active={pageNumber == search.pageNumber}
+                      active={pageNumber == paging.pageNumber}
                       onClick={() => onChangePage(pageNumber)}
                     >
                       {pageNumber}
@@ -88,7 +88,8 @@ const PaginationTable: React.FC<Props> = ({
               <Pagination.Next
                 disabled={
                   search.pageNumber ===
-                  [...Array(paging.totalPages).keys()].length
+                    [...Array(paging.totalPages).keys()].length ||
+                  paging.totalPages === 1
                 }
                 onClick={() =>
                   onChangePage(((search.pageNumber as number) || 1) + 1)
@@ -97,7 +98,8 @@ const PaginationTable: React.FC<Props> = ({
               <Pagination.Last
                 disabled={
                   search.pageNumber ===
-                  [...Array(paging.totalPages).keys()].length
+                    [...Array(paging.totalPages).keys()].length ||
+                  paging.totalPages === 1
                 }
                 onClick={() =>
                   onChangePage([...Array(paging.totalPages).keys()].length)

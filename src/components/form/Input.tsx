@@ -22,6 +22,7 @@ interface PropsInput<T> extends UseControllerProps<T, FieldPath<T>> {
   as?: ElementType<any>;
   min?: string | null;
   max?: string | null;
+  value?: string | number;
 }
 
 function Input<T>({
@@ -35,6 +36,7 @@ function Input<T>({
   min,
   max,
   as = 'input',
+  value,
 }: PropsInput<T>) {
   return (
     <>
@@ -53,6 +55,7 @@ function Input<T>({
             min={min}
             max={max}
             {...field}
+            value={value}
           />
         )}
       ></Controller>

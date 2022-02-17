@@ -23,7 +23,7 @@ const PaginationTable: React.FC<Props> = ({
     currentPage: (search?.pageNumber as number) || 1,
     totalCount: paging.totalItems,
     siblingCount,
-    pageSize: search?.pageSize || 10,
+    pageSize: paging?.pageSize || 10,
   });
 
   let lastPage = paginationRange && paginationRange[paginationRange.length - 1];
@@ -53,7 +53,7 @@ const PaginationTable: React.FC<Props> = ({
               <Pagination.Prev
                 disabled={paging.totalPages === 1 || paging.pageNumber === 1}
                 onClick={() =>
-                  onChangePage(((search.pageNumber as number) || 1) - 1)
+                  onChangePage(((paging.pageNumber as number) || 1) - 1)
                 }
               />
               {paginationRange?.map(
@@ -87,17 +87,17 @@ const PaginationTable: React.FC<Props> = ({
               })} */}
               <Pagination.Next
                 disabled={
-                  search.pageNumber ===
+                  paging.pageNumber ===
                     [...Array(paging.totalPages).keys()].length ||
                   paging.totalPages === 1
                 }
                 onClick={() =>
-                  onChangePage(((search.pageNumber as number) || 1) + 1)
+                  onChangePage(((paging.pageNumber as number) || 1) + 1)
                 }
               />
               <Pagination.Last
                 disabled={
-                  search.pageNumber ===
+                  paging.pageNumber ===
                     [...Array(paging.totalPages).keys()].length ||
                   paging.totalPages === 1
                 }

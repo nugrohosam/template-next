@@ -11,11 +11,11 @@ import {
   fetchBudgetPlanItemGroupDetail,
   fetchBudgetPlanItemGroups,
 } from './api';
-import { BudgetPlanItemGorup } from './entities';
+import { BudgetPlanItemGroup } from './entities';
 
 export const useFetchBudgetPlanItemGroups = (
   params: PaginateParams
-): UseQueryResult<Paginate<BudgetPlanItemGorup>, ResponseError> => {
+): UseQueryResult<Paginate<BudgetPlanItemGroup>, ResponseError> => {
   return useQuery(['budget-plan-item-group', params], () =>
     fetchBudgetPlanItemGroups(params)
   );
@@ -23,7 +23,7 @@ export const useFetchBudgetPlanItemGroups = (
 
 export const useFetchBudgetPlanItemGroupDetail = (
   idBudgetPlanItemGroup: string
-): UseQueryResult<BudgetPlanItemGorup> => {
+): UseQueryResult<BudgetPlanItemGroup> => {
   return useQuery(
     ['budget-plan-item-group-detail', idBudgetPlanItemGroup],
     () => fetchBudgetPlanItemGroupDetail(idBudgetPlanItemGroup),

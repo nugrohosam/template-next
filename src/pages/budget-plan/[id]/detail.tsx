@@ -6,7 +6,7 @@ import DataTable, { usePaginateParams } from 'components/ui/Table/DataTable';
 import Loader from 'components/ui/Table/Loader';
 import { useFetchBudgetPlanDetail } from 'modules/budgetPlan/hook';
 import { deleteBudgetPlanItemGroups } from 'modules/budgetPlanItemGroup/api';
-import { BudgetPlanItemGorup } from 'modules/budgetPlanItemGroup/entities';
+import { BudgetPlanItemGroup } from 'modules/budgetPlanItemGroup/entities';
 import {
   useDeleteBudgetPlanItemGroups,
   useFetchBudgetPlanItemGroups,
@@ -30,7 +30,7 @@ const breadCrumb: PathBreadcrumb[] = [
   },
 ];
 
-const columns: Column<BudgetPlanItemGorup>[] = [
+const columns: Column<BudgetPlanItemGroup>[] = [
   {
     Header: 'ID',
     accessor: 'id',
@@ -150,7 +150,7 @@ const DetailBudgetPlan: NextPage = () => {
           <Col lg={12} className="d-md-flex mt-40 mb-32 align-items-center">
             <h3 className="mb-3 mb-md-0 text__blue">Budget Plan Item Groups</h3>
             <div className="ml-auto d-flex flex-column flex-md-row">
-              <Link href={`/budget-plan/${id}/create-item`} passHref>
+              <Link href={`/budget-plan/${id}/create-items`} passHref>
                 <Button className="mb-1">+ Add Item</Button>
               </Link>
             </div>

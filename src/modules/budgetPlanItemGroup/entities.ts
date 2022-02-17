@@ -1,4 +1,4 @@
-export type BudgetPlanItemGorup = {
+export type BudgetPlanItemGroup = {
   id: string;
   budgetCode: string;
   currency: string;

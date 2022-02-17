@@ -1,12 +1,12 @@
 import { Paginate, PaginateParams, ResponseData } from 'modules/common/types';
 import axios from 'utils/axios';
 
-import { BudgetPlanItemGorup } from './entities';
+import { BudgetPlanItemGroup } from './entities';
 
 export const fetchBudgetPlanItemGroups = async (
   params: PaginateParams
-): Promise<Paginate<BudgetPlanItemGorup>> => {
-  const result = await axios.get<ResponseData<Paginate<BudgetPlanItemGorup>>>(
+): Promise<Paginate<BudgetPlanItemGroup>> => {
+  const result = await axios.get<ResponseData<Paginate<BudgetPlanItemGroup>>>(
     'v1/budgetplanitemgroups',
     { params }
   );
@@ -15,8 +15,8 @@ export const fetchBudgetPlanItemGroups = async (
 
 export const fetchBudgetPlanItemGroupDetail = async (
   idBudgetPlanItemGroup: string
-): Promise<BudgetPlanItemGorup> => {
-  const result = await axios.get<ResponseData<BudgetPlanItemGorup>>(
+): Promise<BudgetPlanItemGroup> => {
+  const result = await axios.get<ResponseData<BudgetPlanItemGroup>>(
     `v1/budgetplanitemgroups/${idBudgetPlanItemGroup}`
   );
   return result.data.data;

@@ -14,21 +14,30 @@ export type BudgetPlanItem = {
 
 export type ItemOfBudgetPlanItem = {
   month: number;
-  quantity: number | string;
+  quantity: number;
   amount: number;
 };
 
 export interface BudgetPlanItemForm {
+  idCapexBudgetPlan: string;
+  outstandingPlanPaymentAttachment?: string;
+  outstandingRetentionAttachment?: string;
+  isBuilding: boolean;
+  budgetPlanItems: ItemOfBudgetPlanItemForm[];
+}
+
+export interface ItemOfBudgetPlanItemForm {
+  idAssetGroup: string;
   idCapexCatalog: string;
   pricePerUnit: number;
   currency: string;
   currencyRate: number;
   totalAmount: number;
   totalAmountUsd: number;
-  items: ItemOfBudgetPlanItem[];
+  items: ItemOfItemOfBudgetPlanItemForm[];
 }
 
-export interface CreateBudgetPlanItemsForm {
-  idCapexBudgetPlan: string;
-  budgetPlanItems: BudgetPlanItemForm;
+export interface ItemOfItemOfBudgetPlanItemForm
+  extends Omit<ItemOfBudgetPlanItem, 'quantity'> {
+  quantity: number | string;
 }

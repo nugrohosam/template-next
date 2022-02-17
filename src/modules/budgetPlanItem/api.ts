@@ -1,10 +1,10 @@
 import { Paginate, PaginateParams, ResponseData } from 'modules/common/types';
 import axios from 'utils/axios';
 
-import { BudgetPlanItem, CreateBudgetPlanItemsForm } from './entities';
+import { BudgetPlanItem, BudgetPlanItemForm } from './entities';
 
 export const createBudgetPlanItems = async (
-  data: CreateBudgetPlanItemsForm
+  data: BudgetPlanItemForm
 ): Promise<BudgetPlanItem> => {
   const result = await axios.post<ResponseData<BudgetPlanItem>>(
     'v1/budgetplanitems',

@@ -7,12 +7,12 @@ import {
 } from 'react-query';
 
 import { createBudgetPlanItems } from './api';
-import { BudgetPlanItem, CreateBudgetPlanItemsForm } from './entities';
+import { BudgetPlanItem, BudgetPlanItemForm } from './entities';
 
 export const useCreateBudgetPlanItems = (): UseMutationResult<
   BudgetPlanItem,
   ResponseError,
-  CreateBudgetPlanItemsForm
+  BudgetPlanItemForm
 > => {
   return useMutation(createBudgetPlanItems);
 };

@@ -4,7 +4,7 @@ import LoadingButton from 'components/ui/Button/LoadingButton';
 import DetailLayout from 'components/ui/DetailLayout';
 import CreateBudgetPlanItemModal from 'components/ui/Modal/CreateBudgetPlanItemModal';
 import SimpleTable from 'components/ui/Table/SimpleTable';
-import { BudgetPlanItemForm } from 'modules/budgetPlanItem/entities';
+import { ItemOfBudgetPlanItemForm } from 'modules/budgetPlanItem/entities';
 import { useCreateBudgetPlanItems } from 'modules/budgetPlanItem/hook';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
@@ -14,7 +14,7 @@ import { Column } from 'react-table';
 import { toast } from 'react-toastify';
 import { showErrorMessage } from 'utils/helpers';
 
-interface MyBudgetPlanItem extends BudgetPlanItemForm {
+interface MyBudgetPlanItem extends ItemOfBudgetPlanItemForm {
   jan: string | number;
   feb: string | number;
   mar: string | number;
@@ -154,7 +154,7 @@ const CreatePeriodActual: NextPage = () => {
     [myBudgetPlanItem]
   );
 
-  const addedItem = (data: BudgetPlanItemForm) => {
+  const addedItem = (data: ItemOfBudgetPlanItemForm) => {
     setMyBudgetPlanItem((prev) => [
       ...prev,
       {
@@ -179,15 +179,21 @@ const CreatePeriodActual: NextPage = () => {
     mutation.mutate(
       {
         idCapexBudgetPlan: id,
+        // TODO: isBuilding, outstandingPlanPaymentAttachment, outstandingRetentionAttachment masih hardcode
+        isBuilding: true,
+        outstandingPlanPaymentAttachment:
+          'outstanding_plan_payment_attachment.xlsx',
+        outstandingRetentionAttachment: 'outstanding_retention_attachment.xlsx',
         budgetPlanItems: myBudgetPlanItem.map((item) => ({
           idCapexCatalog: item.idCapexCatalog,
+          idAssetGroup: item.idAssetGroup,
           pricePerUnit: item.pricePerUnit,
           currency: item.currency,
           currencyRate: item.currencyRate,
           totalAmount: item.totalAmount,
           totalAmountUsd: item.totalAmountUsd,
           items: item.items,
-        })) as unknown as BudgetPlanItemForm,
+        })),
       },
       {
         onSuccess: () => {

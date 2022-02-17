@@ -5,8 +5,8 @@ import SingleSelect, { SelectOption } from 'components/form/SingleSelect';
 import { currencyOptions } from 'constants/currency';
 import { useFetchAssetGroups } from 'modules/assetGroup/hook';
 import {
-  BudgetPlanItemForm,
-  ItemOfBudgetPlanItem,
+  ItemOfBudgetPlanItemForm,
+  ItemOfItemOfBudgetPlanItemForm,
 } from 'modules/budgetPlanItem/entities';
 import { Catalog } from 'modules/catalog/entities';
 import { useFetchCatalogs } from 'modules/catalog/hook';
@@ -28,7 +28,7 @@ import SimpleTable from '../Table/SimpleTable';
 import ModalBox from '.';
 
 interface RejectModalProps {
-  onSend: (data: BudgetPlanItemForm) => void;
+  onSend: (data: ItemOfBudgetPlanItemForm) => void;
   classButton?: string;
 }
 
@@ -37,7 +37,7 @@ const CreateBudgetPlanItemModal: React.FC<RejectModalProps> = ({
   classButton,
 }) => {
   const schema = yup.object().shape({
-    assetGroup: yup.string().required(),
+    idAssetGroup: yup.string().required(),
     idCapexCatalog: yup.string().required(),
     pricePerUnit: yup.string().required(),
     currency: yup.string().required(),
@@ -47,7 +47,7 @@ const CreateBudgetPlanItemModal: React.FC<RejectModalProps> = ({
   });
 
   const [myBudgetPlanItem, setMyBudgetPlanItem] = useState<
-    ItemOfBudgetPlanItem[]
+    ItemOfItemOfBudgetPlanItemForm[]
   >(
     [...Array(12).keys()].map((item) => ({
       month: item + 1,
@@ -63,14 +63,14 @@ const CreateBudgetPlanItemModal: React.FC<RejectModalProps> = ({
     watch,
     resetField,
     setValue,
-  } = useForm<BudgetPlanItemForm & { assetGroup: string }>({
+  } = useForm<ItemOfBudgetPlanItemForm>({
     mode: 'onChange',
     resolver: yupResolver(schema),
   });
-  const watchAssetGroup = watch('assetGroup');
+  const watchAssetGroup = watch('idAssetGroup');
   const watchPricePerUnit = watch('pricePerUnit', 0);
 
-  const handleSubmitForm = (data: BudgetPlanItemForm) =>
+  const handleSubmitForm = (data: ItemOfBudgetPlanItemForm) =>
     onSend({ ...data, items: myBudgetPlanItem });
 
   // asset group options
@@ -104,12 +104,12 @@ const CreateBudgetPlanItemModal: React.FC<RejectModalProps> = ({
     setValue('currencyRate', 10000);
   };
 
-  const columns = useMemo<Column<ItemOfBudgetPlanItem>[]>(
+  const columns = useMemo<Column<ItemOfItemOfBudgetPlanItemForm>[]>(
     () => [
       {
         Header: 'Month',
         accessor: 'month',
-        Cell: ({ row }: CellProps<ItemOfBudgetPlanItem>) =>
+        Cell: ({ row }: CellProps<ItemOfItemOfBudgetPlanItemForm>) =>
           moment()
             .month(row.values.month - 1)
             .format('MMMM'),
@@ -117,7 +117,7 @@ const CreateBudgetPlanItemModal: React.FC<RejectModalProps> = ({
       {
         Header: 'Quantity',
         accessor: 'quantity',
-        Cell: ({ row }: CellProps<ItemOfBudgetPlanItem>) => (
+        Cell: ({ row }: CellProps<ItemOfItemOfBudgetPlanItemForm>) => (
           <FormControl
             type="number"
             value={row.values.quantity}
@@ -127,7 +127,7 @@ const CreateBudgetPlanItemModal: React.FC<RejectModalProps> = ({
                   return index === row.index
                     ? {
                         ...item,
-                        quantity: +val.target.value || '',
+                        quantity: +val.target.value,
                         amount: +val.target.value * (watchPricePerUnit || 0),
                       }
                     : item;
@@ -140,7 +140,7 @@ const CreateBudgetPlanItemModal: React.FC<RejectModalProps> = ({
       {
         Header: 'Amount',
         accessor: 'amount',
-        Cell: ({ row }: CellProps<ItemOfBudgetPlanItem>) => (
+        Cell: ({ row }: CellProps<ItemOfItemOfBudgetPlanItemForm>) => (
           <FormControl type="text" value={row.values.amount} disabled />
         ),
       },
@@ -173,12 +173,12 @@ const CreateBudgetPlanItemModal: React.FC<RejectModalProps> = ({
           <FormGroup>
             <FormLabel>Asset Group</FormLabel>
             <SingleSelect
-              name="assetGroup"
+              name="idAssetGroup"
               control={control}
               defaultValue=""
               placeholder="Asset Group"
               options={assetGroupOptions}
-              error={errors.assetGroup?.message}
+              error={errors.idAssetGroup?.message}
               onChange={() => {
                 resetField('idCapexCatalog');
                 resetField('totalAmount');

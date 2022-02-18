@@ -9,14 +9,15 @@ import {
 import {
   deleteBudgetPlanItemGroups,
   fetchBudgetPlanItemGroupDetail,
+  fetchBudgetPlanItemGroupItems,
   fetchBudgetPlanItemGroups,
 } from './api';
-import { BudgetPlanItemGroup } from './entities';
+import { BudgetPlanItemGroup, BudgetPlanItemGroupItem } from './entities';
 
 export const useFetchBudgetPlanItemGroups = (
   params: PaginateParams
 ): UseQueryResult<Paginate<BudgetPlanItemGroup>, ResponseError> => {
-  return useQuery(['budget-plan-item-group', params], () =>
+  return useQuery(['budget-plan-item-groups', params], () =>
     fetchBudgetPlanItemGroups(params)
   );
 };
@@ -28,6 +29,16 @@ export const useFetchBudgetPlanItemGroupDetail = (
     ['budget-plan-item-group-detail', idBudgetPlanItemGroup],
     () => fetchBudgetPlanItemGroupDetail(idBudgetPlanItemGroup),
     { enabled: !!idBudgetPlanItemGroup }
+  );
+};
+
+export const useFetchBudgetPlanItemGroupItems = (
+  idBudgetPlanItemGroup: string,
+  params: PaginateParams
+): UseQueryResult<Paginate<BudgetPlanItemGroupItem>, ResponseError> => {
+  return useQuery(
+    ['budget-plan-item-group-items', idBudgetPlanItemGroup, params],
+    () => fetchBudgetPlanItemGroupItems(idBudgetPlanItemGroup, params)
   );
 };
 

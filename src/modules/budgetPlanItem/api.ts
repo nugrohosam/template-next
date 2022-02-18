@@ -24,11 +24,11 @@ export const createBudgetPlanItems = async (
 //   return result.data.data;
 // };
 
-// export const deleteBudgetPlan = async (
-//   idBudgetPlans: string[]
-// ): Promise<null> => {
-//   const result = await axios.patch<ResponseData<null>>('v1/budgetplan', {
-//     idBudgetPlans,
-//   });
-//   return result.data.data;
-// };
+export const deleteBudgetPlanItems = async (
+  idBudgetPlanItems: string[]
+): Promise<null> => {
+  const result = await axios.patch<ResponseData<null>>('v1/budgetplanitems', {
+    idBudgetPlanItems,
+  });
+  return result.data.data;
+};

@@ -16,7 +16,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import { Button, Col, Row } from 'react-bootstrap';
-import { Column, SortingRule } from 'react-table';
+import { CellProps, Column, SortingRule } from 'react-table';
 import { getAllIds } from 'utils/helpers';
 
 const breadCrumb: PathBreadcrumb[] = [
@@ -27,41 +27,6 @@ const breadCrumb: PathBreadcrumb[] = [
   {
     label: 'Detail',
     active: true,
-  },
-];
-
-const columns: Column<BudgetPlanItemGroup>[] = [
-  {
-    Header: 'ID',
-    accessor: 'id',
-  },
-  {
-    Header: 'Budget Code',
-    accessor: 'budgetCode',
-  },
-  {
-    Header: 'Units',
-    accessor: 'item',
-  },
-  {
-    Header: 'Currency',
-    accessor: 'currency',
-  },
-  {
-    Header: 'Total USD',
-    accessor: 'totalAmountUsd',
-  },
-  {
-    Header: 'Total IDR',
-    accessor: 'totalAmount',
-  },
-  {
-    Header: 'Status',
-    accessor: 'status',
-  },
-  {
-    Header: 'Created At',
-    accessor: 'createdAt',
   },
 ];
 
@@ -87,6 +52,60 @@ const DetailBudgetPlan: NextPage = () => {
       deleteBudgetPlanItemGroups(ids);
     }
   };
+
+  const columns: Column<BudgetPlanItemGroup>[] = [
+    {
+      Header: 'ID',
+      accessor: 'id',
+    },
+    {
+      Header: 'Budget Code',
+      accessor: 'budgetCode',
+      minWidth: 300,
+    },
+    {
+      Header: 'Units',
+      accessor: 'item',
+      minWidth: 100,
+    },
+    {
+      Header: 'Currency',
+      accessor: 'currency',
+      minWidth: 150,
+    },
+    {
+      Header: 'Total USD',
+      accessor: 'totalAmountUsd',
+      minWidth: 200,
+    },
+    {
+      Header: 'Total IDR',
+      accessor: 'totalAmount',
+      minWidth: 200,
+    },
+    {
+      Header: 'Status',
+      accessor: 'status',
+      minWidth: 200,
+    },
+    {
+      Header: 'Created At',
+      accessor: 'createdAt',
+      minWidth: 200,
+    },
+    {
+      Header: 'Actions',
+      Cell: ({ cell }: CellProps<BudgetPlanItemGroup>) => {
+        return (
+          <div className="d-flex flex-column" style={{ minWidth: 100 }}>
+            <Link href={`/budget-plans/${id}/${cell.row.values.id}`} passHref>
+              <Button className="mb-1">Detail</Button>
+            </Link>
+          </div>
+        );
+      },
+    },
+  ];
 
   return (
     <DetailLayout

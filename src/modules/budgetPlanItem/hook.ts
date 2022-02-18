@@ -6,7 +6,7 @@ import {
   UseQueryResult,
 } from 'react-query';
 
-import { createBudgetPlanItems } from './api';
+import { createBudgetPlanItems, deleteBudgetPlanItems } from './api';
 import { BudgetPlanItem, BudgetPlanItemForm } from './entities';
 
 export const useCreateBudgetPlanItems = (): UseMutationResult<
@@ -31,10 +31,12 @@ export const useCreateBudgetPlanItems = (): UseMutationResult<
 //   );
 // };
 
-// export const useDeleteBudgetPlan = (): UseMutationResult<
-//   null,
-//   ResponseError,
-//   string[]
-// > => {
-//   return useMutation((idBudgetPlans) => deleteBudgetPlan(idBudgetPlans));
-// };
+export const useDeleteBudgetPlanitems = (): UseMutationResult<
+  null,
+  ResponseError,
+  string[]
+> => {
+  return useMutation((idBudgetPlanItems) =>
+    deleteBudgetPlanItems(idBudgetPlanItems)
+  );
+};

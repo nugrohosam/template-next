@@ -1,3 +1,5 @@
+import { BudgetPlanItem } from 'modules/budgetPlanItem/entities';
+
 export type BudgetPlanItemGroup = {
   id: string;
   budgetCode: string;
@@ -11,4 +13,9 @@ export type BudgetPlanItemGroup = {
   workflowApprovalPosition: [];
   workflowApprovalName: [];
   createdAt: string;
+};
+
+export type BudgetPlanItemGroupItem = BudgetPlanItem & {
+  detail: string;
+  budgetCode: string;
 };

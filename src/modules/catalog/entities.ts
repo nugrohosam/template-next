@@ -7,7 +7,7 @@ export type Catalog = {
   priceInIdr: number;
   priceInUsd: number;
   status: string;
-  created_at: string;
+  createdAt: string;
   assetGroup: AssetGroup;
 };
 

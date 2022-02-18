@@ -119,13 +119,13 @@ const DetailBudgetPlan: NextPage = () => {
         </Row>
         <Row>
           <Col lg={6}>
-            <h4 className="profile-detail__info--title mb-1">Tahun</h4>
+            <h4 className="profile-detail__info--title mb-1">Year</h4>
             <h3 className="profile-detail__info--subtitle">
               {dataHook?.data?.periodYear}
             </h3>
           </Col>
           <Col lg={6}>
-            <h4 className="profile-detail__info--title mb-1">Semester</h4>
+            <h4 className="profile-detail__info--title mb-1">Period</h4>
             <h3 className="profile-detail__info--subtitle">
               {dataHook?.data?.periodType}
             </h3>

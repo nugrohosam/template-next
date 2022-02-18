@@ -115,7 +115,7 @@ const CreatePeriodActual: NextPage = () => {
   const breadCrumb: PathBreadcrumb[] = [
     {
       label: 'Detail',
-      link: `/budget-plan/${id}/detail`,
+      link: `/budget-plans/${id}/detail`,
     },
     {
       label: 'Create Items',
@@ -177,7 +177,7 @@ const CreatePeriodActual: NextPage = () => {
   return (
     <DetailLayout
       paths={breadCrumb}
-      backButtonClick={() => router.replace(`/budget-plan/${id}/detail`)}
+      backButtonClick={() => router.replace(`/budget-plans/${id}/detail`)}
       title="Budget Plan Items Create"
     >
       <Panel>

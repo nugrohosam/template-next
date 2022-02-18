@@ -7,10 +7,7 @@ import LoadingButton from 'components/ui/Button/LoadingButton';
 import DetailLayout from 'components/ui/DetailLayout';
 import { periodeTypeOptions, periodeYearOptions } from 'constants/period';
 import { BudgetPlanForm } from 'modules/budgetPlan/entities';
-import {
-  useFetchBudgetPlanDetail,
-  useUpdateBudgetPlan,
-} from 'modules/budgetPlan/hook';
+import { useCreateBudgetPlan } from 'modules/budgetPlan/hook';
 import { useDecodeToken } from 'modules/custom/useDecodeToken';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
@@ -24,10 +21,10 @@ import * as yup from 'yup';
 const breadCrumb: PathBreadcrumb[] = [
   {
     label: 'Budget Plan',
-    link: '/budget-plan',
+    link: '/budget-plans',
   },
   {
-    label: 'Edit',
+    label: 'Create',
     active: true,
   },
 ];
@@ -41,11 +38,9 @@ const schema = yup.object().shape({
 });
 
 const CreatePeriodActual: NextPage = () => {
+  const [profile] = useDecodeToken();
+
   const router = useRouter();
-  const id = router.query.id as string;
-
-  const { data: dataHookBudgetPlanDetail } = useFetchBudgetPlanDetail(id);
-
   const {
     handleSubmit,
     control,
@@ -60,52 +55,62 @@ const CreatePeriodActual: NextPage = () => {
 
   useEffect(() => {
     reset({
-      departmentCode: dataHookBudgetPlanDetail?.departmentCode,
-      districtCode: dataHookBudgetPlanDetail?.districtCode,
-      divisionCode: dataHookBudgetPlanDetail?.divisionCode,
-      periodType: dataHookBudgetPlanDetail?.periodType,
-      periodYear: dataHookBudgetPlanDetail?.periodYear,
+      departmentCode: profile?.job_group,
+      districtCode: profile?.district_code,
+      // TODO: division code masih hardcode
+      divisionCode: 'FATB',
     });
-  }, [dataHookBudgetPlanDetail, reset]);
+  }, [profile, reset]);
 
-  const mutation = useUpdateBudgetPlan();
+  const mutation = useCreateBudgetPlan();
 
   const handleSubmitForm = (data: BudgetPlanForm) => {
-    mutation.mutate(
-      { idBudgetPlan: id, data },
-      {
-        onSuccess: () => {
-          router.push('/budget-plan');
-          toast('Data updated!');
-        },
-        onError: (error) => {
-          console.error('Failed to update data', error);
-          setValidationError(error, setError);
-          toast(error.message, { autoClose: false });
-          showErrorMessage(error);
-        },
-      }
-    );
+    mutation.mutate(data, {
+      onSuccess: () => {
+        router.push('/budget-plans');
+        toast('Data created!');
+      },
+      onError: (error) => {
+        console.error('Failed to create data', error);
+        setValidationError(error, setError);
+        toast(error.message, { autoClose: false });
+        showErrorMessage(error);
+      },
+    });
   };
 
   return (
     <DetailLayout
       paths={breadCrumb}
-      backButtonClick={() => router.replace(`/budget-plan`)}
-      title="Edit Budget Plan"
+      backButtonClick={() => router.replace(`/budget-plans`)}
+      title="Create Budget Plan"
     >
       <Panel>
         <Form onSubmit={handleSubmit(handleSubmitForm)}>
           <Row>
             <Col lg={6}>
               <FormGroup>
-                <FormLabel>Division</FormLabel>
+                <FormLabel>District</FormLabel>
+                <Input
+                  name="districtCode"
+                  control={control}
+                  defaultValue=""
+                  type="text"
+                  placeholder="District"
+                  disabled
+                  error={errors.districtCode?.message}
+                />
+              </FormGroup>
+            </Col>
+            <Col lg={6}>
+              <FormGroup>
+                <FormLabel>Divisi</FormLabel>
                 <Input
                   name="divisionCode"
                   control={control}
                   defaultValue=""
                   type="text"
-                  placeholder="Division"
+                  placeholder="Divisi"
                   disabled
                   error={errors.divisionCode?.message}
                 />
@@ -125,33 +130,9 @@ const CreatePeriodActual: NextPage = () => {
                 />
               </FormGroup>
             </Col>
-            <Col lg={6}>
-              <FormGroup>
-                <FormLabel>District</FormLabel>
-                <Input
-                  name="districtCode"
-                  control={control}
-                  defaultValue=""
-                  type="text"
-                  placeholder="District"
-                  disabled
-                  error={errors.districtCode?.message}
-                />
-              </FormGroup>
-            </Col>
-            <Col lg={6}>
-              <FormGroup>
-                <FormLabel>Periode</FormLabel>
-                <SingleSelect
-                  name="periodType"
-                  control={control}
-                  defaultValue=""
-                  placeholder="Periode"
-                  options={periodeTypeOptions}
-                  error={errors.periodType?.message}
-                />
-              </FormGroup>
-            </Col>
+          </Row>
+
+          <Row>
             <Col lg={6}>
               <FormGroup>
                 <FormLabel>Tahun</FormLabel>
@@ -165,6 +146,19 @@ const CreatePeriodActual: NextPage = () => {
                 />
               </FormGroup>
             </Col>
+            <Col lg={6}>
+              <FormGroup>
+                <FormLabel>Semester</FormLabel>
+                <SingleSelect
+                  name="periodType"
+                  control={control}
+                  defaultValue=""
+                  placeholder="Semester"
+                  options={periodeTypeOptions}
+                  error={errors.periodType?.message}
+                />
+              </FormGroup>
+            </Col>
           </Row>
 
           <Col lg={12} className="d-flex pr-sm-0 justify-content-end">
@@ -174,7 +168,7 @@ const CreatePeriodActual: NextPage = () => {
               disabled={!isValid || mutation.isLoading}
               isLoading={mutation.isLoading}
             >
-              Update
+              Create
             </LoadingButton>
           </Col>
         </Form>

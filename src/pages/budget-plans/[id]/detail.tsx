@@ -22,7 +22,7 @@ import { getAllIds } from 'utils/helpers';
 const breadCrumb: PathBreadcrumb[] = [
   {
     label: 'Budget Plan',
-    link: '/budget-plan',
+    link: '/budget-plans',
   },
   {
     label: 'Detail',
@@ -91,7 +91,7 @@ const DetailBudgetPlan: NextPage = () => {
   return (
     <DetailLayout
       paths={breadCrumb}
-      backButtonClick={() => router.replace('/budget-plan')}
+      backButtonClick={() => router.replace('/budget-plans')}
       title="Detail Budget Plan"
     >
       <Panel>
@@ -136,7 +136,7 @@ const DetailBudgetPlan: NextPage = () => {
 
         <Row>
           <Col lg={12}>
-            <Link href={`/budget-plan/${id}/edit`} passHref>
+            <Link href={`/budget-plans/${id}/edit`} passHref>
               <Button variant="primary" className="float-right">
                 Edit
               </Button>
@@ -150,7 +150,7 @@ const DetailBudgetPlan: NextPage = () => {
           <Col lg={12} className="d-md-flex mt-40 mb-32 align-items-center">
             <h3 className="mb-3 mb-md-0 text__blue">Budget Plan Item Groups</h3>
             <div className="ml-auto d-flex flex-column flex-md-row">
-              <Link href={`/budget-plan/${id}/create-items`} passHref>
+              <Link href={`/budget-plans/${id}/create-items`} passHref>
                 <Button className="mb-1">+ Add Item</Button>
               </Link>
             </div>

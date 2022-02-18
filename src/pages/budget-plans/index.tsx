@@ -77,10 +77,10 @@ const BudgetPlanList: NextPage = () => {
       Cell: ({ cell }: CellProps<BudgetPlan>) => {
         return (
           <div className="d-flex flex-column">
-            <Link href={`/budget-plan/${cell.row.values.id}/detail`} passHref>
+            <Link href={`/budget-plans/${cell.row.values.id}/detail`} passHref>
               <Button className="mb-1">Detail</Button>
             </Link>
-            <Link href={`/budget-plan/${cell.row.values.id}/edit`} passHref>
+            <Link href={`/budget-plans/${cell.row.values.id}/edit`} passHref>
               <Button className="mb-1">Edit</Button>
             </Link>
             <Button
@@ -99,7 +99,7 @@ const BudgetPlanList: NextPage = () => {
     <ContentLayout
       title="Budget Plan"
       controls={
-        <Link href={`/budget-plan/create`} passHref>
+        <Link href={`/budget-plans/create`} passHref>
           <Button>+ Create</Button>
         </Link>
       }

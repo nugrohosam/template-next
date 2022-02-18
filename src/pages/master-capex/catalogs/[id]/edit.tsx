@@ -12,7 +12,14 @@ import { useAssetGroupOptions } from 'modules/custom/useAssetGroupOptions';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import { Col, Form, FormGroup, FormLabel, Row } from 'react-bootstrap';
+import {
+  Col,
+  Form,
+  FormControl,
+  FormGroup,
+  FormLabel,
+  Row,
+} from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import { setValidationError, showErrorMessage } from 'utils/helpers';
@@ -30,12 +37,12 @@ const breadCrumb: PathBreadcrumb[] = [
 ];
 
 const schema = yup.object().shape({
-  assetGroupId: yup.mixed().required(),
-  detail: yup.mixed().required(),
+  assetGroupId: yup.string().required(`Asset Group can't be empty`),
+  detail: yup.string().required(`Detail can't be empty`),
   primaryCurrency: yup.mixed().required(),
   // TODO: price masih hardcode, belum menyesuaikan primaryCurrency
-  priceInIdr: yup.mixed().required(),
-  priceInUsd: yup.mixed().required(),
+  priceInIdr: yup.string().required(`Price (IDR) can't be empty`),
+  priceInUsd: yup.string().required(`Price (USD) can't be empty`),
 });
 
 const EditCatalog: NextPage = () => {
@@ -113,7 +120,7 @@ const EditCatalog: NextPage = () => {
           <Row>
             <Col lg={6}>
               <FormGroup>
-                <FormLabel>Asset Group</FormLabel>
+                <FormLabel className="required">Asset Group</FormLabel>
                 <SingleSelect
                   defaultValue=""
                   name="assetGroupId"
@@ -126,7 +133,7 @@ const EditCatalog: NextPage = () => {
             </Col>
             <Col lg={6}>
               <FormGroup>
-                <FormLabel>Detail</FormLabel>
+                <FormLabel className="required">Detail</FormLabel>
                 <Input
                   name="detail"
                   control={control}
@@ -153,19 +160,12 @@ const EditCatalog: NextPage = () => {
             <Col lg={6}>
               <FormGroup>
                 <FormLabel>Currency Rate</FormLabel>
-                {/* <Input
-                  name="currencyRate"
-                  control={control}
-                  // TODO: get from API
-                  defaultValue="14000"
-                  type="text"
-                  disabled
-                /> */}
-                <h3 className="profile-detail__info--subtitle">14000</h3>
+                {/* TODO: get from API */}
+                <FormControl type="text" value="14.500" disabled />
               </FormGroup>
             </Col>
             <Col lg={6}>
-              <FormLabel>Price (IDR)</FormLabel>
+              <FormLabel className="required">Price (IDR)</FormLabel>
               <Input
                 name="priceInIdr"
                 control={control}
@@ -177,7 +177,7 @@ const EditCatalog: NextPage = () => {
               />
             </Col>
             <Col lg={6}>
-              <FormLabel>Price (USD)</FormLabel>
+              <FormLabel className="required">Price (USD)</FormLabel>
               <Input
                 name="priceInUsd"
                 control={control}
@@ -193,7 +193,7 @@ const EditCatalog: NextPage = () => {
             <LoadingButton
               variant="primary"
               type="submit"
-              disabled={!isValid || mutation.isLoading}
+              disabled={mutation.isLoading}
               isLoading={mutation.isLoading}
             >
               Update

@@ -12,3 +12,12 @@ export const fetchActualYtd = async (
   );
   return result.data.data;
 };
+
+export const deleteActualYtds = async (
+  idActualYtds: string[]
+): Promise<null> => {
+  const result = await axios.patch<ResponseData<null>>(`v1/actualytd`, {
+    idActualYtds,
+  });
+  return result.data.data;
+};

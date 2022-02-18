@@ -8,26 +8,104 @@ import { ItemOfBudgetPlanItemForm } from 'modules/budgetPlanItem/entities';
 import { useCreateBudgetPlanItems } from 'modules/budgetPlanItem/hook';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Button, Col, Row } from 'react-bootstrap';
-import { Column } from 'react-table';
+import { CellProps, Column } from 'react-table';
 import { toast } from 'react-toastify';
 import { showErrorMessage } from 'utils/helpers';
 
-interface MyBudgetPlanItem extends ItemOfBudgetPlanItemForm {
-  jan: string | number;
-  feb: string | number;
-  mar: string | number;
-  apr: string | number;
-  mei: string | number;
-  jun: string | number;
-  jul: string | number;
-  aug: string | number;
-  sep: string | number;
-  oct: string | number;
-  nov: string | number;
-  dec: string | number;
-}
+const columns: Column<ItemOfBudgetPlanItemForm>[] = [
+  {
+    Header: 'Detail',
+    minWidth: 300,
+    accessor: 'idCapexCatalog',
+  },
+  {
+    Header: 'Currency',
+    accessor: 'currency',
+    minWidth: 150,
+  },
+  {
+    Header: 'Price/Unit',
+    accessor: 'pricePerUnit',
+    minWidth: 200,
+  },
+  {
+    Header: 'Total USD',
+    accessor: 'totalAmountUsd',
+    minWidth: 200,
+  },
+  {
+    Header: 'Total IDR',
+    accessor: 'totalAmount',
+    minWidth: 200,
+  },
+  {
+    Header: 'Item',
+    accessor: 'items',
+  },
+  {
+    Header: 'Jan',
+    Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) =>
+      row.values.items[0]?.quantity || '',
+  },
+  {
+    Header: 'Feb',
+    Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) =>
+      row.values.items[1]?.quantity || '',
+  },
+  {
+    Header: 'Mar',
+    Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) =>
+      row.values.items[2]?.quantity || '',
+  },
+  {
+    Header: 'Apr',
+    minWidth: 100,
+    Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) =>
+      row.values.items[3]?.quantity || '',
+  },
+  {
+    Header: 'Mei',
+    Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) =>
+      row.values.items[4]?.quantity || '',
+  },
+  {
+    Header: 'Jun',
+    Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) =>
+      row.values.items[5]?.quantity || '',
+  },
+  {
+    Header: 'Jul',
+    Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) =>
+      row.values.items[6]?.quantity || '',
+  },
+  {
+    Header: 'Aug',
+    Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) =>
+      row.values.items[7]?.quantity || '',
+  },
+  {
+    Header: 'Sep',
+    Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) =>
+      row.values.items[8]?.quantity || '',
+  },
+  {
+    Header: 'Oct',
+    Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) =>
+      row.values.items[9]?.quantity || '',
+  },
+  {
+    Header: 'Nov',
+    Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) =>
+      row.values.items[10]?.quantity || '',
+  },
+  {
+    Header: 'Dec',
+    Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) =>
+      row.values.items[11]?.quantity || '',
+  },
+];
 
 const CreatePeriodActual: NextPage = () => {
   const router = useRouter();
@@ -47,9 +125,9 @@ const CreatePeriodActual: NextPage = () => {
 
   const mutation = useCreateBudgetPlanItems();
 
-  const [myBudgetPlanItem, setMyBudgetPlanItem] = useState<MyBudgetPlanItem[]>(
-    []
-  );
+  const [myBudgetPlanItem, setMyBudgetPlanItem] = useState<
+    ItemOfBudgetPlanItemForm[]
+  >([]);
 
   const handleDeleteMultipleMyBudgetPlanItem = () => {
     setMyBudgetPlanItem((prev) =>
@@ -60,119 +138,6 @@ const CreatePeriodActual: NextPage = () => {
             .includes(i)
       )
     );
-  };
-
-  const columns = useMemo<Column<MyBudgetPlanItem>[]>(
-    () => [
-      {
-        Header: 'Detail',
-        minWidth: 300,
-        accessor: 'idCapexCatalog',
-      },
-      {
-        Header: 'Currency',
-        accessor: 'currency',
-        minWidth: 150,
-      },
-      {
-        Header: 'Price/Unit',
-        accessor: 'pricePerUnit',
-        minWidth: 200,
-      },
-      {
-        Header: 'Total USD',
-        accessor: 'totalAmountUsd',
-        minWidth: 200,
-      },
-      {
-        Header: 'Total IDR',
-        accessor: 'totalAmount',
-        minWidth: 200,
-      },
-      {
-        Header: 'Jan',
-        accessor: 'jan',
-        minWidth: 100,
-      },
-      {
-        Header: 'Feb',
-        accessor: 'feb',
-        minWidth: 100,
-      },
-      {
-        Header: 'Mar',
-        accessor: 'mar',
-        minWidth: 100,
-      },
-      {
-        Header: 'Apr',
-        accessor: 'apr',
-        minWidth: 100,
-      },
-      {
-        Header: 'Mei',
-        accessor: 'mei',
-        minWidth: 100,
-      },
-      {
-        Header: 'Jun',
-        accessor: 'jun',
-        minWidth: 100,
-      },
-      {
-        Header: 'Jul',
-        accessor: 'jul',
-        minWidth: 100,
-      },
-      {
-        Header: 'Aug',
-        accessor: 'aug',
-        minWidth: 100,
-      },
-      {
-        Header: 'Sep',
-        accessor: 'sep',
-        minWidth: 100,
-      },
-      {
-        Header: 'Oct',
-        accessor: 'oct',
-        minWidth: 100,
-      },
-      {
-        Header: 'Nov',
-        accessor: 'nov',
-        minWidth: 100,
-      },
-      {
-        Header: 'Dec',
-        accessor: 'dec',
-        minWidth: 100,
-      },
-    ],
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [myBudgetPlanItem]
-  );
-
-  const addedItem = (data: ItemOfBudgetPlanItemForm) => {
-    setMyBudgetPlanItem((prev) => [
-      ...prev,
-      {
-        ...data,
-        jan: data.items.find((item) => item.month === 1)?.quantity || '',
-        feb: data.items.find((item) => item.month === 2)?.quantity || '',
-        mar: data.items.find((item) => item.month === 3)?.quantity || '',
-        apr: data.items.find((item) => item.month === 4)?.quantity || '',
-        mei: data.items.find((item) => item.month === 5)?.quantity || '',
-        jun: data.items.find((item) => item.month === 6)?.quantity || '',
-        jul: data.items.find((item) => item.month === 7)?.quantity || '',
-        aug: data.items.find((item) => item.month === 8)?.quantity || '',
-        sep: data.items.find((item) => item.month === 9)?.quantity || '',
-        oct: data.items.find((item) => item.month === 10)?.quantity || '',
-        nov: data.items.find((item) => item.month === 11)?.quantity || '',
-        dec: data.items.find((item) => item.month === 12)?.quantity || '',
-      },
-    ]);
   };
 
   const submitCreateBudgetPlanItems = () => {
@@ -222,10 +187,13 @@ const CreatePeriodActual: NextPage = () => {
             columns={columns}
             items={myBudgetPlanItem}
             selectedRows={selectedRow}
+            hiddenColumns={['items']}
             onSelectedRowsChanged={(rows) => setSelectedRow(rows)}
             addOns={
               <CreateBudgetPlanItemModal
-                onSend={(data) => addedItem(data)}
+                onSend={(data) =>
+                  setMyBudgetPlanItem((prev) => [...prev, data])
+                }
               ></CreateBudgetPlanItemModal>
             }
             actions={

@@ -30,11 +30,11 @@ const breadCrumb: PathBreadcrumb[] = [
 ];
 
 const schema = yup.object().shape({
-  periodType: yup.mixed().required(),
-  periodYear: yup.mixed().required(),
-  districtCode: yup.mixed().required(),
-  divisionCode: yup.mixed().required(),
-  departmentCode: yup.mixed().required(),
+  periodType: yup.string().required(`Period can't be empty`),
+  periodYear: yup.string().required(`Year can't be empty`),
+  districtCode: yup.string().required(),
+  divisionCode: yup.string().required(),
+  departmentCode: yup.string().required(),
 });
 
 const CreatePeriodActual: NextPage = () => {
@@ -90,7 +90,7 @@ const CreatePeriodActual: NextPage = () => {
           <Row>
             <Col lg={6}>
               <FormGroup>
-                <FormLabel>District</FormLabel>
+                <FormLabel className="required">District</FormLabel>
                 <Input
                   name="districtCode"
                   control={control}
@@ -104,7 +104,7 @@ const CreatePeriodActual: NextPage = () => {
             </Col>
             <Col lg={6}>
               <FormGroup>
-                <FormLabel>Divisi</FormLabel>
+                <FormLabel className="required">Divisi</FormLabel>
                 <Input
                   name="divisionCode"
                   control={control}
@@ -118,7 +118,7 @@ const CreatePeriodActual: NextPage = () => {
             </Col>
             <Col lg={6}>
               <FormGroup>
-                <FormLabel>Departemen</FormLabel>
+                <FormLabel className="required">Departemen</FormLabel>
                 <Input
                   name="departmentCode"
                   control={control}
@@ -135,7 +135,7 @@ const CreatePeriodActual: NextPage = () => {
           <Row>
             <Col lg={6}>
               <FormGroup>
-                <FormLabel>Tahun</FormLabel>
+                <FormLabel className="required">Year</FormLabel>
                 <SingleSelect
                   name="periodYear"
                   control={control}
@@ -148,7 +148,7 @@ const CreatePeriodActual: NextPage = () => {
             </Col>
             <Col lg={6}>
               <FormGroup>
-                <FormLabel>Semester</FormLabel>
+                <FormLabel className="required">Period</FormLabel>
                 <SingleSelect
                   name="periodType"
                   control={control}

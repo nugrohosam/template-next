@@ -197,7 +197,10 @@ function DataTable<T extends object = {}>({
                       {...column.getHeaderProps([
                         {
                           className: (column as any).className,
-                          style: (column as any).style,
+                          style: {
+                            ...(column as any).style,
+                            minWidth: column.minWidth,
+                          },
                         },
                         column.getSortByToggleProps(),
                       ])}

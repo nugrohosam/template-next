@@ -7,6 +7,8 @@ interface Props {
   paginateParams?: PaginateParams;
   actions?: React.ReactNode;
   filters?: React.ReactNode;
+  addOns?: React.ReactNode;
+  isSearched?: boolean;
   onPageSizeChanged?: (pageSize: number) => void;
   onSearch?: (search: string) => void;
 }
@@ -15,6 +17,8 @@ const Filter: React.FC<Props> = ({
   paginateParams,
   actions,
   filters,
+  addOns,
+  isSearched = true,
   onPageSizeChanged,
   onSearch,
 }: Props) => {
@@ -69,36 +73,42 @@ const Filter: React.FC<Props> = ({
               Filter
             </Button>
           )}
+
+          {addOns}
         </div>
 
-        <InputGroup
-          className={`form-group form-group--icon mb-0 w-auto ${
-            filters ? 'ml-md-3' : 'ml-auto'
-          }`}
-        >
-          <div className="w-100 position-relative">
-            <FormControl
-              placeholder="Search"
-              aria-label="Search"
-              aria-describedby="basic-addon1"
-              value={search}
-              onChange={(event) => {
-                event.preventDefault();
-                setSearch(event.target.value);
-              }}
-            />
-            <InputGroup.Append>
-              <span className="input-group-text">
-                <div className="ic_search"></div>
-              </span>
-            </InputGroup.Append>
-          </div>
-        </InputGroup>
-        <div className="ml-md-2 mt-3 mt-md-0 pr-lg-25">
-          <Button variant="primary" onClick={handleSearch}>
-            Search
-          </Button>
-        </div>
+        {isSearched && (
+          <>
+            <InputGroup
+              className={`form-group form-group--icon mb-0 w-auto ${
+                filters ? 'ml-md-3' : 'ml-auto'
+              }`}
+            >
+              <div className="w-100 position-relative">
+                <FormControl
+                  placeholder="Search"
+                  aria-label="Search"
+                  aria-describedby="basic-addon1"
+                  value={search}
+                  onChange={(event) => {
+                    event.preventDefault();
+                    setSearch(event.target.value);
+                  }}
+                />
+                <InputGroup.Append>
+                  <span className="input-group-text">
+                    <div className="ic_search"></div>
+                  </span>
+                </InputGroup.Append>
+              </div>
+            </InputGroup>
+            <div className="ml-md-2 mt-3 mt-md-0 pr-lg-25">
+              <Button variant="primary" onClick={handleSearch}>
+                Search
+              </Button>
+            </div>
+          </>
+        )}
       </div>
       {showFilter && <div>{filters}</div>}
     </>

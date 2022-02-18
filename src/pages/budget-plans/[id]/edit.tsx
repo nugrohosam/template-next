@@ -7,7 +7,10 @@ import LoadingButton from 'components/ui/Button/LoadingButton';
 import DetailLayout from 'components/ui/DetailLayout';
 import { periodeTypeOptions, periodeYearOptions } from 'constants/period';
 import { BudgetPlanForm } from 'modules/budgetPlan/entities';
-import { useCreateBudgetPlan } from 'modules/budgetPlan/hook';
+import {
+  useFetchBudgetPlanDetail,
+  useUpdateBudgetPlan,
+} from 'modules/budgetPlan/hook';
 import { useDecodeToken } from 'modules/custom/useDecodeToken';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
@@ -21,26 +24,28 @@ import * as yup from 'yup';
 const breadCrumb: PathBreadcrumb[] = [
   {
     label: 'Budget Plan',
-    link: '/budget-plan',
+    link: '/budget-plans',
   },
   {
-    label: 'Create',
+    label: 'Edit',
     active: true,
   },
 ];
 
 const schema = yup.object().shape({
-  periodType: yup.string().required(`Period can't be empty`),
-  periodYear: yup.string().required(`Year can't be empty`),
-  districtCode: yup.string().required(),
-  divisionCode: yup.string().required(),
-  departmentCode: yup.string().required(),
+  periodType: yup.mixed().required(),
+  periodYear: yup.mixed().required(),
+  districtCode: yup.mixed().required(),
+  divisionCode: yup.mixed().required(),
+  departmentCode: yup.mixed().required(),
 });
 
 const CreatePeriodActual: NextPage = () => {
-  const [profile] = useDecodeToken();
-
   const router = useRouter();
+  const id = router.query.id as string;
+
+  const { data: dataHookBudgetPlanDetail } = useFetchBudgetPlanDetail(id);
+
   const {
     handleSubmit,
     control,
@@ -55,42 +60,74 @@ const CreatePeriodActual: NextPage = () => {
 
   useEffect(() => {
     reset({
-      departmentCode: profile?.job_group,
-      districtCode: profile?.district_code,
-      // TODO: division code masih hardcode
-      divisionCode: 'FATB',
+      departmentCode: dataHookBudgetPlanDetail?.departmentCode,
+      districtCode: dataHookBudgetPlanDetail?.districtCode,
+      divisionCode: dataHookBudgetPlanDetail?.divisionCode,
+      periodType: dataHookBudgetPlanDetail?.periodType,
+      periodYear: dataHookBudgetPlanDetail?.periodYear,
     });
-  }, [profile, reset]);
+  }, [dataHookBudgetPlanDetail, reset]);
 
-  const mutation = useCreateBudgetPlan();
+  const mutation = useUpdateBudgetPlan();
 
   const handleSubmitForm = (data: BudgetPlanForm) => {
-    mutation.mutate(data, {
-      onSuccess: () => {
-        router.push('/budget-plan');
-        toast('Data created!');
-      },
-      onError: (error) => {
-        console.error('Failed to create data', error);
-        setValidationError(error, setError);
-        toast(error.message, { autoClose: false });
-        showErrorMessage(error);
-      },
-    });
+    mutation.mutate(
+      { idBudgetPlan: id, data },
+      {
+        onSuccess: () => {
+          router.push('/budget-plans');
+          toast('Data updated!');
+        },
+        onError: (error) => {
+          console.error('Failed to update data', error);
+          setValidationError(error, setError);
+          toast(error.message, { autoClose: false });
+          showErrorMessage(error);
+        },
+      }
+    );
   };
 
   return (
     <DetailLayout
       paths={breadCrumb}
-      backButtonClick={() => router.replace(`/budget-plan`)}
-      title="Create Budget Plan"
+      backButtonClick={() => router.replace(`/budget-plan/${id}/detail`)}
+      title="Edit Budget Plan"
     >
       <Panel>
         <Form onSubmit={handleSubmit(handleSubmitForm)}>
           <Row>
             <Col lg={6}>
               <FormGroup>
-                <FormLabel className="required">District</FormLabel>
+                <FormLabel>Division</FormLabel>
+                <Input
+                  name="divisionCode"
+                  control={control}
+                  defaultValue=""
+                  type="text"
+                  placeholder="Division"
+                  disabled
+                  error={errors.divisionCode?.message}
+                />
+              </FormGroup>
+            </Col>
+            <Col lg={6}>
+              <FormGroup>
+                <FormLabel>Departemen</FormLabel>
+                <Input
+                  name="departmentCode"
+                  control={control}
+                  defaultValue=""
+                  type="text"
+                  placeholder="Departemen"
+                  disabled
+                  error={errors.departmentCode?.message}
+                />
+              </FormGroup>
+            </Col>
+            <Col lg={6}>
+              <FormGroup>
+                <FormLabel>District</FormLabel>
                 <Input
                   name="districtCode"
                   control={control}
@@ -104,38 +141,20 @@ const CreatePeriodActual: NextPage = () => {
             </Col>
             <Col lg={6}>
               <FormGroup>
-                <FormLabel className="required">Divisi</FormLabel>
-                <Input
-                  name="divisionCode"
+                <FormLabel>Periode</FormLabel>
+                <SingleSelect
+                  name="periodType"
                   control={control}
                   defaultValue=""
-                  type="text"
-                  placeholder="Divisi"
-                  disabled
-                  error={errors.divisionCode?.message}
+                  placeholder="Periode"
+                  options={periodeTypeOptions}
+                  error={errors.periodType?.message}
                 />
               </FormGroup>
             </Col>
             <Col lg={6}>
               <FormGroup>
-                <FormLabel className="required">Departemen</FormLabel>
-                <Input
-                  name="departmentCode"
-                  control={control}
-                  defaultValue=""
-                  type="text"
-                  placeholder="Departemen"
-                  disabled
-                  error={errors.departmentCode?.message}
-                />
-              </FormGroup>
-            </Col>
-          </Row>
-
-          <Row>
-            <Col lg={6}>
-              <FormGroup>
-                <FormLabel className="required">Year</FormLabel>
+                <FormLabel>Tahun</FormLabel>
                 <SingleSelect
                   name="periodYear"
                   control={control}
@@ -143,19 +162,6 @@ const CreatePeriodActual: NextPage = () => {
                   placeholder="Year"
                   options={periodeYearOptions}
                   error={errors.periodYear?.message}
-                />
-              </FormGroup>
-            </Col>
-            <Col lg={6}>
-              <FormGroup>
-                <FormLabel className="required">Period</FormLabel>
-                <SingleSelect
-                  name="periodType"
-                  control={control}
-                  defaultValue=""
-                  placeholder="Semester"
-                  options={periodeTypeOptions}
-                  error={errors.periodType?.message}
                 />
               </FormGroup>
             </Col>
@@ -168,7 +174,7 @@ const CreatePeriodActual: NextPage = () => {
               disabled={!isValid || mutation.isLoading}
               isLoading={mutation.isLoading}
             >
-              Create
+              Update
             </LoadingButton>
           </Col>
         </Form>

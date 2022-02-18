@@ -36,6 +36,8 @@ interface Props<T extends object = {}> {
   selectedSort?: Array<SortingRule<T>>;
   onSelectedRowsChanged?: (rows: Record<IdType<T>, boolean>) => void;
   onSelectedSortChanged?: (sort: SortingRule<T>[]) => void;
+  actions?: React.ReactNode;
+  addOns?: React.ReactNode;
   hiddenColumns?: Array<string>;
   disabledRowIds?: string[];
 }
@@ -49,6 +51,8 @@ function SimpleTable<T extends object = {}>({
   selectedSort = [],
   onSelectedRowsChanged,
   onSelectedSortChanged,
+  actions,
+  addOns,
   hiddenColumns = [],
   disabledRowIds = [],
 }: Props<T>): JSX.Element {
@@ -158,6 +162,13 @@ function SimpleTable<T extends object = {}>({
   return (
     <>
       <Col lg={12}>
+        {(addOns || actions) && (
+          <Filter
+            actions={selectedRowKes.length > 0 && actions}
+            addOns={addOns}
+            isSearched={false}
+          />
+        )}
         <Table
           {...getTableProps()}
           className={classTable || 'table-admin'}

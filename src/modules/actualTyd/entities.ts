@@ -7,3 +7,9 @@ export type ActualYtd = {
   period: string;
   createdAt: string;
 };
+
+export interface UploadActualYtdReq {
+  file: Array<File>;
+  year: string;
+  period: string;
+}

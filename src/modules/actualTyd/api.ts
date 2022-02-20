@@ -21,3 +21,9 @@ export const deleteActualYtds = async (
   });
   return result.data.data;
 };
+
+export const uploadActualYtd = async (data: FormData): Promise<void> => {
+  await axios.post<ResponseData<null>>('v1/actualytd', data, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+};

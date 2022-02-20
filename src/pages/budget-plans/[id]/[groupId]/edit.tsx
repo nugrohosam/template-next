@@ -6,6 +6,10 @@ import BudgetPlanItemModal from 'components/ui/Modal/BudgetPlanItemModal';
 import SimpleTable from 'components/ui/Table/SimpleTable';
 import { ItemOfBudgetPlanItemForm } from 'modules/budgetPlanItem/entities';
 import { useCreateBudgetPlanItems } from 'modules/budgetPlanItem/hook';
+import {
+  useFetchBudgetPlanItemGroupDetail,
+  useFetchBudgetPlanItemGroupItems,
+} from 'modules/budgetPlanItemGroup/hook';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
@@ -47,81 +51,89 @@ const columns: Column<ItemOfBudgetPlanItemForm>[] = [
   {
     Header: 'Jan',
     Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) =>
-      row.values.items[0]?.quantity || '-',
+      row.values.items[0]?.quantity || '',
   },
   {
     Header: 'Feb',
     Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) =>
-      row.values.items[1]?.quantity || '-',
+      row.values.items[1]?.quantity || '',
   },
   {
     Header: 'Mar',
     Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) =>
-      row.values.items[2]?.quantity || '-',
+      row.values.items[2]?.quantity || '',
   },
   {
     Header: 'Apr',
     minWidth: 100,
     Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) =>
-      row.values.items[3]?.quantity || '-',
+      row.values.items[3]?.quantity || '',
   },
   {
     Header: 'Mei',
     Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) =>
-      row.values.items[4]?.quantity || '-',
+      row.values.items[4]?.quantity || '',
   },
   {
     Header: 'Jun',
     Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) =>
-      row.values.items[5]?.quantity || '-',
+      row.values.items[5]?.quantity || '',
   },
   {
     Header: 'Jul',
     Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) =>
-      row.values.items[6]?.quantity || '-',
+      row.values.items[6]?.quantity || '',
   },
   {
     Header: 'Aug',
     Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) =>
-      row.values.items[7]?.quantity || '-',
+      row.values.items[7]?.quantity || '',
   },
   {
     Header: 'Sep',
     Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) =>
-      row.values.items[8]?.quantity || '-',
+      row.values.items[8]?.quantity || '',
   },
   {
     Header: 'Oct',
     Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) =>
-      row.values.items[9]?.quantity || '-',
+      row.values.items[9]?.quantity || '',
   },
   {
     Header: 'Nov',
     Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) =>
-      row.values.items[10]?.quantity || '-',
+      row.values.items[10]?.quantity || '',
   },
   {
     Header: 'Dec',
     Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) =>
-      row.values.items[11]?.quantity || '-',
+      row.values.items[11]?.quantity || '',
   },
 ];
 
 const CreatePeriodActual: NextPage = () => {
   const router = useRouter();
-  const id = router.query.id as string;
+  const budgetPlanId = router.query.id as string;
+  const budgetPlanGroupId = router.query.groupId as string;
   const [selectedRow, setSelectedRow] = useState<Record<string, boolean>>({});
 
   const breadCrumb: PathBreadcrumb[] = [
     {
       label: 'Detail',
-      link: `/budget-plans/${id}/detail`,
+      link: `/budget-plans/${budgetPlanId}/detail`,
     },
     {
       label: 'Create Items',
       active: true,
     },
   ];
+
+  const dataHookBudgetPlanItemGroup =
+    useFetchBudgetPlanItemGroupDetail(budgetPlanGroupId);
+  const dataHookBudgetPlanItemGroupItems = useFetchBudgetPlanItemGroupItems(
+    budgetPlanGroupId,
+    {}
+  );
 
   const mutation = useCreateBudgetPlanItems();
 
@@ -143,16 +155,26 @@ const CreatePeriodActual: NextPage = () => {
   const submitCreateBudgetPlanItems = () => {
     mutation.mutate(
       {
-        idCapexBudgetPlan: id,
+        idCapexBudgetPlan: budgetPlanId,
         // TODO: isBuilding, outstandingPlanPaymentAttachment, outstandingRetentionAttachment masih hardcode
-        isBuilding: false,
-        outstandingPlanPaymentAttachment: null,
-        outstandingRetentionAttachment: null,
-        budgetPlanItems: myBudgetPlanItem,
+        isBuilding: true,
+        outstandingPlanPaymentAttachment:
+          'outstanding_plan_payment_attachment.xlsx',
+        outstandingRetentionAttachment: 'outstanding_retention_attachment.xlsx',
+        budgetPlanItems: myBudgetPlanItem.map((item) => ({
+          idCapexCatalog: item.idCapexCatalog,
+          idAssetGroup: item.idAssetGroup,
+          pricePerUnit: item.pricePerUnit,
+          currency: item.currency,
+          currencyRate: item.currencyRate,
+          totalAmount: item.totalAmount,
+          totalAmountUsd: item.totalAmountUsd,
+          items: item.items,
+        })),
       },
       {
         onSuccess: () => {
-          router.push(`/budget-plans/${id}/detail`);
+          router.push('/master-capex/asset-groups');
           toast('Data created!');
         },
         onError: (error) => {
@@ -167,7 +189,9 @@ const CreatePeriodActual: NextPage = () => {
   return (
     <DetailLayout
       paths={breadCrumb}
-      backButtonClick={() => router.replace(`/budget-plans/${id}/detail`)}
+      backButtonClick={() =>
+        router.replace(`/budget-plans/${budgetPlanId}/detail`)
+      }
       title="Budget Plan Items Create"
     >
       <Panel>

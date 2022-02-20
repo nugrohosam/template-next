@@ -42,10 +42,9 @@ const CreateBudgetPlanItemModal: React.FC<RejectModalProps> = ({
     pricePerUnit: yup.string().required(),
     currency: yup.string().required(),
     currencyRate: yup.string().required(),
-    totalAmount: yup.string().required(),
-    totalAmountUsd: yup.string().required(),
   });
 
+  const [kurs, setKurs] = useState<number>(14500);
   const [myBudgetPlanItem, setMyBudgetPlanItem] = useState<
     ItemOfItemOfBudgetPlanItemForm[]
   >(
@@ -63,15 +62,24 @@ const CreateBudgetPlanItemModal: React.FC<RejectModalProps> = ({
     watch,
     resetField,
     setValue,
+    reset,
+    getValues,
   } = useForm<ItemOfBudgetPlanItemForm>({
     mode: 'onChange',
     resolver: yupResolver(schema),
   });
   const watchAssetGroup = watch('idAssetGroup');
   const watchPricePerUnit = watch('pricePerUnit', 0);
+  const watchCurrency = watch('currency');
 
-  const handleSubmitForm = (data: ItemOfBudgetPlanItemForm) =>
-    onSend({ ...data, items: myBudgetPlanItem });
+  const handleSubmitForm = (data: ItemOfBudgetPlanItemForm) => {
+    data.items = myBudgetPlanItem.filter((item) => item.quantity);
+    data.totalAmount = +totalAmount();
+    data.totalAmountUsd = +totalAmountUsd();
+    console.log(data);
+    onSend(data);
+    reset();
+  };
 
   // asset group options
   const dataHookAssetGroups = useFetchAssetGroups({ pageSize: 50 });
@@ -97,11 +105,29 @@ const CreateBudgetPlanItemModal: React.FC<RejectModalProps> = ({
     const found = dataHookCatalogs.data?.items.find(
       (item) => item.id === idCapexCatalog
     );
-    setValue('totalAmount', found?.priceInIdr || 0);
-    setValue('totalAmountUsd', found?.priceInUsd || 0);
-    // TODO: 2 data ini masih di hardcode
-    setValue('pricePerUnit', 1000000);
+    // TODO: data ini masih di hardcode
     setValue('currencyRate', 10000);
+    if (getValues('currency')) {
+      const pricePerUnit =
+        (getValues('currency') === 'IDR'
+          ? found?.priceInIdr
+          : found?.priceInUsd) || 0;
+      setValue('pricePerUnit', pricePerUnit);
+      reCalculateItems(pricePerUnit);
+    }
+  };
+
+  const changeCurrency = (currency: string) => {
+    const idCapexCatalog = getValues('idCapexCatalog');
+    const found = dataHookCatalogs.data?.items.find(
+      (item) => item.id === idCapexCatalog
+    );
+    if (idCapexCatalog) {
+      const pricePerunit =
+        (currency === 'IDR' ? found?.priceInIdr : found?.priceInUsd) || 0;
+      setValue('pricePerUnit', pricePerunit);
+      reCalculateItems(pricePerunit);
+    }
   };
 
   const columns = useMemo<Column<ItemOfItemOfBudgetPlanItemForm>[]>(
@@ -119,9 +145,9 @@ const CreateBudgetPlanItemModal: React.FC<RejectModalProps> = ({
         accessor: 'quantity',
         Cell: ({ row }: CellProps<ItemOfItemOfBudgetPlanItemForm>) => (
           <FormControl
-            type="number"
+            type="text"
             value={row.values.quantity}
-            onChange={(val) =>
+            onChange={(val) => {
               setMyBudgetPlanItem((prev) =>
                 prev.map((item, index) => {
                   return index === row.index
@@ -132,8 +158,8 @@ const CreateBudgetPlanItemModal: React.FC<RejectModalProps> = ({
                       }
                     : item;
                 })
-              )
-            }
+              );
+            }}
           />
         ),
       },
@@ -147,6 +173,33 @@ const CreateBudgetPlanItemModal: React.FC<RejectModalProps> = ({
     ],
     [watchPricePerUnit, setMyBudgetPlanItem]
   );
+
+  const reCalculateItems = (pricePerUnit: number) => {
+    setMyBudgetPlanItem((prev) =>
+      prev.map((item) => ({
+        ...item,
+        amount: ((item.quantity as number) || 0) * (pricePerUnit || 0),
+      }))
+    );
+  };
+
+  const totalAmount = () => {
+    if (!watchCurrency) return 0;
+    const total = myBudgetPlanItem
+      .map((item) => item.amount)
+      .reduce((previousValue, currentValue) => previousValue + currentValue, 0);
+
+    return watchCurrency === 'USD' ? total * kurs : total;
+  };
+
+  const totalAmountUsd = () => {
+    if (!watchCurrency) return 0;
+    const total = myBudgetPlanItem
+      .map((item) => item.amount)
+      .reduce((previousValue, currentValue) => previousValue + currentValue, 0);
+
+    return watchCurrency === 'IDR' ? total / kurs : total;
+  };
 
   return (
     <ModalBox
@@ -163,7 +216,7 @@ const CreateBudgetPlanItemModal: React.FC<RejectModalProps> = ({
         <Col lg={6}>
           <FormGroup>
             <FormLabel>Kurs</FormLabel>
-            <FormControl type="text" value="14.500" disabled />
+            <FormControl type="text" value={kurs} disabled />
           </FormGroup>
         </Col>
       </Row>
@@ -181,8 +234,9 @@ const CreateBudgetPlanItemModal: React.FC<RejectModalProps> = ({
               error={errors.idAssetGroup?.message}
               onChange={() => {
                 resetField('idCapexCatalog');
-                resetField('totalAmount');
-                resetField('totalAmountUsd');
+                resetField('currency');
+                resetField('currencyRate');
+                resetField('pricePerUnit');
               }}
             />
           </FormGroup>
@@ -211,48 +265,37 @@ const CreateBudgetPlanItemModal: React.FC<RejectModalProps> = ({
               placeholder="Currency"
               options={currencyOptions}
               error={errors.idCapexCatalog?.message}
+              onChange={(val) => changeCurrency(val.value as string)}
             />
           </FormGroup>
         </Col>
         <Col lg={6}>
           <FormGroup>
             <FormLabel>Price/Unit</FormLabel>
-            <Input
-              name="pricePerUnit"
-              control={control}
-              defaultValue=""
+            <FormControl
               type="text"
-              placeholder="Price/Unit"
+              value={watchPricePerUnit?.toLocaleString('id-Id') || 0}
               disabled
-              error={errors.pricePerUnit?.message}
             />
           </FormGroup>
         </Col>
         <Col lg={6}>
           <FormGroup>
             <FormLabel>Total IDR</FormLabel>
-            <Input
-              name="totalAmount"
-              control={control}
-              defaultValue=""
+            <FormControl
               type="text"
-              placeholder="Total IDR"
+              value={totalAmount().toLocaleString('id-Id')}
               disabled
-              error={errors.totalAmount?.message}
             />
           </FormGroup>
         </Col>
         <Col lg={6}>
           <FormGroup>
             <FormLabel>Total USD</FormLabel>
-            <Input
-              name="totalAmountUsd"
-              control={control}
-              defaultValue=""
+            <FormControl
               type="text"
-              placeholder="Total USD"
+              value={totalAmountUsd().toLocaleString('en-EN')}
               disabled
-              error={errors.totalAmountUsd?.message}
             />
           </FormGroup>
         </Col>

@@ -5,8 +5,8 @@ import SingleSelect, { SelectOption } from 'components/form/SingleSelect';
 import { currencyOptions } from 'constants/currency';
 import { useFetchAssetGroups } from 'modules/assetGroup/hook';
 import {
+  ItemOfBudgetPlanItem,
   ItemOfBudgetPlanItemForm,
-  ItemOfItemOfBudgetPlanItemForm,
 } from 'modules/budgetPlanItem/entities';
 import { Catalog } from 'modules/catalog/entities';
 import { useFetchCatalogs } from 'modules/catalog/hook';
@@ -32,6 +32,13 @@ interface RejectModalProps {
   classButton?: string;
 }
 
+const initMyBudgetPlanItem = () =>
+  [...Array(12).keys()].map((item) => ({
+    month: item + 1,
+    quantity: 0,
+    amount: 0,
+  }));
+
 const CreateBudgetPlanItemModal: React.FC<RejectModalProps> = ({
   onSend,
   classButton,
@@ -46,14 +53,8 @@ const CreateBudgetPlanItemModal: React.FC<RejectModalProps> = ({
 
   const [kurs, setKurs] = useState<number>(14500);
   const [myBudgetPlanItem, setMyBudgetPlanItem] = useState<
-    ItemOfItemOfBudgetPlanItemForm[]
-  >(
-    [...Array(12).keys()].map((item) => ({
-      month: item + 1,
-      quantity: '',
-      amount: 0,
-    }))
-  );
+    ItemOfBudgetPlanItem[]
+  >(initMyBudgetPlanItem());
 
   const {
     handleSubmit,
@@ -76,9 +77,12 @@ const CreateBudgetPlanItemModal: React.FC<RejectModalProps> = ({
     data.items = myBudgetPlanItem.filter((item) => item.quantity);
     data.totalAmount = +totalAmount();
     data.totalAmountUsd = +totalAmountUsd();
+    data.pricePerUnit = +data.pricePerUnit;
+    data.currencyRate = +data.currencyRate;
     console.log(data);
     onSend(data);
     reset();
+    setMyBudgetPlanItem(initMyBudgetPlanItem());
   };
 
   // asset group options
@@ -130,12 +134,12 @@ const CreateBudgetPlanItemModal: React.FC<RejectModalProps> = ({
     }
   };
 
-  const columns = useMemo<Column<ItemOfItemOfBudgetPlanItemForm>[]>(
+  const columns = useMemo<Column<ItemOfBudgetPlanItem>[]>(
     () => [
       {
         Header: 'Month',
         accessor: 'month',
-        Cell: ({ row }: CellProps<ItemOfItemOfBudgetPlanItemForm>) =>
+        Cell: ({ row }: CellProps<ItemOfBudgetPlanItem>) =>
           moment()
             .month(row.values.month - 1)
             .format('MMMM'),
@@ -143,7 +147,7 @@ const CreateBudgetPlanItemModal: React.FC<RejectModalProps> = ({
       {
         Header: 'Quantity',
         accessor: 'quantity',
-        Cell: ({ row }: CellProps<ItemOfItemOfBudgetPlanItemForm>) => (
+        Cell: ({ row }: CellProps<ItemOfBudgetPlanItem>) => (
           <FormControl
             type="text"
             value={row.values.quantity}
@@ -166,7 +170,7 @@ const CreateBudgetPlanItemModal: React.FC<RejectModalProps> = ({
       {
         Header: 'Amount',
         accessor: 'amount',
-        Cell: ({ row }: CellProps<ItemOfItemOfBudgetPlanItemForm>) => (
+        Cell: ({ row }: CellProps<ItemOfBudgetPlanItem>) => (
           <FormControl type="text" value={row.values.amount} disabled />
         ),
       },

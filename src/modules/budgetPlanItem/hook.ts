@@ -6,7 +6,11 @@ import {
   UseQueryResult,
 } from 'react-query';
 
-import { createBudgetPlanItems, deleteBudgetPlanItems } from './api';
+import {
+  createBudgetPlanItems,
+  deleteBudgetPlanItems,
+  updateBudgetPlanItems,
+} from './api';
 import { BudgetPlanItem, BudgetPlanItemForm } from './entities';
 
 export const useCreateBudgetPlanItems = (): UseMutationResult<
@@ -17,19 +21,13 @@ export const useCreateBudgetPlanItems = (): UseMutationResult<
   return useMutation(createBudgetPlanItems);
 };
 
-// interface UpdateBudgetPlanParams {
-//   idBudgetPlan: string;
-//   data: BudgetPlanForm;
-// }
-// export const useUpdateBudgetPlan = (): UseMutationResult<
-//   BudgetPlan,
-//   ResponseError,
-//   UpdateBudgetPlanParams
-// > => {
-//   return useMutation(({ idBudgetPlan, data }) =>
-//     updateBudgetPlan(idBudgetPlan, data)
-//   );
-// };
+export const useUpdateBudgetPlanItems = (): UseMutationResult<
+  BudgetPlanItem,
+  ResponseError,
+  BudgetPlanItemForm
+> => {
+  return useMutation(updateBudgetPlanItems);
+};
 
 export const useDeleteBudgetPlanitems = (): UseMutationResult<
   null,

@@ -34,10 +34,5 @@ export interface ItemOfBudgetPlanItemForm {
   currencyRate: number;
   totalAmount: number;
   totalAmountUsd: number;
-  items: ItemOfItemOfBudgetPlanItemForm[];
-}
-
-export interface ItemOfItemOfBudgetPlanItemForm
-  extends Omit<ItemOfBudgetPlanItem, 'quantity'> {
-  quantity: number | string;
+  items: ItemOfBudgetPlanItem[];
 }

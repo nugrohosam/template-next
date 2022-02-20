@@ -81,7 +81,6 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
               control={control}
               type="number"
               defaultValue="0"
-              value={amountAdjustment}
               disabled
             />
           </Col>

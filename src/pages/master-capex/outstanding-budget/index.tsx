@@ -1,8 +1,13 @@
 import { customStyles } from 'components/form/SingleSelect';
 import LoadingButton from 'components/ui/Button/LoadingButton';
 import ContentLayout from 'components/ui/ContentLayout';
+import ConfirmationModal from 'components/ui/Modal/OutstandingBudget/ConfirmationModal';
 import DataTable, { usePaginateParams } from 'components/ui/Table/DataTable';
-import { outstandingBudget } from 'modules/outstandingBudget/entities';
+import {
+  confirmOutstandingBudget,
+  confirmOutstandingBudgetField,
+  outstandingBudget,
+} from 'modules/outstandingBudget/entities';
 import {
   useConfirmationOutstandingBudget,
   useFetchOutstandingBudget,
@@ -17,7 +22,6 @@ import { toast } from 'react-toastify';
 import { getAllIds, showErrorMessage } from 'utils/helpers';
 
 const OutstandingBudgets: NextPage = () => {
-  const [selectedRow, setSelectedRow] = useState<Record<string, boolean>>({});
   const [selectedSort, setSelectedSort] = useState<SortingRule<any>[]>([]);
   const { params, setPageNumber, setPageSize, setSearch, setSortingRules } =
     usePaginateParams();
@@ -28,6 +32,26 @@ const OutstandingBudgets: NextPage = () => {
 
   const mutation = useConfirmationOutstandingBudget();
 
+  const confirmMutation = useConfirmationOutstandingBudget();
+
+  const handleConfirmation = (data: confirmOutstandingBudget) => {
+    console.log(data);
+    const confirmationData = {
+      ...data,
+    };
+    confirmMutation.mutate(confirmationData, {
+      onSuccess: () => {
+        dataHook.refetch();
+        toast('Confirmation Success!');
+      },
+      onError: (error) => {
+        console.log('Failed to confirm', error);
+        toast(error.message);
+        showErrorMessage(error);
+      },
+    });
+  };
+
   const columns = useMemo<Column<outstandingBudget>[]>(
     () => [
       {
@@ -37,22 +61,37 @@ const OutstandingBudgets: NextPage = () => {
       {
         Header: 'Budget ID',
         accessor: 'budgetId',
+        style: {
+          minWidth: '250px',
+        },
       },
       {
         Header: 'District',
         accessor: 'district',
+        style: {
+          minWidth: '150px',
+        },
       },
       {
         Header: 'Department',
         accessor: 'department',
+        style: {
+          minWidth: '175px',
+        },
       },
       {
         Header: 'Detail',
         accessor: 'detail',
+        style: {
+          minWidth: '150px',
+        },
       },
       {
         Header: 'Left Information',
         accessor: 'leftInformation',
+        style: {
+          minWidth: '150px',
+        },
         Cell: ({ cell }: CellProps<outstandingBudget>) => {
           return (
             <div className="text-right">
@@ -64,6 +103,9 @@ const OutstandingBudgets: NextPage = () => {
       {
         Header: 'Used Information',
         accessor: 'usedInformation',
+        style: {
+          minWidth: '150px',
+        },
         Cell: ({ cell }: CellProps<outstandingBudget>) => {
           return (
             <div className="text-right">
@@ -75,6 +117,9 @@ const OutstandingBudgets: NextPage = () => {
       {
         Header: 'Original Sisa Budget (USD) S1 Current Period',
         accessor: 'originalSisaBudgetUsdS1CurrentPeriod',
+        style: {
+          minWidth: '250px',
+        },
         Cell: ({ cell }: CellProps<outstandingBudget>) => {
           return (
             <div className="text-right">
@@ -88,6 +133,9 @@ const OutstandingBudgets: NextPage = () => {
       {
         Header: 'Original Quantity',
         accessor: 'originalQuantity',
+        style: {
+          minWidth: '150px',
+        },
         Cell: ({ cell }: CellProps<outstandingBudget>) => {
           return (
             <div className="text-right">
@@ -99,6 +147,9 @@ const OutstandingBudgets: NextPage = () => {
       {
         Header: 'Realisasi Sisa Budget S1 Current Period',
         accessor: 'realisasiSisaBudgetS1CurrentPeriod',
+        style: {
+          minWidth: '250px',
+        },
         Cell: ({ cell }: CellProps<outstandingBudget>) => {
           return (
             <div className="text-right">
@@ -112,6 +163,9 @@ const OutstandingBudgets: NextPage = () => {
       {
         Header: 'Adjusted Left Information',
         accessor: 'adjustedLeftInformation',
+        style: {
+          minWidth: '250px',
+        },
         Cell: ({ cell }: CellProps<outstandingBudget>) => {
           return (
             <div className="text-right">
@@ -123,6 +177,9 @@ const OutstandingBudgets: NextPage = () => {
       {
         Header: 'Quantity Realisasi S1 Current Period',
         accessor: 'quantityRealisasiS1CurrentPeriod',
+        style: {
+          minWidth: '250px',
+        },
         Cell: ({ cell }: CellProps<outstandingBudget>) => {
           return (
             <div className="text-right">
@@ -136,6 +193,9 @@ const OutstandingBudgets: NextPage = () => {
       {
         Header: 'Total Pengajuan Budget (USD) S1 Current Period',
         accessor: 'totalPengajuanBudgetUsdS1CurrentPeriod',
+        style: {
+          minWidth: '250px',
+        },
         Cell: ({ cell }: CellProps<outstandingBudget>) => {
           return (
             <div className="text-right">
@@ -149,6 +209,9 @@ const OutstandingBudgets: NextPage = () => {
       {
         Header: 'Adjustment Current Period',
         accessor: 'adjustmentCurrentPeriod',
+        style: {
+          minWidth: '250px',
+        },
         Cell: ({ cell }: CellProps<outstandingBudget>) => {
           return (
             <div className="text-right">
@@ -160,6 +223,9 @@ const OutstandingBudgets: NextPage = () => {
       {
         Header: 'Adjusted Sisa Budget (USD) S1 Current Period',
         accessor: 'adjustedSisaBudgetUsdS1CurrentPeriod',
+        style: {
+          minWidth: '250px',
+        },
         Cell: ({ cell }: CellProps<outstandingBudget>) => {
           return (
             <div className="text-right">
@@ -173,10 +239,16 @@ const OutstandingBudgets: NextPage = () => {
       {
         Header: 'Remark',
         accessor: 'adjustmentRemark',
+        style: {
+          minWidth: '250px',
+        },
       },
       {
         Header: 'Realisasi Sisa Budget S1 Current Period',
         accessor: 'adjustedRealisasiSisaBudgetS1CurrentPeriod',
+        style: {
+          minWidth: '250px',
+        },
         Cell: ({ cell }: CellProps<outstandingBudget>) => {
           return (
             <div className="text-right">
@@ -189,19 +261,37 @@ const OutstandingBudgets: NextPage = () => {
       },
       {
         Header: 'Actions',
+        accessor: 'createdAt',
+        style: {
+          minWidth: '250px',
+        },
         Cell: ({ cell }: CellProps<outstandingBudget>) => {
           return (
             <div className="d-flex flex-column">
-              <Button variant="primary">Confirm</Button>
+              <ConfirmationModal
+                onSend={handleConfirmation}
+                classButton="mb-0"
+                confirmData={{
+                  idOutstandingBudgets: [cell.row.values.id],
+                  totalPengajuanBudgetUsdS1CurrentPeriod:
+                    cell.row.original.totalPengajuanBudgetUsdS1CurrentPeriod,
+                  adjustedSisaBudgetUsdS1CurrentPeriod:
+                    cell.row.original.adjustedSisaBudgetUsdS1CurrentPeriod,
+                  originalQuantity: cell.row.original.originalQuantity,
+                  adjustedLeftInformation:
+                    cell.row.original.adjustedLeftInformation,
+                  realisasiSisaBudgetS1CurrentPeriod:
+                    cell.row.original.realisasiSisaBudgetS1CurrentPeriod,
+                }}
+              />
             </div>
           );
         },
       },
     ],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
-
-  const handleMultipleConfirmOutstanding = () => {};
 
   return (
     <ContentLayout title="Outstanding Budgets">
@@ -210,26 +300,10 @@ const OutstandingBudgets: NextPage = () => {
           <DataTable
             columns={columns}
             data={dataHook.data}
-            actions={
-              <>
-                <LoadingButton
-                  variant="primary"
-                  size="sm"
-                  className="mr-2"
-                  disabled={mutation.isLoading}
-                  onClick={handleMultipleConfirmOutstanding}
-                  isLoading={mutation.isLoading}
-                >
-                  Confirm
-                </LoadingButton>
-              </>
-            }
             isLoading={dataHook.isFetching}
-            selectedSort={selectedSort}
-            selectedRows={selectedRow}
             hiddenColumns={['id']}
+            selectedSort={selectedSort}
             paginateParams={params}
-            onSelectedRowsChanged={(rows) => setSelectedRow(rows)}
             onSelectedSortChanged={(sort) => {
               setSelectedSort(sort);
               setSortingRules(sort);

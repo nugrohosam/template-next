@@ -23,8 +23,18 @@ export type outstandingBudget = {
 };
 
 export type confirmOutstandingBudget = {
-  idOutstandingBudgets: string[];
+  idOutstandingBudgets: Array<string>;
   adjustmentCurrentPeriod: number;
-  amountAdjustment: number;
-  remark: string;
+  adjustedSisaBudgetUsdS1CurrentPeriod: number;
+  adjustedRealisasiSisaBudgetS1CurrentPeriod: number;
+  adjustmentRemark: string;
+};
+
+export type confirmOutstandingBudgetField = {
+  idOutstandingBudgets: Array<string>;
+  totalPengajuanBudgetUsdS1CurrentPeriod: number;
+  adjustedSisaBudgetUsdS1CurrentPeriod: number;
+  originalQuantity: number;
+  adjustedLeftInformation: number;
+  realisasiSisaBudgetS1CurrentPeriod: number;
 };

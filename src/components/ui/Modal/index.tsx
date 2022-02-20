@@ -9,6 +9,8 @@ interface ModalBoxProps {
   title: string;
   children?: React.ReactNode;
   classButton?: string;
+  wordingSubmit?: string;
+  dialogClassName?: string;
   onSend: () => void;
   onClikModal?: () => void;
 }
@@ -20,6 +22,8 @@ const ModalBox: React.FC<ModalBoxProps> = ({
   buttonVariant = 'green',
   submitButtonVariant = 'green',
   classButton,
+  wordingSubmit,
+  dialogClassName,
   onSend,
   onClikModal,
 }) => {
@@ -45,7 +49,12 @@ const ModalBox: React.FC<ModalBoxProps> = ({
       >
         {buttonTitle}
       </Button>
-      <Modal show={isShow} onHide={toggleShow} centered>
+      <Modal
+        show={isShow}
+        onHide={toggleShow}
+        centered
+        dialogClassName={dialogClassName}
+      >
         <Modal.Header className="pt-5">
           <Modal.Title>{title}</Modal.Title>
         </Modal.Header>
@@ -57,7 +66,7 @@ const ModalBox: React.FC<ModalBoxProps> = ({
             Close
           </Button>
           <Button variant={submitButtonVariant} onClick={handleSubmit}>
-            Send
+            {wordingSubmit || 'Send'}
           </Button>
         </Modal.Footer>
       </Modal>

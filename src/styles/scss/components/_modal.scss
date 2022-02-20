@@ -1,6 +1,6 @@
 // DEFAULT HEADER MODAL
 .modal {
-  .modal-content{
+  .modal-content {
     border: 0;
     border-radius: 0;
     .modal-header {
@@ -42,22 +42,22 @@
     p {
       padding: 0px 65px;
     }
-  } 
-  .modal-supplier{
+  }
+  .modal-supplier {
     .step-progress {
       height: 5px;
       background-color: #e2e8f9;
       &--active {
         background-color: $yellow !important;
         &:after {
-          content: "";
+          content: '';
           width: 18px !important;
           height: 18px !important;
           background-color: $yellow !important;
         }
       }
       &:after {
-        content: "";
+        content: '';
         width: 18px;
         height: 18px;
         background-color: #e2e8f9;
@@ -271,5 +271,14 @@
         padding: 16px 32px;
       }
     }
+  }
+}
+
+.modal-90w {
+  width: 90vw;
+  max-width: none;
+
+  @media screen and (min-width: $tablet) {
+    width: 50vw;
   }
 }

@@ -15,8 +15,11 @@ import {
 } from './api';
 import { Catalog, CatalogForm } from './entities';
 
+interface FetchCatalogParams extends PaginateParams {
+  assetGroupId?: string;
+}
 export const useFetchCatalogs = (
-  params: PaginateParams
+  params: FetchCatalogParams
 ): UseQueryResult<Paginate<Catalog>, ResponseError> => {
   return useQuery(['catalogs', params], () => fetchCatalogs(params));
 };

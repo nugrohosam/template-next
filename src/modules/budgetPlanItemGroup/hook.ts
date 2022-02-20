@@ -9,25 +9,36 @@ import {
 import {
   deleteBudgetPlanItemGroups,
   fetchBudgetPlanItemGroupDetail,
+  fetchBudgetPlanItemGroupItems,
   fetchBudgetPlanItemGroups,
 } from './api';
-import { BudgetPlanItemGorup } from './entities';
+import { BudgetPlanItemGroup, BudgetPlanItemGroupItem } from './entities';
 
 export const useFetchBudgetPlanItemGroups = (
   params: PaginateParams
-): UseQueryResult<Paginate<BudgetPlanItemGorup>, ResponseError> => {
-  return useQuery(['budget-plan-item-group', params], () =>
+): UseQueryResult<Paginate<BudgetPlanItemGroup>, ResponseError> => {
+  return useQuery(['budget-plan-item-groups', params], () =>
     fetchBudgetPlanItemGroups(params)
   );
 };
 
 export const useFetchBudgetPlanItemGroupDetail = (
   idBudgetPlanItemGroup: string
-): UseQueryResult<BudgetPlanItemGorup> => {
+): UseQueryResult<BudgetPlanItemGroup> => {
   return useQuery(
     ['budget-plan-item-group-detail', idBudgetPlanItemGroup],
     () => fetchBudgetPlanItemGroupDetail(idBudgetPlanItemGroup),
     { enabled: !!idBudgetPlanItemGroup }
+  );
+};
+
+export const useFetchBudgetPlanItemGroupItems = (
+  idBudgetPlanItemGroup: string,
+  params: PaginateParams
+): UseQueryResult<Paginate<BudgetPlanItemGroupItem>, ResponseError> => {
+  return useQuery(
+    ['budget-plan-item-group-items', idBudgetPlanItemGroup, params],
+    () => fetchBudgetPlanItemGroupItems(idBudgetPlanItemGroup, params)
   );
 };
 

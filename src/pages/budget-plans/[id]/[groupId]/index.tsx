@@ -20,7 +20,7 @@ import { CellProps, Column, SortingRule } from 'react-table';
 import { toast } from 'react-toastify';
 import { getAllIds, showErrorMessage } from 'utils/helpers';
 
-const BudgetPlanList: NextPage = () => {
+const BudgetPlanGroupItemList: NextPage = () => {
   const router = useRouter();
   const budgetPlanId = router.query.id as string;
   const budgetPlanGroupId = router.query.groupId as string;
@@ -48,8 +48,8 @@ const BudgetPlanList: NextPage = () => {
     params
   );
 
+  // handle delete
   const mutationDeleteBudgetPlanItems = useDeleteBudgetPlanitems();
-
   const deleteBudgetPlan = (ids: string[]) => {
     mutationDeleteBudgetPlanItems.mutate(ids, {
       onSuccess: () => {
@@ -64,7 +64,6 @@ const BudgetPlanList: NextPage = () => {
       },
     });
   };
-
   const handleDeleteMultipleBudgetPlan = () => {
     const ids = getAllIds(
       selectedRow,
@@ -84,9 +83,6 @@ const BudgetPlanList: NextPage = () => {
       Cell: ({ cell }: CellProps<BudgetPlanItemGroupItem>) => {
         return (
           <div className="d-flex flex-column" style={{ minWidth: 100 }}>
-            <Link href={`/budget-plans/${cell.row.values.id}/edit`} passHref>
-              <Button className="mb-1">Edit</Button>
-            </Link>
             <Button variant="red" onClick={() => {}}>
               Delete
             </Button>
@@ -188,7 +184,7 @@ const BudgetPlanList: NextPage = () => {
       backButtonClick={() =>
         router.replace(`/budget-plans/${budgetPlanId}/detail`)
       }
-      title="Detail Budget Plan Item Groups"
+      title="Detail Budget Plan Item Group"
     >
       <Panel>
         {dataHookBudgetPlanItemGroup.isLoading && <Loader size="sm" />}
@@ -225,49 +221,55 @@ const BudgetPlanList: NextPage = () => {
             </h3>
           </Col>
         </Row>
-      </Panel>
 
-      <Panel>
+        <br />
+
         <Row>
-          <Col lg={12}>
-            {dataHookBudgetPlanItemGroupItems.data && (
-              <DataTable
-                columns={columns}
-                data={dataHookBudgetPlanItemGroupItems.data}
-                actions={
-                  <>
-                    <LoadingButton
-                      variant="red"
-                      size="sm"
-                      className="mr-2"
-                      disabled={mutationDeleteBudgetPlanItems.isLoading}
-                      onClick={handleDeleteMultipleBudgetPlan}
-                      isLoading={mutationDeleteBudgetPlanItems.isLoading}
-                    >
-                      Delete
-                    </LoadingButton>
-                  </>
-                }
-                isLoading={dataHookBudgetPlanItemGroupItems.isFetching}
-                selectedSort={selectedSort}
-                selectedRows={selectedRow}
-                hiddenColumns={['id', 'catalog', 'items']}
-                paginateParams={params}
-                onSelectedRowsChanged={(rows) => setSelectedRow(rows)}
-                onSelectedSortChanged={(sort) => {
-                  setSelectedSort(sort);
-                  setSortingRules(sort);
-                }}
-                onSearch={(keyword) => setSearch(keyword)}
-                onPageSizeChanged={(pageSize) => setPageSize(pageSize)}
-                onChangePage={(page) => setPageNumber(page)}
-              ></DataTable>
-            )}
-          </Col>
+          {dataHookBudgetPlanItemGroupItems.data && (
+            <DataTable
+              columns={columns}
+              data={dataHookBudgetPlanItemGroupItems.data}
+              actions={
+                <>
+                  <LoadingButton
+                    variant="red"
+                    size="sm"
+                    className="mr-2"
+                    disabled={mutationDeleteBudgetPlanItems.isLoading}
+                    onClick={handleDeleteMultipleBudgetPlan}
+                    isLoading={mutationDeleteBudgetPlanItems.isLoading}
+                  >
+                    Delete
+                  </LoadingButton>
+                </>
+              }
+              addOns={
+                <Link
+                  href={`/budget-plans/${budgetPlanId}/${budgetPlanGroupId}/edit`}
+                  passHref
+                >
+                  <Button variant="primary">Edit</Button>
+                </Link>
+              }
+              isLoading={dataHookBudgetPlanItemGroupItems.isFetching}
+              selectedSort={selectedSort}
+              selectedRows={selectedRow}
+              hiddenColumns={['id', 'catalog', 'items']}
+              paginateParams={params}
+              onSelectedRowsChanged={(rows) => setSelectedRow(rows)}
+              onSelectedSortChanged={(sort) => {
+                setSelectedSort(sort);
+                setSortingRules(sort);
+              }}
+              onSearch={(keyword) => setSearch(keyword)}
+              onPageSizeChanged={(pageSize) => setPageSize(pageSize)}
+              onChangePage={(page) => setPageNumber(page)}
+            ></DataTable>
+          )}
         </Row>
       </Panel>
     </DetailLayout>
   );
 };
 
-export default BudgetPlanList;
+export default BudgetPlanGroupItemList;

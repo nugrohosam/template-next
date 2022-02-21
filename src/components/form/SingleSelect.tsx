@@ -47,6 +47,7 @@ export const customStyles = (error: string = '') => {
     menu: (provided: any) => ({
       ...provided,
       borderRadius: 0,
+      zIndex: 1001,
     }),
     option: (provided: any) => ({
       ...provided,

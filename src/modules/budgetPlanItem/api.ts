@@ -13,16 +13,15 @@ export const createBudgetPlanItems = async (
   return result.data.data;
 };
 
-// export const updateBudgetPlan = async (
-//   idBudgetPlan: string,
-//   data: BudgetPlanForm
-// ): Promise<BudgetPlan> => {
-//   const result = await axios.put<ResponseData<BudgetPlan>>(
-//     `v1/budgetplan/${idBudgetPlan}`,
-//     data
-//   );
-//   return result.data.data;
-// };
+export const updateBudgetPlanItems = async (
+  data: BudgetPlanItemForm
+): Promise<BudgetPlanItem> => {
+  const result = await axios.put<ResponseData<BudgetPlanItem>>(
+    `v1/budgetplanitems`,
+    data
+  );
+  return result.data.data;
+};
 
 export const deleteBudgetPlanItems = async (
   idBudgetPlanItems: string[]

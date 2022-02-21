@@ -35,6 +35,9 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   } = useForm<OutstandingPrPoConfirmation>({
     mode: 'onChange',
     resolver: yupResolver(schema),
+    defaultValues: {
+      amountAdjustment: 0,
+    },
   });
 
   const options = adjustmentCurrentPeriodOptions;
@@ -44,10 +47,8 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   const handleAdjustmentChange = (value: string | number | boolean) => {
     if (value !== '0') {
       setValue('amountAdjustment', confirmData.amountAdjustment);
-      setAmountAdjustment(confirmData.amountAdjustment);
     } else {
       setValue('amountAdjustment', 0);
-      setAmountAdjustment(0);
     }
   };
 

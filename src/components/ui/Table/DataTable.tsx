@@ -39,6 +39,7 @@ interface Props<T extends object = {}> {
   onSelectedRowsChanged?: (rows: Record<IdType<T>, boolean>) => void;
   onSelectedSortChanged?: (sort: SortingRule<T>[]) => void;
   actions?: React.ReactNode;
+  addOns?: React.ReactNode;
   filters?: React.ReactNode;
   paginateParams?: PaginateParams;
   hiddenColumns?: Array<string>;
@@ -60,6 +61,7 @@ function DataTable<T extends object = {}>({
   onSelectedRowsChanged,
   onSelectedSortChanged,
   actions,
+  addOns,
   filters,
   paginateParams = {},
   hiddenColumns = [],
@@ -174,11 +176,12 @@ function DataTable<T extends object = {}>({
   return (
     <>
       <Col lg={12}>
-        {(filters || actions || onChangePage) && isTablePaginate && (
+        {(filters || actions || addOns || onChangePage) && isTablePaginate && (
           <Filter
             onPageSizeChanged={onPageSizeChanged}
             onSearch={onSearch}
             actions={selectedRowKes.length > 0 && actions}
+            addOns={addOns}
             filters={filters}
             paginateParams={paginateParams}
           />

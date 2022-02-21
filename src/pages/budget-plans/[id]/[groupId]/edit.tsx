@@ -5,10 +5,11 @@ import DetailLayout from 'components/ui/DetailLayout';
 import BudgetPlanItemModal from 'components/ui/Modal/BudgetPlanItemModal';
 import SimpleTable from 'components/ui/Table/SimpleTable';
 import { ItemOfBudgetPlanItemForm } from 'modules/budgetPlanItem/entities';
-import { useCreateBudgetPlanItems } from 'modules/budgetPlanItem/hook';
+import { useUpdateBudgetPlanItems } from 'modules/budgetPlanItem/hook';
+import { useFetchBudgetPlanItemGroupItems } from 'modules/budgetPlanItemGroup/hook';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button, Col, Row } from 'react-bootstrap';
 import { CellProps, Column } from 'react-table';
 import { toast } from 'react-toastify';
@@ -107,15 +108,16 @@ const columns: Column<ItemOfBudgetPlanItemForm>[] = [
   },
 ];
 
-const CreatePeriodActual: NextPage = () => {
+const UpdateBudgetPlanItems: NextPage = () => {
   const router = useRouter();
-  const id = router.query.id as string;
+  const budgetPlanId = router.query.id as string;
+  const budgetPlanGroupId = router.query.groupId as string;
   const [selectedRow, setSelectedRow] = useState<Record<string, boolean>>({});
 
   const breadCrumb: PathBreadcrumb[] = [
     {
       label: 'Detail',
-      link: `/budget-plans/${id}/detail`,
+      link: `/budget-plans/${budgetPlanId}/detail`,
     },
     {
       label: 'Create Items',
@@ -123,7 +125,25 @@ const CreatePeriodActual: NextPage = () => {
     },
   ];
 
-  const mutation = useCreateBudgetPlanItems();
+  const dataHookBudgetPlanItemGroupItems = useFetchBudgetPlanItemGroupItems(
+    budgetPlanGroupId,
+    {}
+  );
+
+  useEffect(() => {
+    setMyBudgetPlanItem(
+      dataHookBudgetPlanItemGroupItems.data?.items.map((item) => ({
+        idAssetGroup: item.catalog.assetGroup.id,
+        idCapexCatalog: item.catalog.id,
+        pricePerUnit: item.pricePerUnit,
+        currency: item.currency,
+        currencyRate: item.currencyRate,
+        totalAmount: item.totalAmount,
+        totalAmountUsd: item.totalAmountUsd,
+        items: item.items,
+      })) || []
+    );
+  }, [dataHookBudgetPlanItemGroupItems.data]);
 
   const [myBudgetPlanItem, setMyBudgetPlanItem] = useState<
     ItemOfBudgetPlanItemForm[]
@@ -140,10 +160,11 @@ const CreatePeriodActual: NextPage = () => {
     );
   };
 
-  const submitCreateBudgetPlanItems = () => {
+  const mutation = useUpdateBudgetPlanItems();
+  const submitUpdateBudgetPlanItems = () => {
     mutation.mutate(
       {
-        idCapexBudgetPlan: id,
+        idCapexBudgetPlan: budgetPlanId,
         // TODO: isBuilding, outstandingPlanPaymentAttachment, outstandingRetentionAttachment masih hardcode
         isBuilding: false,
         outstandingPlanPaymentAttachment: null,
@@ -152,11 +173,11 @@ const CreatePeriodActual: NextPage = () => {
       },
       {
         onSuccess: () => {
-          router.push(`/budget-plans/${id}/detail`);
-          toast('Data created!');
+          router.replace(`/budget-plans/${budgetPlanId}/${budgetPlanGroupId}`);
+          toast('Data Updated!');
         },
         onError: (error) => {
-          console.error('Failed to create data', error);
+          console.error('Failed to update data', error);
           toast(error.message, { autoClose: false });
           showErrorMessage(error);
         },
@@ -167,8 +188,10 @@ const CreatePeriodActual: NextPage = () => {
   return (
     <DetailLayout
       paths={breadCrumb}
-      backButtonClick={() => router.replace(`/budget-plans/${id}/detail`)}
-      title="Budget Plan Items Create"
+      backButtonClick={() =>
+        router.replace(`/budget-plans/${budgetPlanId}/detail`)
+      }
+      title="Budget Plan Items Update"
     >
       <Panel>
         <Row>
@@ -209,9 +232,9 @@ const CreatePeriodActual: NextPage = () => {
             type="submit"
             disabled={mutation.isLoading}
             isLoading={mutation.isLoading}
-            onClick={submitCreateBudgetPlanItems}
+            onClick={submitUpdateBudgetPlanItems}
           >
-            Create
+            Update
           </LoadingButton>
         </Col>
       </Panel>
@@ -219,4 +242,4 @@ const CreatePeriodActual: NextPage = () => {
   );
 };
 
-export default CreatePeriodActual;
+export default UpdateBudgetPlanItems;

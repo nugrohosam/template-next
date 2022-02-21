@@ -81,7 +81,7 @@ const Filter: React.FC<Props> = ({
           <>
             <InputGroup
               className={`form-group form-group--icon mb-0 w-auto ${
-                filters ? 'ml-md-3' : 'ml-auto'
+                filters || addOns ? 'ml-md-3' : 'ml-auto'
               }`}
             >
               <div className="w-100 position-relative">

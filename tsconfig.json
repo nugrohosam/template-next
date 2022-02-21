@@ -15,7 +15,8 @@
     "jsx": "preserve",
     "baseUrl": "./src",
     "downlevelIteration": true,
-    "incremental": true
+    "incremental": true,
+    "outDir": "./.next/"
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
   "exclude": ["node_modules"]

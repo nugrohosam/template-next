@@ -43,3 +43,15 @@ export const deleteBudgetPlanItemGroups = async (
   );
   return result.data.data;
 };
+
+export const submitBudgetPlanItemGroups = async (
+  idBudgetPlanItemGroups: string[]
+): Promise<null> => {
+  const result = await axios.patch<ResponseData<null>>(
+    'v1/budgetplanitemgroups/submit',
+    {
+      idBudgetPlanItemGroups,
+    }
+  );
+  return result.data.data;
+};

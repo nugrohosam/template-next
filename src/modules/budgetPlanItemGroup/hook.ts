@@ -11,6 +11,7 @@ import {
   fetchBudgetPlanItemGroupDetail,
   fetchBudgetPlanItemGroupItems,
   fetchBudgetPlanItemGroups,
+  submitBudgetPlanItemGroups,
 } from './api';
 import { BudgetPlanItemGroup, BudgetPlanItemGroupItem } from './entities';
 
@@ -49,5 +50,15 @@ export const useDeleteBudgetPlanItemGroups = (): UseMutationResult<
 > => {
   return useMutation((idBudgetPlanItemGroups) =>
     deleteBudgetPlanItemGroups(idBudgetPlanItemGroups)
+  );
+};
+
+export const useSubmitBudgetPlanItemGroups = (): UseMutationResult<
+  null,
+  ResponseError,
+  string[]
+> => {
+  return useMutation((idBudgetPlanItemGroups) =>
+    submitBudgetPlanItemGroups(idBudgetPlanItemGroups)
   );
 };

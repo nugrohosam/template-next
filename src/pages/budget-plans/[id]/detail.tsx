@@ -5,11 +5,11 @@ import DetailLayout from 'components/ui/DetailLayout';
 import DataTable, { usePaginateParams } from 'components/ui/Table/DataTable';
 import Loader from 'components/ui/Table/Loader';
 import { useFetchBudgetPlanDetail } from 'modules/budgetPlan/hook';
-import { deleteBudgetPlanItemGroups } from 'modules/budgetPlanItemGroup/api';
 import { BudgetPlanItemGroup } from 'modules/budgetPlanItemGroup/entities';
 import {
   useDeleteBudgetPlanItemGroups,
   useFetchBudgetPlanItemGroups,
+  useSubmitBudgetPlanItemGroups,
 } from 'modules/budgetPlanItemGroup/hook';
 import { NextPage } from 'next';
 import Link from 'next/link';
@@ -17,7 +17,8 @@ import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import { Button, Col, Row } from 'react-bootstrap';
 import { CellProps, Column, SortingRule } from 'react-table';
-import { getAllIds } from 'utils/helpers';
+import { toast } from 'react-toastify';
+import { getAllIds, showErrorMessage } from 'utils/helpers';
 
 const breadCrumb: PathBreadcrumb[] = [
   {
@@ -41,7 +42,48 @@ const DetailBudgetPlan: NextPage = () => {
 
   const dataHook = useFetchBudgetPlanDetail(id);
   const dataHookBudgetPlanItemGroup = useFetchBudgetPlanItemGroups(params);
-  const mutationBudgetPlanItemGroup = useDeleteBudgetPlanItemGroups();
+  const mutationDeleteBudgetPlanItemGroup = useDeleteBudgetPlanItemGroups();
+  const mutationSubmitBudgetPlanItemGroup = useSubmitBudgetPlanItemGroups();
+
+  const submitBudgetPlanItemGroups = (ids: Array<string>) => {
+    mutationSubmitBudgetPlanItemGroup.mutate(ids, {
+      onSuccess: () => {
+        setSelectedRow({});
+        dataHook.refetch();
+        toast('Data Submited!');
+      },
+      onError: (error) => {
+        console.error('Failed to submit data', error);
+        toast(error.message, { autoClose: false });
+        showErrorMessage(error);
+      },
+    });
+  };
+
+  const handlSeubmitMultipleBudgetPlanItemsGroups = () => {
+    const ids = getAllIds(
+      selectedRow,
+      dataHookBudgetPlanItemGroup.data
+    ) as string[];
+    if (ids?.length > 0) {
+      submitBudgetPlanItemGroups(ids);
+    }
+  };
+
+  const deleteBudgetPlanItemGroups = (ids: Array<string>) => {
+    mutationSubmitBudgetPlanItemGroup.mutate(ids, {
+      onSuccess: () => {
+        setSelectedRow({});
+        dataHook.refetch();
+        toast('Data Deleted!');
+      },
+      onError: (error) => {
+        console.error('Failed to delete data', error);
+        toast(error.message, { autoClose: false });
+        showErrorMessage(error);
+      },
+    });
+  };
 
   const handleDeleteMultipleBudgetPlanItemsGroups = () => {
     const ids = getAllIds(
@@ -185,11 +227,20 @@ const DetailBudgetPlan: NextPage = () => {
                     variant="red"
                     size="sm"
                     className="mr-2"
-                    disabled={mutationBudgetPlanItemGroup.isLoading}
+                    disabled={mutationDeleteBudgetPlanItemGroup.isLoading}
                     onClick={handleDeleteMultipleBudgetPlanItemsGroups}
-                    isLoading={mutationBudgetPlanItemGroup.isLoading}
+                    isLoading={mutationDeleteBudgetPlanItemGroup.isLoading}
                   >
                     Delete
+                  </LoadingButton>
+                  <LoadingButton
+                    size="sm"
+                    className="mr-2"
+                    disabled={mutationSubmitBudgetPlanItemGroup.isLoading}
+                    onClick={handlSeubmitMultipleBudgetPlanItemsGroups}
+                    isLoading={mutationSubmitBudgetPlanItemGroup.isLoading}
+                  >
+                    Submit
                   </LoadingButton>
                 </>
               }

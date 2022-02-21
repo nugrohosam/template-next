@@ -19,3 +19,9 @@ export type BudgetPlanItemGroupItem = BudgetPlanItem & {
   detail: string;
   budgetCode: string;
 };
+
+export interface ApprovalBudgetPlanItemGroup {
+  idBudgetPlanItemGroups: string[];
+  status: string;
+  remark?: string;
+}

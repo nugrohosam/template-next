@@ -20,8 +20,8 @@ export type ItemOfBudgetPlanItem = {
 
 export interface BudgetPlanItemForm {
   idCapexBudgetPlan: string;
-  outstandingPlanPaymentAttachment?: string;
-  outstandingRetentionAttachment?: string;
+  outstandingPlanPaymentAttachment?: string | null;
+  outstandingRetentionAttachment?: string | null;
   isBuilding: boolean;
   budgetPlanItems: ItemOfBudgetPlanItemForm[];
 }
@@ -34,10 +34,5 @@ export interface ItemOfBudgetPlanItemForm {
   currencyRate: number;
   totalAmount: number;
   totalAmountUsd: number;
-  items: ItemOfItemOfBudgetPlanItemForm[];
-}
-
-export interface ItemOfItemOfBudgetPlanItemForm
-  extends Omit<ItemOfBudgetPlanItem, 'quantity'> {
-  quantity: number | string;
+  items: ItemOfBudgetPlanItem[];
 }

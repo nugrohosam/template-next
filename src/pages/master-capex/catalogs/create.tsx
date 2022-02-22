@@ -5,7 +5,7 @@ import SingleSelect from 'components/form/SingleSelect';
 import { PathBreadcrumb } from 'components/ui/Breadcrumb';
 import LoadingButton from 'components/ui/Button/LoadingButton';
 import DetailLayout from 'components/ui/DetailLayout';
-import { currencyOptions } from 'constants/currency';
+import { currency, currencyOptions } from 'constants/currency';
 import { CatalogForm } from 'modules/catalog/entities';
 import { useCreateCatalog } from 'modules/catalog/hook';
 import { useAssetGroupOptions } from 'modules/custom/useAssetGroupOptions';
@@ -85,7 +85,7 @@ const CreateCatalog: NextPage = () => {
   const [usdDisabled, setUsdDisabled] = useState(true);
 
   const handleCurrencyChange = (value: string | number | boolean) => {
-    if (value === 'USD') {
+    if (value === currency.USD) {
       // TODO: reset value IDR
       setUsdDisabled(false);
       setIdrDisabled(true);
@@ -98,9 +98,9 @@ const CreateCatalog: NextPage = () => {
   };
 
   useEffect(() => {
-    if (data.primaryCurrency === 'IDR') {
+    if (data.primaryCurrency === currency.IDR) {
       setValue('priceInUsd', data.priceInIdr / currencyRate);
-    } else if (data.primaryCurrency === 'USD') {
+    } else if (data.primaryCurrency === currency.USD) {
       setValue('priceInIdr', data.priceInUsd * currencyRate);
     }
   }, [data.primaryCurrency, data.priceInIdr, data.priceInUsd, setValue]);

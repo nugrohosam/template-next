@@ -18,3 +18,7 @@ export interface CatalogForm {
   priceInUsd: number;
   assetGroupId: string;
 }
+
+export interface UploadCatalogReq {
+  file: Array<File>;
+}

@@ -9,9 +9,11 @@ import {
 import {
   createCatalog,
   deleteCatalogs,
+  downloadCatalogExcel,
   fetchCatalogDetail,
   fetchCatalogs,
   updateCatalog,
+  uploadCatalog,
 } from './api';
 import { Catalog, CatalogForm } from './entities';
 
@@ -61,4 +63,19 @@ export const useDeleteCatalogs = (): UseMutationResult<
   string[]
 > => {
   return useMutation((idCatalogs) => deleteCatalogs(idCatalogs));
+};
+
+export const useDownloadCatalogExcel = (): UseMutationResult<
+  void,
+  ResponseError
+> => {
+  return useMutation(() => downloadCatalogExcel());
+};
+
+export const useUploadCatalog = (): UseMutationResult<
+  void,
+  ResponseError,
+  FormData
+> => {
+  return useMutation(uploadCatalog);
 };

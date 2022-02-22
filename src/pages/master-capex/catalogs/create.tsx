@@ -5,13 +5,13 @@ import SingleSelect from 'components/form/SingleSelect';
 import { PathBreadcrumb } from 'components/ui/Breadcrumb';
 import LoadingButton from 'components/ui/Button/LoadingButton';
 import DetailLayout from 'components/ui/DetailLayout';
-import { currencyOptions } from 'constants/currency';
+import { currency, currencyOptions } from 'constants/currency';
 import { CatalogForm } from 'modules/catalog/entities';
 import { useCreateCatalog } from 'modules/catalog/hook';
 import { useAssetGroupOptions } from 'modules/custom/useAssetGroupOptions';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Col,
   Form,
@@ -53,6 +53,8 @@ const CreateCatalog: NextPage = () => {
     handleSubmit,
     control,
     setError,
+    setValue,
+    watch,
     formState: { errors, isValid },
   } = useForm<CatalogForm>({
     mode: 'onChange',
@@ -76,19 +78,32 @@ const CreateCatalog: NextPage = () => {
     });
   };
 
+  const currencyRate = 14500; // TODO: get from API
+
+  const data = watch();
   const [idrDisabled, setIdrDisabled] = useState(false);
   const [usdDisabled, setUsdDisabled] = useState(true);
 
   const handleCurrencyChange = (value: string | number | boolean) => {
-    if (value == 'USD') {
+    if (value === currency.USD) {
+      // TODO: reset value IDR
       setUsdDisabled(false);
       setIdrDisabled(true);
     } else {
+      // TODO: reset value USD
       setUsdDisabled(true);
       setIdrDisabled(false);
     }
     return currencyOptions;
   };
+
+  useEffect(() => {
+    if (data.primaryCurrency === currency.IDR) {
+      setValue('priceInUsd', data.priceInIdr / currencyRate);
+    } else if (data.primaryCurrency === currency.USD) {
+      setValue('priceInIdr', data.priceInUsd * currencyRate);
+    }
+  }, [data.primaryCurrency, data.priceInIdr, data.priceInUsd, setValue]);
 
   return (
     <DetailLayout
@@ -144,7 +159,11 @@ const CreateCatalog: NextPage = () => {
               <FormGroup>
                 <FormLabel>Currency Rate</FormLabel>
                 {/* TODO: get from API */}
-                <FormControl type="text" value="14.500" disabled />
+                <FormControl
+                  type="text"
+                  value={currencyRate.toLocaleString('id-Id')}
+                  disabled
+                />
               </FormGroup>
             </Col>
           </Row>
@@ -169,7 +188,7 @@ const CreateCatalog: NextPage = () => {
                 <Input
                   name="priceInUsd"
                   control={control}
-                  defaultValue="10"
+                  defaultValue=""
                   type="number"
                   placeholder="Price (USD)"
                   error={errors.priceInUsd?.message}
@@ -183,7 +202,7 @@ const CreateCatalog: NextPage = () => {
             <LoadingButton
               variant="primary"
               type="submit"
-              disabled={mutation.isLoading}
+              disabled={!isValid || mutation.isLoading}
               isLoading={mutation.isLoading}
             >
               Create

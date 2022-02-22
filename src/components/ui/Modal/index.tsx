@@ -12,6 +12,7 @@ interface ModalBoxProps {
   wordingSubmit?: string;
   dialogClassName?: string;
   onSend: () => void;
+  onClikModal?: () => void;
 }
 
 const ModalBox: React.FC<ModalBoxProps> = ({
@@ -24,6 +25,7 @@ const ModalBox: React.FC<ModalBoxProps> = ({
   wordingSubmit,
   dialogClassName,
   onSend,
+  onClikModal,
 }) => {
   const [isShow, setIsShow] = useState(false);
 
@@ -33,11 +35,16 @@ const ModalBox: React.FC<ModalBoxProps> = ({
     onSend();
     toggleShow();
   };
+
+  const handleClickModal = () => {
+    toggleShow();
+    onClikModal && onClikModal();
+  };
   return (
     <>
       <Button
         variant={buttonVariant}
-        onClick={toggleShow}
+        onClick={handleClickModal}
         className={classButton ? classButton : 'mr-lg-2 mb-3'}
       >
         {buttonTitle}

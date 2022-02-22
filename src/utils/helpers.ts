@@ -72,6 +72,8 @@ export const parseMenuToUrl = (menu: string) => {
       ? '/master-capex/asset-groups'
       : menu === 'catalogs'
       ? '/master-capex/catalogs'
+      : menu === 'outstanding budgets'
+      ? '/master-capex/outstanding-budget'
       : menu === 'budget plans'
       ? '/budget-plans'
       : menu === 'outstanding pr po'

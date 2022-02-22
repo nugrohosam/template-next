@@ -75,7 +75,13 @@ export const parseMenuToUrl = (menu: string) => {
       : menu === 'budget plans'
       ? '/budget-plans'
       : menu === 'outstanding pr po'
-      ? '/outstandingprpo'
+      ? '/outstanding-pr-po'
+      : menu === 'outstanding budgets'
+      ? '/outstanding-budgets'
+      : menu === 'actual YTD'
+      ? '/actual-ytd'
+      : menu === 'budget reference'
+      ? '/budget-reference'
       : '/';
   return url;
 };

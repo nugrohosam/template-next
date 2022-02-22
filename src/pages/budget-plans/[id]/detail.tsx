@@ -17,11 +17,12 @@ import {
   useSubmitBudgetPlanItemGroups,
 } from 'modules/budgetPlanItemGroup/hook';
 import { useDecodeToken } from 'modules/custom/useDecodeToken';
+import moment from 'moment';
 import { NextPage } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
-import { Button, Col, Row } from 'react-bootstrap';
+import { Badge, Button, Col, Row } from 'react-bootstrap';
 import { CellProps, Column, SortingRule } from 'react-table';
 import { toast } from 'react-toastify';
 import { getAllIds, showErrorMessage } from 'utils/helpers';
@@ -158,21 +159,36 @@ const DetailBudgetPlan: NextPage = () => {
       Header: 'Total USD',
       accessor: 'totalAmountUsd',
       minWidth: 200,
+      Cell: ({ row }: CellProps<BudgetPlanItemGroup>) => {
+        return row.values.totalAmountUsd.toLocaleString('en-EN');
+      },
     },
     {
       Header: 'Total IDR',
       accessor: 'totalAmount',
       minWidth: 200,
+      Cell: ({ row }: CellProps<BudgetPlanItemGroup>) => {
+        return row.values.totalAmount.toLocaleString('id-Id');
+      },
     },
     {
       Header: 'Status',
       accessor: 'status',
-      minWidth: 200,
+      Cell: ({ row }: CellProps<BudgetPlanItemGroup>) => {
+        return (
+          <Badge className="badge--status badge--status-blue">
+            {row.values.status}
+          </Badge>
+        );
+      },
     },
     {
       Header: 'Created At',
       accessor: 'createdAt',
       minWidth: 200,
+      Cell: ({ row }: CellProps<BudgetPlanItemGroup>) => {
+        return moment(row.values.createdAt).format('YYYY-MM-DD');
+      },
     },
     {
       Header: 'Actions',

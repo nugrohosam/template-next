@@ -66,9 +66,9 @@ export const submitBudgetPlanItemGroups = async (
 export const approvalBudgetPlanItemGroups = async (
   data: ApprovalBudgetPlanItemGroup
 ): Promise<null> => {
-  const result = await axios.patch<ResponseData<null>>(
+  const result = await axios.put<ResponseData<null>>(
     'v1/budgetplanitemgroups/approval',
-    { data }
+    data
   );
   return result.data.data;
 };

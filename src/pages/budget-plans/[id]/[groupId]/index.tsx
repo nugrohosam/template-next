@@ -2,13 +2,18 @@ import Panel from 'components/form/Panel';
 import { PathBreadcrumb } from 'components/ui/Breadcrumb';
 import LoadingButton from 'components/ui/Button/LoadingButton';
 import DetailLayout from 'components/ui/DetailLayout';
+import ApproveModal from 'components/ui/Modal/ApproveModal';
+import RejectModal from 'components/ui/Modal/RejectModal';
+import ReviseModal from 'components/ui/Modal/ReviseModal';
 import DataTable, { usePaginateParams } from 'components/ui/Table/DataTable';
 import Loader from 'components/ui/Table/Loader';
 import { UserType } from 'constants/user';
+import { ApprovalField } from 'modules/approval/entities';
 import { ItemOfBudgetPlanItem } from 'modules/budgetPlanItem/entities';
 import { useDeleteBudgetPlanitems } from 'modules/budgetPlanItem/hook';
 import { BudgetPlanItemGroupItem } from 'modules/budgetPlanItemGroup/entities';
 import {
+  useApprovalBudgetPlanItemGroups,
   useFetchBudgetPlanItemGroupDetail,
   useFetchBudgetPlanItemGroupItems,
 } from 'modules/budgetPlanItemGroup/hook';
@@ -75,6 +80,28 @@ const BudgetPlanGroupItemList: NextPage = () => {
     if (ids?.length > 0) {
       if (confirm('Delete selected data?')) deleteBudgetPlan(ids);
     }
+  };
+
+  const mutationApprovalBudgetPlanItemGroup = useApprovalBudgetPlanItemGroups();
+  const approvalBudgetPlanItemGroups = (data: ApprovalField) => {
+    mutationApprovalBudgetPlanItemGroup.mutate(
+      {
+        idBudgetPlanItemGroups: [budgetPlanId],
+        status: data.status,
+        remark: data.notes,
+      },
+      {
+        onSuccess: () => {
+          router.push(`/budget-plans/${budgetPlanId}/detail`);
+          toast('Data Approved!');
+        },
+        onError: (error) => {
+          console.error('Failed to approve data', error);
+          toast(error.message, { autoClose: false });
+          showErrorMessage(error);
+        },
+      }
+    );
   };
 
   const columns: Column<BudgetPlanItemGroupItem>[] = [
@@ -259,7 +286,19 @@ const BudgetPlanGroupItemList: NextPage = () => {
                 )
               }
               addOns={
-                profile?.type !== UserType.ApprovalBudgetPlanCapex && (
+                profile?.type === UserType.ApprovalBudgetPlanCapex ? (
+                  <>
+                    <ApproveModal
+                      onSend={approvalBudgetPlanItemGroups}
+                      classButton="mr-2"
+                    />
+                    <ReviseModal
+                      onSend={approvalBudgetPlanItemGroups}
+                      classButton="mr-2"
+                    />
+                    <RejectModal onSend={approvalBudgetPlanItemGroups} />
+                  </>
+                ) : (
                   <Link
                     href={`/budget-plans/${budgetPlanId}/${budgetPlanGroupId}/edit`}
                     passHref

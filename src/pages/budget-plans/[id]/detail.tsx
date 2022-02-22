@@ -4,20 +4,27 @@ import LoadingButton from 'components/ui/Button/LoadingButton';
 import DetailLayout from 'components/ui/DetailLayout';
 import DataTable, { usePaginateParams } from 'components/ui/Table/DataTable';
 import Loader from 'components/ui/Table/Loader';
+import { UserType } from 'constants/user';
 import { useFetchBudgetPlanDetail } from 'modules/budgetPlan/hook';
-import { deleteBudgetPlanItemGroups } from 'modules/budgetPlanItemGroup/api';
-import { BudgetPlanItemGroup } from 'modules/budgetPlanItemGroup/entities';
 import {
+  ApprovalBudgetPlanItemGroup,
+  BudgetPlanItemGroup,
+} from 'modules/budgetPlanItemGroup/entities';
+import {
+  useApprovalBudgetPlanItemGroups,
   useDeleteBudgetPlanItemGroups,
   useFetchBudgetPlanItemGroups,
+  useSubmitBudgetPlanItemGroups,
 } from 'modules/budgetPlanItemGroup/hook';
+import { useDecodeToken } from 'modules/custom/useDecodeToken';
 import { NextPage } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import { Button, Col, Row } from 'react-bootstrap';
 import { CellProps, Column, SortingRule } from 'react-table';
-import { getAllIds } from 'utils/helpers';
+import { toast } from 'react-toastify';
+import { getAllIds, showErrorMessage } from 'utils/helpers';
 
 const breadCrumb: PathBreadcrumb[] = [
   {
@@ -31,6 +38,7 @@ const breadCrumb: PathBreadcrumb[] = [
 ];
 
 const DetailBudgetPlan: NextPage = () => {
+  const [profile] = useDecodeToken();
   const [selectedRow, setSelectedRow] = useState<Record<string, boolean>>({});
   const [selectedSort, setSelectedSort] = useState<SortingRule<any>[]>([]);
   const { params, setPageNumber, setPageSize, setSearch, setSortingRules } =
@@ -40,8 +48,53 @@ const DetailBudgetPlan: NextPage = () => {
   const id = router.query.id as string;
 
   const dataHook = useFetchBudgetPlanDetail(id);
-  const dataHookBudgetPlanItemGroup = useFetchBudgetPlanItemGroups(params);
-  const mutationBudgetPlanItemGroup = useDeleteBudgetPlanItemGroups();
+  const dataHookBudgetPlanItemGroup = useFetchBudgetPlanItemGroups({
+    ...params,
+    idBudgetPlan: id,
+  });
+  const mutationDeleteBudgetPlanItemGroup = useDeleteBudgetPlanItemGroups();
+  const mutationSubmitBudgetPlanItemGroup = useSubmitBudgetPlanItemGroups();
+  const mutationApprovalBudgetPlanItemGroup = useApprovalBudgetPlanItemGroups();
+
+  const submitBudgetPlanItemGroups = (ids: Array<string>) => {
+    mutationSubmitBudgetPlanItemGroup.mutate(ids, {
+      onSuccess: () => {
+        setSelectedRow({});
+        dataHook.refetch();
+        toast('Data Submited!');
+      },
+      onError: (error) => {
+        console.error('Failed to submit data', error);
+        toast(error.message, { autoClose: false });
+        showErrorMessage(error);
+      },
+    });
+  };
+
+  const handleSubmitMultipleBudgetPlanItemsGroups = () => {
+    const ids = getAllIds(
+      selectedRow,
+      dataHookBudgetPlanItemGroup.data
+    ) as string[];
+    if (ids?.length > 0) {
+      submitBudgetPlanItemGroups(ids);
+    }
+  };
+
+  const deleteBudgetPlanItemGroups = (ids: Array<string>) => {
+    mutationSubmitBudgetPlanItemGroup.mutate(ids, {
+      onSuccess: () => {
+        setSelectedRow({});
+        dataHook.refetch();
+        toast('Data Deleted!');
+      },
+      onError: (error) => {
+        console.error('Failed to delete data', error);
+        toast(error.message, { autoClose: false });
+        showErrorMessage(error);
+      },
+    });
+  };
 
   const handleDeleteMultipleBudgetPlanItemsGroups = () => {
     const ids = getAllIds(
@@ -50,6 +103,34 @@ const DetailBudgetPlan: NextPage = () => {
     ) as string[];
     if (ids?.length > 0) {
       deleteBudgetPlanItemGroups(ids);
+    }
+  };
+
+  const approvalBudgetPlanItemGroups = (data: ApprovalBudgetPlanItemGroup) => {
+    mutationApprovalBudgetPlanItemGroup.mutate(data, {
+      onSuccess: () => {
+        setSelectedRow({});
+        dataHook.refetch();
+        toast('Data Approved!');
+      },
+      onError: (error) => {
+        console.error('Failed to approve data', error);
+        toast(error.message, { autoClose: false });
+        showErrorMessage(error);
+      },
+    });
+  };
+
+  const handleApprovaltMultipleBudgetPlanItemsGroups = () => {
+    const ids = getAllIds(
+      selectedRow,
+      dataHookBudgetPlanItemGroup.data
+    ) as string[];
+    if (ids?.length > 0) {
+      approvalBudgetPlanItemGroups({
+        idBudgetPlanItemGroups: ids,
+        status: 'approve',
+      });
     }
   };
 
@@ -185,12 +266,33 @@ const DetailBudgetPlan: NextPage = () => {
                     variant="red"
                     size="sm"
                     className="mr-2"
-                    disabled={mutationBudgetPlanItemGroup.isLoading}
+                    disabled={mutationDeleteBudgetPlanItemGroup.isLoading}
                     onClick={handleDeleteMultipleBudgetPlanItemsGroups}
-                    isLoading={mutationBudgetPlanItemGroup.isLoading}
+                    isLoading={mutationDeleteBudgetPlanItemGroup.isLoading}
                   >
                     Delete
                   </LoadingButton>
+                  {profile?.type === UserType.Approval ? (
+                    <LoadingButton
+                      size="sm"
+                      className="mr-2"
+                      disabled={mutationApprovalBudgetPlanItemGroup.isLoading}
+                      onClick={handleApprovaltMultipleBudgetPlanItemsGroups}
+                      isLoading={mutationApprovalBudgetPlanItemGroup.isLoading}
+                    >
+                      Approve
+                    </LoadingButton>
+                  ) : (
+                    <LoadingButton
+                      size="sm"
+                      className="mr-2"
+                      disabled={mutationSubmitBudgetPlanItemGroup.isLoading}
+                      onClick={handleSubmitMultipleBudgetPlanItemsGroups}
+                      isLoading={mutationSubmitBudgetPlanItemGroup.isLoading}
+                    >
+                      Submit
+                    </LoadingButton>
+                  )}
                 </>
               }
               isLoading={dataHook.isFetching}

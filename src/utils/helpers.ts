@@ -74,6 +74,14 @@ export const parseMenuToUrl = (menu: string) => {
       ? '/master-capex/catalogs'
       : menu === 'budget plans'
       ? '/budget-plans'
+      : menu === 'outstanding pr po'
+      ? '/outstanding-pr-po'
+      : menu === 'outstanding budgets'
+      ? '/outstanding-budgets'
+      : menu === 'actual YTD'
+      ? '/actual-ytd'
+      : menu === 'budget reference'
+      ? '/budget-reference'
       : '/';
   return url;
 };

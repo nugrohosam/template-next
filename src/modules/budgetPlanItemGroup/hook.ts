@@ -7,13 +7,19 @@ import {
 } from 'react-query';
 
 import {
+  approvalBudgetPlanItemGroups,
   BudgetPlanItemGroupsParams,
   deleteBudgetPlanItemGroups,
   fetchBudgetPlanItemGroupDetail,
   fetchBudgetPlanItemGroupItems,
   fetchBudgetPlanItemGroups,
+  submitBudgetPlanItemGroups,
 } from './api';
-import { BudgetPlanItemGroup, BudgetPlanItemGroupItem } from './entities';
+import {
+  ApprovalBudgetPlanItemGroup,
+  BudgetPlanItemGroup,
+  BudgetPlanItemGroupItem,
+} from './entities';
 
 export const useFetchBudgetPlanItemGroups = (
   params: BudgetPlanItemGroupsParams
@@ -51,4 +57,22 @@ export const useDeleteBudgetPlanItemGroups = (): UseMutationResult<
   return useMutation((idBudgetPlanItemGroups) =>
     deleteBudgetPlanItemGroups(idBudgetPlanItemGroups)
   );
+};
+
+export const useSubmitBudgetPlanItemGroups = (): UseMutationResult<
+  null,
+  ResponseError,
+  string[]
+> => {
+  return useMutation((idBudgetPlanItemGroups) =>
+    submitBudgetPlanItemGroups(idBudgetPlanItemGroups)
+  );
+};
+
+export const useApprovalBudgetPlanItemGroups = (): UseMutationResult<
+  null,
+  ResponseError,
+  ApprovalBudgetPlanItemGroup
+> => {
+  return useMutation((data) => approvalBudgetPlanItemGroups(data));
 };

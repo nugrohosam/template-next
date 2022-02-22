@@ -1,7 +1,11 @@
 import { Paginate, PaginateParams, ResponseData } from 'modules/common/types';
 import axios from 'utils/axios';
 
-import { BudgetPlanItemGroup, BudgetPlanItemGroupItem } from './entities';
+import {
+  ApprovalBudgetPlanItemGroup,
+  BudgetPlanItemGroup,
+  BudgetPlanItemGroupItem,
+} from './entities';
 
 export interface BudgetPlanItemGroupsParams extends PaginateParams {
   idBudgetPlan: string;
@@ -43,6 +47,28 @@ export const deleteBudgetPlanItemGroups = async (
     {
       idBudgetPlanItemGroups,
     }
+  );
+  return result.data.data;
+};
+
+export const submitBudgetPlanItemGroups = async (
+  idBudgetPlanItemGroups: string[]
+): Promise<null> => {
+  const result = await axios.patch<ResponseData<null>>(
+    'v1/budgetplanitemgroups/submit',
+    {
+      idBudgetPlanItemGroups,
+    }
+  );
+  return result.data.data;
+};
+
+export const approvalBudgetPlanItemGroups = async (
+  data: ApprovalBudgetPlanItemGroup
+): Promise<null> => {
+  const result = await axios.patch<ResponseData<null>>(
+    'v1/budgetplanitemgroups/approval',
+    { data }
   );
   return result.data.data;
 };

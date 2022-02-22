@@ -7,6 +7,7 @@ import {
 } from 'react-query';
 
 import {
+  BudgetPlanItemGroupsParams,
   deleteBudgetPlanItemGroups,
   fetchBudgetPlanItemGroupDetail,
   fetchBudgetPlanItemGroupItems,
@@ -15,7 +16,7 @@ import {
 import { BudgetPlanItemGroup, BudgetPlanItemGroupItem } from './entities';
 
 export const useFetchBudgetPlanItemGroups = (
-  params: PaginateParams
+  params: BudgetPlanItemGroupsParams
 ): UseQueryResult<Paginate<BudgetPlanItemGroup>, ResponseError> => {
   return useQuery(['budget-plan-item-groups', params], () =>
     fetchBudgetPlanItemGroups(params)

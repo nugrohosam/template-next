@@ -1,3 +1,4 @@
+import fileDownload from 'js-file-download';
 import { Paginate, PaginateParams, ResponseData } from 'modules/common/types';
 import axios from 'utils/axios';
 
@@ -43,4 +44,18 @@ export const deleteCatalogs = async (idCatalogs: string[]): Promise<null> => {
     idCatalogs,
   });
   return result.data.data;
+};
+
+export const downloadCatalogExcel = async (): Promise<void> => {
+  const result = await axios.get('v1/catalogs/downloadexcel', {
+    responseType: 'blob',
+  });
+
+  fileDownload(result.data, 'catalog.xlsx');
+};
+
+export const uploadCatalog = async (data: FormData): Promise<void> => {
+  await axios.post('v1/catalogs/upload', data, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
 };

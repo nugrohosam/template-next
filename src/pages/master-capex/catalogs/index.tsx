@@ -3,7 +3,12 @@ import LoadingButton from 'components/ui/Button/LoadingButton';
 import ContentLayout from 'components/ui/ContentLayout';
 import DataTable, { usePaginateParams } from 'components/ui/Table/DataTable';
 import { Catalog } from 'modules/catalog/entities';
-import { useDeleteCatalogs, useFetchCatalogs } from 'modules/catalog/hook';
+import {
+  useDeleteCatalogs,
+  useDownloadCatalogExcel,
+  useFetchCatalogs,
+} from 'modules/catalog/hook';
+import { ResponseError } from 'modules/common/types';
 import { useAssetGroupOptions } from 'modules/custom/useAssetGroupOptions';
 import { NextPage } from 'next';
 import Link from 'next/link';
@@ -31,6 +36,7 @@ const CatalogsIndex: NextPage = () => {
   const [assetGroupOptions] = useAssetGroupOptions();
 
   const mutation = useDeleteCatalogs();
+  const downloadCatalogMutation = useDownloadCatalogExcel();
 
   const deleteCatalog = (ids: Array<string>) => {
     mutation.mutate(ids, {
@@ -54,6 +60,21 @@ const CatalogsIndex: NextPage = () => {
         deleteCatalog(ids);
       }
     }
+  };
+
+  const handleDownloadExcel = () => {
+    downloadCatalogMutation.mutate(
+      {},
+      {
+        onSuccess: () => {
+          toast('Excel file downloaded successfully!');
+        },
+        onError: (error) => {
+          toast(error.message, { autoClose: false });
+          showErrorMessage(error);
+        },
+      }
+    );
   };
 
   const columns = useMemo<Column<Catalog>[]>(
@@ -138,9 +159,22 @@ const CatalogsIndex: NextPage = () => {
     <ContentLayout
       title="Catalog"
       controls={
-        <Link href={`/master-capex/catalogs/create`} passHref>
-          <Button>+ Create</Button>
-        </Link>
+        <>
+          <LoadingButton
+            className="mr-md-2 mb-2 mb-md-0"
+            disabled={downloadCatalogMutation.isLoading}
+            onClick={handleDownloadExcel}
+            isLoading={downloadCatalogMutation.isLoading}
+          >
+            Download
+          </LoadingButton>
+          <Link href={`/master-capex/catalogs/upload`} passHref>
+            <Button className="mr-md-2 mb-2 mb-md-0">Upload</Button>
+          </Link>
+          <Link href={`/master-capex/catalogs/create`} passHref>
+            <Button>+ Create</Button>
+          </Link>
+        </>
       }
     >
       <Col lg={12}>

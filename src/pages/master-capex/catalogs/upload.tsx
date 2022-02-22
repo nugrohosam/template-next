@@ -4,20 +4,12 @@ import Panel from 'components/form/Panel';
 import { PathBreadcrumb } from 'components/ui/Breadcrumb';
 import LoadingButton from 'components/ui/Button/LoadingButton';
 import DetailLayout from 'components/ui/DetailLayout';
-import { UploadActualYtdReq } from 'modules/actualTyd/entities';
-import { useUploadActualYtd } from 'modules/actualTyd/hook';
+import { UploadCatalogReq } from 'modules/catalog/entities';
+import { useUploadCatalog } from 'modules/catalog/hook';
 import { useDownloadTemplateExcel } from 'modules/downloadTemplate/hook';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
-import {
-  Button,
-  Col,
-  Form,
-  FormControl,
-  FormGroup,
-  FormLabel,
-  Row,
-} from 'react-bootstrap';
+import { Button, Col, Form, FormGroup, FormLabel, Row } from 'react-bootstrap';
 import { FieldError, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import { setValidationError, showErrorMessage } from 'utils/helpers';
@@ -25,8 +17,8 @@ import * as yup from 'yup';
 
 const breadCrumb: PathBreadcrumb[] = [
   {
-    label: 'Actual YTD',
-    link: '/actual-ytd',
+    label: 'Catalog',
+    link: '/master-capex/catalogs',
   },
   {
     label: 'Upload',
@@ -36,32 +28,26 @@ const breadCrumb: PathBreadcrumb[] = [
 
 const schema = yup.object().shape({
   file: yup.mixed().required(`File can't be empty`),
-  year: yup.string().required(`Year can't be empty`),
-  period: yup.string().required(`Period can't be empty`),
 });
 
-const UploadActualYtd: NextPage = () => {
+const UploadCatalog: NextPage = () => {
   const router = useRouter();
-  const uploadMutation = useUploadActualYtd();
   const downloadTemplateExcelMutation = useDownloadTemplateExcel();
-  const date = new Date();
-  const year = date.getFullYear().toString();
-  const period = date.getMonth() <= 6 ? 'S1' : 'S2';
+  const uploadMutation = useUploadCatalog();
 
   const {
     handleSubmit,
     control,
     setError,
     formState: { errors, isValid },
-  } = useForm<UploadActualYtdReq>({
+  } = useForm<UploadCatalogReq>({
     mode: 'onChange',
-    defaultValues: { year, period },
     resolver: yupResolver(schema),
   });
 
   const handleDownloadTemplate = () => {
     downloadTemplateExcelMutation.mutate(
-      { feature: 'actual ytd' },
+      { feature: 'katalog' },
       {
         onSuccess: () => {
           toast('Excel template file downloaded!');
@@ -74,15 +60,13 @@ const UploadActualYtd: NextPage = () => {
     );
   };
 
-  const handleSubmitForm = (data: UploadActualYtdReq) => {
+  const handleSubmitForm = (data: UploadCatalogReq) => {
     const formData = new FormData();
     formData.append('file', data.file[0]);
-    formData.append('year', data.year);
-    formData.append('period', data.period);
 
     uploadMutation.mutate(formData, {
       onSuccess: () => {
-        router.push('/actual-ytd');
+        router.push('/master-capex/catalogs');
         toast('Data uploaded!');
       },
       onError: (error) => {
@@ -95,34 +79,22 @@ const UploadActualYtd: NextPage = () => {
   return (
     <DetailLayout
       paths={breadCrumb}
-      backButtonClick={() => router.replace('/actual-ytd')}
-      title="Upload Actual YTD"
+      backButtonClick={() => router.replace('/master-capex/catalogs')}
+      title="Upload Catalog"
     >
       <Panel>
         <Form onSubmit={handleSubmit(handleSubmitForm)}>
           <Row>
             <Col lg={6}>
               <FormGroup>
-                <FormLabel>Year</FormLabel>
-                <FormControl value={year} disabled />
+                <FormLabel>File</FormLabel>
+                <FileInput
+                  name="file"
+                  control={control}
+                  placeholder="Select File"
+                  error={(errors.file as unknown as FieldError)?.message}
+                />
               </FormGroup>
-            </Col>
-            <Col lg={6}>
-              <FormGroup>
-                <FormLabel>Period</FormLabel>
-                <FormControl value={period} disabled />
-              </FormGroup>
-            </Col>
-          </Row>
-          <Row>
-            <Col lg={6}>
-              <FormGroup>File</FormGroup>
-              <FileInput
-                name="file"
-                control={control}
-                placeholder="Upload Excel File"
-                error={(errors.file as unknown as FieldError)?.message}
-              />
             </Col>
           </Row>
           <Row>
@@ -142,7 +114,7 @@ const UploadActualYtd: NextPage = () => {
                 disabled={!isValid || uploadMutation.isLoading}
                 isLoading={uploadMutation.isLoading}
               >
-                Save
+                Submit
               </LoadingButton>
             </Col>
           </Row>
@@ -152,4 +124,4 @@ const UploadActualYtd: NextPage = () => {
   );
 };
 
-export default UploadActualYtd;
+export default UploadCatalog;

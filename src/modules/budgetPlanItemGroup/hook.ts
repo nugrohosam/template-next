@@ -8,6 +8,7 @@ import {
 
 import {
   approvalBudgetPlanItemGroups,
+  BudgetPlanItemGroupsParams,
   deleteBudgetPlanItemGroups,
   fetchBudgetPlanItemGroupDetail,
   fetchBudgetPlanItemGroupItems,
@@ -21,7 +22,7 @@ import {
 } from './entities';
 
 export const useFetchBudgetPlanItemGroups = (
-  params: PaginateParams
+  params: BudgetPlanItemGroupsParams
 ): UseQueryResult<Paginate<BudgetPlanItemGroup>, ResponseError> => {
   return useQuery(['budget-plan-item-groups', params], () =>
     fetchBudgetPlanItemGroups(params)

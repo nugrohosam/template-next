@@ -48,7 +48,10 @@ const DetailBudgetPlan: NextPage = () => {
   const id = router.query.id as string;
 
   const dataHook = useFetchBudgetPlanDetail(id);
-  const dataHookBudgetPlanItemGroup = useFetchBudgetPlanItemGroups(params);
+  const dataHookBudgetPlanItemGroup = useFetchBudgetPlanItemGroups({
+    ...params,
+    idBudgetPlan: id,
+  });
   const mutationDeleteBudgetPlanItemGroup = useDeleteBudgetPlanItemGroups();
   const mutationSubmitBudgetPlanItemGroup = useSubmitBudgetPlanItemGroups();
   const mutationApprovalBudgetPlanItemGroup = useApprovalBudgetPlanItemGroups();

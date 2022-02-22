@@ -7,8 +7,11 @@ import {
   BudgetPlanItemGroupItem,
 } from './entities';
 
+export interface BudgetPlanItemGroupsParams extends PaginateParams {
+  idBudgetPlan: string;
+}
 export const fetchBudgetPlanItemGroups = async (
-  params: PaginateParams
+  params: BudgetPlanItemGroupsParams
 ): Promise<Paginate<BudgetPlanItemGroup>> => {
   const result = await axios.get<ResponseData<Paginate<BudgetPlanItemGroup>>>(
     'v1/budgetplanitemgroups',

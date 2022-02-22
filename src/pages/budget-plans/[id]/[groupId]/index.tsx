@@ -4,6 +4,7 @@ import LoadingButton from 'components/ui/Button/LoadingButton';
 import DetailLayout from 'components/ui/DetailLayout';
 import DataTable, { usePaginateParams } from 'components/ui/Table/DataTable';
 import Loader from 'components/ui/Table/Loader';
+import { UserType } from 'constants/user';
 import { ItemOfBudgetPlanItem } from 'modules/budgetPlanItem/entities';
 import { useDeleteBudgetPlanitems } from 'modules/budgetPlanItem/hook';
 import { BudgetPlanItemGroupItem } from 'modules/budgetPlanItemGroup/entities';
@@ -11,6 +12,7 @@ import {
   useFetchBudgetPlanItemGroupDetail,
   useFetchBudgetPlanItemGroupItems,
 } from 'modules/budgetPlanItemGroup/hook';
+import { useDecodeToken } from 'modules/custom/useDecodeToken';
 import type { NextPage } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -21,6 +23,7 @@ import { toast } from 'react-toastify';
 import { getAllIds, showErrorMessage } from 'utils/helpers';
 
 const BudgetPlanGroupItemList: NextPage = () => {
+  const [profile] = useDecodeToken();
   const router = useRouter();
   const budgetPlanId = router.query.id as string;
   const budgetPlanGroupId = router.query.groupId as string;
@@ -70,7 +73,7 @@ const BudgetPlanGroupItemList: NextPage = () => {
       dataHookBudgetPlanItemGroupItems.data
     ) as string[];
     if (ids?.length > 0) {
-      deleteBudgetPlan(ids);
+      if (confirm('Delete selected data?')) deleteBudgetPlan(ids);
     }
   };
 
@@ -78,20 +81,14 @@ const BudgetPlanGroupItemList: NextPage = () => {
     { Header: 'ID', accessor: 'id' },
     { Header: 'Catalog', accessor: 'catalog' },
     { Header: 'Items', accessor: 'items' },
-    {
-      Header: 'Actions',
-      Cell: ({ cell }: CellProps<BudgetPlanItemGroupItem>) => {
-        return (
-          <div className="d-flex flex-column" style={{ minWidth: 100 }}>
-            <Button variant="red" onClick={() => {}}>
-              Delete
-            </Button>
-          </div>
-        );
-      },
-    },
     { Header: 'Budget Code', accessor: 'budgetCode', minWidth: 300 },
-    { Header: 'Detail', accessor: 'detail', minWidth: 200 },
+    {
+      Header: 'Detail',
+      accessor: 'detail',
+      minWidth: 300,
+      Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) =>
+        row.values.catalog?.detail,
+    },
     {
       Header: 'Asset Group',
       Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) => (
@@ -101,9 +98,27 @@ const BudgetPlanGroupItemList: NextPage = () => {
       ),
     },
     { Header: 'Currency', accessor: 'currency', minWidth: 150 },
-    { Header: 'Price/Unit', accessor: 'pricePerUnit', minWidth: 150 },
-    { Header: 'Total USD', accessor: 'totalAmountUsd', minWidth: 200 },
-    { Header: 'Total IDR', accessor: 'totalAmount', minWidth: 200 },
+    {
+      Header: 'Price/Unit',
+      accessor: 'pricePerUnit',
+      minWidth: 200,
+      Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) =>
+        row.values.pricePerUnit.toLocaleString('id-Id'),
+    },
+    {
+      Header: 'Total USD',
+      accessor: 'totalAmountUsd',
+      minWidth: 200,
+      Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) =>
+        row.values.totalAmountUsd.toLocaleString('en-EN'),
+    },
+    {
+      Header: 'Total IDR',
+      accessor: 'totalAmount',
+      minWidth: 200,
+      Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) =>
+        row.values.totalAmount.toLocaleString('id-Id'),
+    },
     {
       Header: 'Jan',
       Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) =>
@@ -230,7 +245,7 @@ const BudgetPlanGroupItemList: NextPage = () => {
               columns={columns}
               data={dataHookBudgetPlanItemGroupItems.data}
               actions={
-                <>
+                profile?.type !== UserType.ApprovalBudgetPlanCapex && (
                   <LoadingButton
                     variant="red"
                     size="sm"
@@ -241,15 +256,17 @@ const BudgetPlanGroupItemList: NextPage = () => {
                   >
                     Delete
                   </LoadingButton>
-                </>
+                )
               }
               addOns={
-                <Link
-                  href={`/budget-plans/${budgetPlanId}/${budgetPlanGroupId}/edit`}
-                  passHref
-                >
-                  <Button variant="primary">Edit</Button>
-                </Link>
+                profile?.type !== UserType.ApprovalBudgetPlanCapex && (
+                  <Link
+                    href={`/budget-plans/${budgetPlanId}/${budgetPlanGroupId}/edit`}
+                    passHref
+                  >
+                    <Button variant="primary">Edit</Button>
+                  </Link>
+                )
               }
               isLoading={dataHookBudgetPlanItemGroupItems.isFetching}
               selectedSort={selectedSort}

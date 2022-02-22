@@ -103,7 +103,7 @@ const DetailBudgetPlan: NextPage = () => {
       dataHookBudgetPlanItemGroup.data
     ) as string[];
     if (ids?.length > 0) {
-      deleteBudgetPlanItemGroups(ids);
+      if (confirm('Delete selected data?')) deleteBudgetPlanItemGroups(ids);
     }
   };
 
@@ -130,6 +130,7 @@ const DetailBudgetPlan: NextPage = () => {
     if (ids?.length > 0) {
       approvalBudgetPlanItemGroups({
         idBudgetPlanItemGroups: ids,
+        // TODO: define constant
         status: 'approve',
       });
     }
@@ -278,17 +279,20 @@ const DetailBudgetPlan: NextPage = () => {
               data={dataHookBudgetPlanItemGroup.data}
               actions={
                 <>
-                  <LoadingButton
-                    variant="red"
-                    size="sm"
-                    className="mr-2"
-                    disabled={mutationDeleteBudgetPlanItemGroup.isLoading}
-                    onClick={handleDeleteMultipleBudgetPlanItemsGroups}
-                    isLoading={mutationDeleteBudgetPlanItemGroup.isLoading}
-                  >
-                    Delete
-                  </LoadingButton>
-                  {profile?.type === UserType.Approval ? (
+                  {profile?.type !== UserType.ApprovalBudgetPlanCapex && (
+                    <LoadingButton
+                      variant="red"
+                      size="sm"
+                      className="mr-2"
+                      disabled={mutationDeleteBudgetPlanItemGroup.isLoading}
+                      onClick={handleDeleteMultipleBudgetPlanItemsGroups}
+                      isLoading={mutationDeleteBudgetPlanItemGroup.isLoading}
+                    >
+                      Delete
+                    </LoadingButton>
+                  )}
+
+                  {profile?.type === UserType.ApprovalBudgetPlanCapex ? (
                     <LoadingButton
                       size="sm"
                       className="mr-2"

@@ -1,5 +1,5 @@
 export enum ApprovalStatus {
-  APPROVE = 'approved',
+  APPROVE = 'approve',
   REJECT = 'rejected',
   REVISE = 'revised',
 }

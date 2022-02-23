@@ -32,6 +32,7 @@ interface Props<T extends object = {}> {
   data: Paginate<T>;
   items?: Array<T>;
   classTable?: string;
+  classThead?: string;
   isLoading?: boolean;
   isTablePaginate?: boolean;
   selectedRows?: Record<IdType<T>, boolean>;
@@ -54,6 +55,7 @@ function DataTable<T extends object = {}>({
   data,
   items = [],
   classTable,
+  classThead,
   isLoading = false,
   isTablePaginate = true,
   selectedRows,
@@ -191,7 +193,7 @@ function DataTable<T extends object = {}>({
           className={classTable || 'table-admin'}
           responsive
         >
-          <thead>
+          <thead className={classThead}>
             {headerGroups.map((headerGroup, parent_index) => (
               <tr {...headerGroup.getHeaderGroupProps()} key={parent_index}>
                 {headerGroup.headers.map((column, child_index) =>

@@ -1,10 +1,11 @@
+import { Currency } from 'constants/currency';
 import { Catalog } from 'modules/catalog/entities';
 
 export type BudgetPlanItem = {
   id: string;
   catalog: Catalog;
   pricePerUnit: number;
-  currency: string;
+  currency: Currency;
   currencyRate: number;
   totalAmount: number;
   totalAmountUsd: number;
@@ -30,7 +31,7 @@ export interface ItemOfBudgetPlanItemForm {
   idAssetGroup: string;
   idCapexCatalog: string;
   pricePerUnit: number;
-  currency: string;
+  currency: Currency;
   currencyRate: number;
   totalAmount: number;
   totalAmountUsd: number;

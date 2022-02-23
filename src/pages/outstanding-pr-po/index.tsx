@@ -157,6 +157,7 @@ const OutstandingPrPoIndex: NextPage = () => {
           <DataTable
             columns={columns}
             data={dataHook?.data}
+            classThead="text-nowrap"
             isLoading={dataHook.isFetching}
             selectedSort={selectedSort}
             selectedRows={selectedRow}

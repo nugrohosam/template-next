@@ -35,4 +35,6 @@ export interface ItemOfBudgetPlanItemForm {
   totalAmount: number;
   totalAmountUsd: number;
   items: ItemOfBudgetPlanItem[];
+  id?: string;
+  catalog?: Catalog;
 }

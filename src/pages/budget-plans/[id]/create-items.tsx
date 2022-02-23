@@ -15,10 +15,18 @@ import { toast } from 'react-toastify';
 import { showErrorMessage } from 'utils/helpers';
 
 const columns: Column<ItemOfBudgetPlanItemForm>[] = [
+  { Header: 'Catalog', accessor: 'catalog' },
+  { Header: 'Item', accessor: 'items' },
+  { Header: 'ID Asset Group', accessor: 'idAssetGroup' },
+  { Header: 'ID Capex Catalog', accessor: 'idCapexCatalog' },
+  { Header: 'Currency Rate', accessor: 'currencyRate' },
+  { Header: 'id', accessor: 'id' },
   {
     Header: 'Detail',
     minWidth: 300,
-    accessor: 'idCapexCatalog',
+    Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) => (
+      <div style={{ minWidth: 300 }}>{row.values.catalog?.detail}</div>
+    ),
   },
   {
     Header: 'Currency',
@@ -39,10 +47,6 @@ const columns: Column<ItemOfBudgetPlanItemForm>[] = [
     Header: 'Total IDR',
     accessor: 'totalAmount',
     minWidth: 200,
-  },
-  {
-    Header: 'Item',
-    accessor: 'items',
   },
   {
     Header: 'Jan',
@@ -177,7 +181,14 @@ const CreatePeriodActual: NextPage = () => {
             columns={columns}
             items={myBudgetPlanItem}
             selectedRows={selectedRow}
-            hiddenColumns={['items']}
+            hiddenColumns={[
+              'items',
+              'catalog',
+              'idAssetGroup',
+              'idCapexCatalog',
+              'currencyRate',
+              'id',
+            ]}
             onSelectedRowsChanged={(rows) => setSelectedRow(rows)}
             addOns={
               <BudgetPlanItemModal

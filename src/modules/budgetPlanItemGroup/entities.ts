@@ -1,3 +1,4 @@
+import { Currency } from 'constants/currency';
 import { BudgetPlanItem } from 'modules/budgetPlanItem/entities';
 
 export enum BudgetPlanItemGroupStatus {
@@ -7,7 +8,7 @@ export enum BudgetPlanItemGroupStatus {
 export type BudgetPlanItemGroup = {
   id: string;
   budgetCode: string;
-  currency: string;
+  currency: Currency;
   status: string;
   item: number;
   totalAmount: number;

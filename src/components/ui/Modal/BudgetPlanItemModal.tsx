@@ -2,7 +2,7 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import Input from 'components/form/Input';
 import SingleSelect, { SelectOption } from 'components/form/SingleSelect';
-import { currencyOptions } from 'constants/currency';
+import { Currency, currencyOptions } from 'constants/currency';
 import { useFetchAssetGroups } from 'modules/assetGroup/hook';
 import {
   ItemOfBudgetPlanItem,
@@ -24,7 +24,7 @@ interface RejectModalProps {
   onSend: (data: ItemOfBudgetPlanItemForm) => void;
   classButton?: string;
   isEdit?: boolean;
-  inPageUpdate?: { idAssetGroup: string; currency: string };
+  inPageUpdate?: { idAssetGroup: string; currency: Currency };
   buttonTitle?: string;
   myItem?: ItemOfBudgetPlanItemForm;
 }
@@ -124,14 +124,15 @@ const CreateBudgetPlanItemModal: React.FC<RejectModalProps> = ({
     }
   };
 
-  const changeCurrency = (currency: string) => {
+  const changeCurrency = (currency: Currency) => {
     const idCapexCatalog = getValues('idCapexCatalog');
     const found = dataHookCatalogs.data?.items.find(
       (item) => item.id === idCapexCatalog
     );
     if (idCapexCatalog) {
       const pricePerunit =
-        (currency === 'IDR' ? found?.priceInIdr : found?.priceInUsd) || 0;
+        (currency === Currency.IDR ? found?.priceInIdr : found?.priceInUsd) ||
+        0;
       setValue('pricePerUnit', pricePerunit);
       reCalculateItems(pricePerunit);
     }
@@ -174,11 +175,17 @@ const CreateBudgetPlanItemModal: React.FC<RejectModalProps> = ({
         Header: 'Amount',
         accessor: 'amount',
         Cell: ({ row }: CellProps<ItemOfBudgetPlanItem>) => (
-          <FormControl type="text" value={row.values.amount} disabled />
+          <FormControl
+            type="text"
+            value={row.values.amount.toLocaleString(
+              watchCurrency === Currency.USD ? 'en-En' : 'id-Id'
+            )}
+            disabled
+          />
         ),
       },
     ],
-    [watchPricePerUnit, setMyBudgetPlanItem]
+    [watchPricePerUnit, setMyBudgetPlanItem, watchCurrency]
   );
 
   const reCalculateItems = (pricePerUnit: number) => {
@@ -196,7 +203,7 @@ const CreateBudgetPlanItemModal: React.FC<RejectModalProps> = ({
       .map((item) => item.amount)
       .reduce((previousValue, currentValue) => previousValue + currentValue, 0);
 
-    return watchCurrency === 'USD' ? total * kurs : total;
+    return watchCurrency === Currency.USD ? total * kurs : total;
   };
 
   const totalAmountUsd = () => {
@@ -205,7 +212,7 @@ const CreateBudgetPlanItemModal: React.FC<RejectModalProps> = ({
       .map((item) => item.amount)
       .reduce((previousValue, currentValue) => previousValue + currentValue, 0);
 
-    return watchCurrency === 'IDR' ? total / kurs : total;
+    return watchCurrency === Currency.IDR ? total / kurs : total;
   };
 
   const onModalOpened = () => {
@@ -306,7 +313,7 @@ const CreateBudgetPlanItemModal: React.FC<RejectModalProps> = ({
               options={currencyOptions}
               error={errors.idCapexCatalog?.message}
               isDisabled={isEdit || !!inPageUpdate}
-              onChange={(val) => changeCurrency(val.value as string)}
+              onChange={(val) => changeCurrency(val.value as Currency)}
             />
           </FormGroup>
         </Col>

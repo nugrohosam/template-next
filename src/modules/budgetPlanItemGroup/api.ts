@@ -43,10 +43,8 @@ export const deleteBudgetPlanItemGroups = async (
   idBudgetPlanItemGroups: string[]
 ): Promise<null> => {
   const result = await axios.patch<ResponseData<null>>(
-    'v1/budgetplanitemgroups/cancel',
-    {
-      idBudgetPlanItemGroups,
-    }
+    'v1/budgetplanitemgroups/delete',
+    { idBudgetPlanItemGroups }
   );
   return result.data.data;
 };

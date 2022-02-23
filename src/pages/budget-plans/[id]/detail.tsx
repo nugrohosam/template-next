@@ -5,6 +5,7 @@ import DetailLayout from 'components/ui/DetailLayout';
 import DataTable, { usePaginateParams } from 'components/ui/Table/DataTable';
 import Loader from 'components/ui/Table/Loader';
 import { UserType } from 'constants/user';
+import { ApprovalStatus } from 'modules/approval/entities';
 import { useFetchBudgetPlanDetail } from 'modules/budgetPlan/hook';
 import {
   ApprovalBudgetPlanItemGroup,
@@ -130,8 +131,7 @@ const DetailBudgetPlan: NextPage = () => {
     if (ids?.length > 0) {
       approvalBudgetPlanItemGroups({
         idBudgetPlanItemGroups: ids,
-        // TODO: define constant
-        status: 'approve',
+        status: ApprovalStatus.APPROVE,
       });
     }
   };

@@ -84,7 +84,7 @@ const DetailBudgetPlan: NextPage = () => {
   };
 
   const deleteBudgetPlanItemGroups = (ids: Array<string>) => {
-    mutationSubmitBudgetPlanItemGroup.mutate(ids, {
+    mutationDeleteBudgetPlanItemGroup.mutate(ids, {
       onSuccess: () => {
         setSelectedRow({});
         dataHook.refetch();

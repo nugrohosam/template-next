@@ -9,6 +9,8 @@ export type AssetGroup = {
 export type AssetGroupPics = {
   districtCode: string;
   departementCode: string;
+  type: string;
+  isBudgetCodeDefault: boolean;
 };
 
 export interface AssetGroupForm {

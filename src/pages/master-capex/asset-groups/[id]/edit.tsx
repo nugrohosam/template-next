@@ -79,7 +79,11 @@ const EditPeriodActual: NextPage = () => {
 
         const map = dataHookAssetGroupDetail.pics.map(async (val) => {
           let options: SelectOption[] = [];
-          await fetchNoiDivision({ search: val.districtCode }).then(
+          await fetchNoiDivision({
+            district: val.districtCode,
+            pageNumber: 1,
+            pageSize: 50,
+          }).then(
             (resp) =>
               (options =
                 resp.items.map((x) => ({
@@ -90,6 +94,8 @@ const EditPeriodActual: NextPage = () => {
           return {
             districtCode: val.districtCode,
             departementCode: val.departementCode,
+            type: val.type,
+            isBudgetCodeDefault: val.isBudgetCodeDefault,
             options,
           };
         });
@@ -110,6 +116,8 @@ const EditPeriodActual: NextPage = () => {
             return {
               districtCode: val.districtCode,
               departementCode: val.departementCode,
+              type: val.type,
+              isBudgetCodeDefault: val.isBudgetCodeDefault,
             };
           }),
         },
@@ -131,13 +139,19 @@ const EditPeriodActual: NextPage = () => {
 
   const [myPics, setMyPics] = useState<MyPics[]>([]);
   const districtChoosed = async (districtCode: string, indexTo: number) => {
-    const result = await fetchNoiDivision({ search: districtCode });
+    const result = await fetchNoiDivision({
+      district: districtCode,
+      pageNumber: 1,
+      pageSize: 50,
+    });
     setMyPics((prev) => {
       return prev.map((val, index) => {
         if (index === indexTo)
           val = {
             districtCode: districtCode,
             departementCode: '',
+            type: 'site',
+            isBudgetCodeDefault: false,
             options:
               result?.items.map((x) => ({
                 value: x.deptCode,
@@ -270,7 +284,13 @@ const EditPeriodActual: NextPage = () => {
                 onClick={() =>
                   setMyPics((prev) => [
                     ...prev,
-                    { districtCode: '', departementCode: '', options: [] },
+                    {
+                      districtCode: '',
+                      departementCode: '',
+                      type: 'site',
+                      isBudgetCodeDefault: false,
+                      options: [],
+                    },
                   ])
                 }
               >

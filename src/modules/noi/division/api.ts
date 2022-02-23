@@ -3,8 +3,12 @@ import axiosNfs from 'utils/axiosNfs';
 
 import { NoiDivision } from './entities';
 
+export interface NoiDivisionPaginateParams extends PaginateParams {
+  district?: string;
+}
+
 export const fetchNoiDivision = async (
-  params: PaginateParams
+  params: NoiDivisionPaginateParams
 ): Promise<Paginate<NoiDivision>> => {
   const result = await axiosNfs.get<ResponseData<Paginate<NoiDivision>>>(
     `v1/noi/division`,

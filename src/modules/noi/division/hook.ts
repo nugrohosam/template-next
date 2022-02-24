@@ -8,11 +8,11 @@ import {
   UseQueryResult,
 } from 'react-query';
 
-import { fetchNoiDivision } from './api';
+import { fetchNoiDivision, NoiDivisionPaginateParams } from './api';
 import { NoiDivision } from './entities';
 
 export const useFetchNoiDivision = (
-  params: PaginateParams
+  params: NoiDivisionPaginateParams
 ): UseQueryResult<Paginate<NoiDivision>, ResponseError> => {
   return useQuery(['noi-division', params], () => fetchNoiDivision(params), {
     enabled: !!params.search,

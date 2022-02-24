@@ -14,7 +14,7 @@ export const useDistrictOptions = () => {
     () =>
       districtHook.data?.items.map((item) => ({
         value: item.code,
-        label: item.districtName,
+        label: item.code,
       })) || [],
     [districtHook.data?.items]
   );

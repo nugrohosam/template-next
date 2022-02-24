@@ -45,7 +45,7 @@ const ModalBox: React.FC<ModalBoxProps> = ({
       <Button
         variant={buttonVariant}
         onClick={handleClickModal}
-        className={classButton ? classButton : 'mr-lg-2 mb-3'}
+        className={classButton ? classButton : ''}
       >
         {buttonTitle}
       </Button>

@@ -1,3 +1,4 @@
+import ButtonActions from 'components/ui/Button/ButtonActions';
 import LoadingButton from 'components/ui/Button/LoadingButton';
 import ContentLayout from 'components/ui/ContentLayout';
 import DataTable, { usePaginateParams } from 'components/ui/Table/DataTable';
@@ -76,20 +77,11 @@ const BudgetPlanList: NextPage = () => {
       Header: 'Actions',
       Cell: ({ cell }: CellProps<BudgetPlan>) => {
         return (
-          <div className="d-flex flex-column">
-            <Link href={`/budget-plans/${cell.row.values.id}/detail`} passHref>
-              <Button className="mb-1">Detail</Button>
-            </Link>
-            <Link href={`/budget-plans/${cell.row.values.id}/edit`} passHref>
-              <Button className="mb-1">Edit</Button>
-            </Link>
-            <Button
-              variant="red"
-              onClick={() => deleteBudgetPlan([cell.row.values.id])}
-            >
-              Delete
-            </Button>
-          </div>
+          <ButtonActions
+            hrefDetail={`/budget-plans/${cell.row.values.id}/detail`}
+            hrefEdit={`/budget-plans/${cell.row.values.id}/edit`}
+            onDelete={() => deleteBudgetPlan([cell.row.values.id])}
+          ></ButtonActions>
         );
       },
     },

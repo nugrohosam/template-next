@@ -5,7 +5,7 @@ import SingleSelect from 'components/form/SingleSelect';
 import { PathBreadcrumb } from 'components/ui/Breadcrumb';
 import LoadingButton from 'components/ui/Button/LoadingButton';
 import DetailLayout from 'components/ui/DetailLayout';
-import { currency, currencyOptions } from 'constants/currency';
+import { Currency, currencyOptions } from 'constants/currency';
 import { CatalogForm } from 'modules/catalog/entities';
 import { useFetchCatalogDetail, useUpdateCatalog } from 'modules/catalog/hook';
 import { useAssetGroupOptions } from 'modules/custom/useAssetGroupOptions';
@@ -103,7 +103,7 @@ const EditCatalog: NextPage = () => {
   const [usdDisabled, setUsdDisabled] = useState(true);
 
   const handleCurrencyChange = (value: string | number | boolean) => {
-    if (value == currency.USD) {
+    if (value == Currency.USD) {
       // TODO: reset value IDR
       setUsdDisabled(false);
       setIdrDisabled(true);
@@ -116,9 +116,9 @@ const EditCatalog: NextPage = () => {
   };
 
   useEffect(() => {
-    if (data.primaryCurrency === currency.IDR) {
+    if (data.primaryCurrency === Currency.IDR) {
       setValue('priceInUsd', data.priceInIdr / currencyRate);
-    } else if (data.primaryCurrency === currency.USD) {
+    } else if (data.primaryCurrency === Currency.USD) {
       setValue('priceInIdr', data.priceInUsd * currencyRate);
     }
   }, [data.primaryCurrency, data.priceInIdr, data.priceInUsd, setValue]);
@@ -126,7 +126,7 @@ const EditCatalog: NextPage = () => {
   return (
     <DetailLayout
       paths={breadCrumb}
-      backButtonClick={() => router.replace(`/master-capex/catalogs`)}
+      backButtonClick={router.back}
       title="Edit Catalog"
     >
       <Panel>

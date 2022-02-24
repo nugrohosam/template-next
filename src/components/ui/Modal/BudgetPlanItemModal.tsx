@@ -2,7 +2,7 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import Input from 'components/form/Input';
 import SingleSelect, { SelectOption } from 'components/form/SingleSelect';
-import { currencyOptions } from 'constants/currency';
+import { Currency, currencyOptions } from 'constants/currency';
 import { useFetchAssetGroups } from 'modules/assetGroup/hook';
 import {
   ItemOfBudgetPlanItem,
@@ -12,14 +12,7 @@ import { Catalog } from 'modules/catalog/entities';
 import { useFetchCatalogs } from 'modules/catalog/hook';
 import moment from 'moment';
 import React, { useMemo, useState } from 'react';
-import {
-  Col,
-  Form,
-  FormControl,
-  FormGroup,
-  FormLabel,
-  Row,
-} from 'react-bootstrap';
+import { Col, FormControl, FormGroup, FormLabel, Row } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { CellProps, Column } from 'react-table';
 import * as yup from 'yup';
@@ -30,6 +23,10 @@ import ModalBox from '.';
 interface RejectModalProps {
   onSend: (data: ItemOfBudgetPlanItemForm) => void;
   classButton?: string;
+  isEdit?: boolean;
+  inPageUpdate?: { idAssetGroup: string; currency: Currency };
+  buttonTitle?: string;
+  myItem?: ItemOfBudgetPlanItemForm;
 }
 
 const initMyBudgetPlanItem = () =>
@@ -42,6 +39,10 @@ const initMyBudgetPlanItem = () =>
 const CreateBudgetPlanItemModal: React.FC<RejectModalProps> = ({
   onSend,
   classButton,
+  isEdit = false,
+  inPageUpdate,
+  buttonTitle = '+ Add Item',
+  myItem,
 }) => {
   const schema = yup.object().shape({
     idAssetGroup: yup.string().required(),
@@ -79,7 +80,9 @@ const CreateBudgetPlanItemModal: React.FC<RejectModalProps> = ({
     data.totalAmountUsd = +totalAmountUsd();
     data.pricePerUnit = +data.pricePerUnit;
     data.currencyRate = +data.currencyRate;
-    console.log(data);
+    data.catalog = dataHookCatalogs.data?.items.find(
+      (item) => item.id === data.idCapexCatalog
+    );
     onSend(data);
     reset();
     setMyBudgetPlanItem(initMyBudgetPlanItem());
@@ -121,14 +124,15 @@ const CreateBudgetPlanItemModal: React.FC<RejectModalProps> = ({
     }
   };
 
-  const changeCurrency = (currency: string) => {
+  const changeCurrency = (currency: Currency) => {
     const idCapexCatalog = getValues('idCapexCatalog');
     const found = dataHookCatalogs.data?.items.find(
       (item) => item.id === idCapexCatalog
     );
     if (idCapexCatalog) {
       const pricePerunit =
-        (currency === 'IDR' ? found?.priceInIdr : found?.priceInUsd) || 0;
+        (currency === Currency.IDR ? found?.priceInIdr : found?.priceInUsd) ||
+        0;
       setValue('pricePerUnit', pricePerunit);
       reCalculateItems(pricePerunit);
     }
@@ -171,11 +175,17 @@ const CreateBudgetPlanItemModal: React.FC<RejectModalProps> = ({
         Header: 'Amount',
         accessor: 'amount',
         Cell: ({ row }: CellProps<ItemOfBudgetPlanItem>) => (
-          <FormControl type="text" value={row.values.amount} disabled />
+          <FormControl
+            type="text"
+            value={row.values.amount.toLocaleString(
+              watchCurrency === Currency.USD ? 'en-En' : 'id-Id'
+            )}
+            disabled
+          />
         ),
       },
     ],
-    [watchPricePerUnit, setMyBudgetPlanItem]
+    [watchPricePerUnit, setMyBudgetPlanItem, watchCurrency]
   );
 
   const reCalculateItems = (pricePerUnit: number) => {
@@ -193,7 +203,7 @@ const CreateBudgetPlanItemModal: React.FC<RejectModalProps> = ({
       .map((item) => item.amount)
       .reduce((previousValue, currentValue) => previousValue + currentValue, 0);
 
-    return watchCurrency === 'USD' ? total * kurs : total;
+    return watchCurrency === Currency.USD ? total * kurs : total;
   };
 
   const totalAmountUsd = () => {
@@ -202,12 +212,43 @@ const CreateBudgetPlanItemModal: React.FC<RejectModalProps> = ({
       .map((item) => item.amount)
       .reduce((previousValue, currentValue) => previousValue + currentValue, 0);
 
-    return watchCurrency === 'IDR' ? total / kurs : total;
+    return watchCurrency === Currency.IDR ? total / kurs : total;
+  };
+
+  const onModalOpened = () => {
+    if (isEdit) {
+      reset({
+        idAssetGroup: myItem?.idAssetGroup,
+        idCapexCatalog: myItem?.idCapexCatalog,
+        pricePerUnit: myItem?.pricePerUnit,
+        currency: myItem?.currency,
+        currencyRate: myItem?.currencyRate,
+        id: myItem?.id,
+      });
+      setMyBudgetPlanItem((prevs) =>
+        prevs.map((prev) => {
+          const foundMonth = myItem?.items.find(
+            (item) => item.month === prev.month
+          );
+          return foundMonth || prev;
+        })
+      );
+    } else if (inPageUpdate) {
+      /**
+       * special condition when create item in update page,
+       * field idAssetGroup and currency will disable.
+       * Because the value will get from index 0 budget plan items
+       */
+      reset({
+        idAssetGroup: inPageUpdate.idAssetGroup,
+        currency: inPageUpdate.currency,
+      });
+    }
   };
 
   return (
     <ModalBox
-      buttonTitle="+ Add Item"
+      buttonTitle={buttonTitle}
       buttonVariant="primary"
       submitButtonVariant="primary"
       classButton={classButton}
@@ -215,6 +256,7 @@ const CreateBudgetPlanItemModal: React.FC<RejectModalProps> = ({
       wordingSubmit="Save"
       dialogClassName="modal-90w"
       onSend={handleSubmit(handleSubmitForm)}
+      onClikModal={onModalOpened}
     >
       <Row>
         <Col lg={6}>
@@ -236,6 +278,7 @@ const CreateBudgetPlanItemModal: React.FC<RejectModalProps> = ({
               placeholder="Asset Group"
               options={assetGroupOptions}
               error={errors.idAssetGroup?.message}
+              isDisabled={isEdit || !!inPageUpdate}
               onChange={() => {
                 resetField('idCapexCatalog');
                 resetField('currency');
@@ -269,7 +312,8 @@ const CreateBudgetPlanItemModal: React.FC<RejectModalProps> = ({
               placeholder="Currency"
               options={currencyOptions}
               error={errors.idCapexCatalog?.message}
-              onChange={(val) => changeCurrency(val.value as string)}
+              isDisabled={isEdit || !!inPageUpdate}
+              onChange={(val) => changeCurrency(val.value as Currency)}
             />
           </FormGroup>
         </Col>

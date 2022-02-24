@@ -2,13 +2,24 @@ import Panel from 'components/form/Panel';
 import { PathBreadcrumb } from 'components/ui/Breadcrumb';
 import LoadingButton from 'components/ui/Button/LoadingButton';
 import DetailLayout from 'components/ui/DetailLayout';
+import ApproveModal from 'components/ui/Modal/ApproveModal';
+import RejectModal from 'components/ui/Modal/RejectModal';
+import ReviseModal from 'components/ui/Modal/ReviseModal';
 import DataTable, { usePaginateParams } from 'components/ui/Table/DataTable';
 import Loader from 'components/ui/Table/Loader';
+import AuditTimeline from 'components/ui/Timeline/AuditTimeline';
 import { UserType } from 'constants/user';
+import { ApprovalField } from 'modules/approval/entities';
+import { ResourceType } from 'modules/audit/parent/entities';
+import { useFetchAudits } from 'modules/audit/parent/hook';
 import { ItemOfBudgetPlanItem } from 'modules/budgetPlanItem/entities';
 import { useDeleteBudgetPlanitems } from 'modules/budgetPlanItem/hook';
-import { BudgetPlanItemGroupItem } from 'modules/budgetPlanItemGroup/entities';
 import {
+  BudgetPlanItemGroupItem,
+  BudgetPlanItemGroupStatus,
+} from 'modules/budgetPlanItemGroup/entities';
+import {
+  useApprovalBudgetPlanItemGroups,
   useFetchBudgetPlanItemGroupDetail,
   useFetchBudgetPlanItemGroupItems,
 } from 'modules/budgetPlanItemGroup/hook';
@@ -17,7 +28,7 @@ import type { NextPage } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
-import { Button, Col, Row } from 'react-bootstrap';
+import { Button, Col, Container, Row } from 'react-bootstrap';
 import { CellProps, Column, SortingRule } from 'react-table';
 import { toast } from 'react-toastify';
 import { getAllIds, showErrorMessage } from 'utils/helpers';
@@ -76,6 +87,37 @@ const BudgetPlanGroupItemList: NextPage = () => {
       if (confirm('Delete selected data?')) deleteBudgetPlan(ids);
     }
   };
+
+  const mutationApprovalBudgetPlanItemGroup = useApprovalBudgetPlanItemGroups();
+  const approvalBudgetPlanItemGroups = (data: ApprovalField) => {
+    mutationApprovalBudgetPlanItemGroup.mutate(
+      {
+        idBudgetPlanItemGroups: [budgetPlanId],
+        status: data.status,
+        remark: data.notes,
+      },
+      {
+        onSuccess: () => {
+          router.push(`/budget-plans/${budgetPlanId}/detail`);
+          toast('Data Approved!');
+        },
+        onError: (error) => {
+          console.error('Failed to approve data', error);
+          toast(error.message, { autoClose: false });
+          showErrorMessage(error);
+        },
+      }
+    );
+  };
+
+  const auditHook = useFetchAudits({
+    resourceId: budgetPlanGroupId,
+    resourceType: ResourceType.BUDGET_PLAN_ITEM_GROUP,
+    orderBy: 'asc',
+    order: 'created_at',
+    pageNumber: 1,
+    pageSize: 10,
+  });
 
   const columns: Column<BudgetPlanItemGroupItem>[] = [
     { Header: 'ID', accessor: 'id' },
@@ -196,9 +238,7 @@ const BudgetPlanGroupItemList: NextPage = () => {
   return (
     <DetailLayout
       paths={breadCrumb}
-      backButtonClick={() =>
-        router.replace(`/budget-plans/${budgetPlanId}/detail`)
-      }
+      backButtonClick={router.back}
       title="Detail Budget Plan Item Group"
     >
       <Panel>
@@ -226,65 +266,92 @@ const BudgetPlanGroupItemList: NextPage = () => {
           <Col lg={6}>
             <h4 className="profile-detail__info--title mb-1">Total USD</h4>
             <h3 className="profile-detail__info--subtitle">
-              {dataHookBudgetPlanItemGroup?.data?.totalAmountUsd}
+              {dataHookBudgetPlanItemGroup?.data?.totalAmountUsd?.toLocaleString(
+                'en-En'
+              )}
             </h3>
           </Col>
           <Col lg={6}>
             <h4 className="profile-detail__info--title mb-1">Total IDR</h4>
             <h3 className="profile-detail__info--subtitle">
-              {dataHookBudgetPlanItemGroup?.data?.totalAmount}
+              {dataHookBudgetPlanItemGroup?.data?.totalAmount?.toLocaleString(
+                'id-Id'
+              )}
             </h3>
           </Col>
         </Row>
-
-        <br />
-
-        <Row>
-          {dataHookBudgetPlanItemGroupItems.data && (
-            <DataTable
-              columns={columns}
-              data={dataHookBudgetPlanItemGroupItems.data}
-              actions={
-                profile?.type !== UserType.ApprovalBudgetPlanCapex && (
-                  <LoadingButton
-                    variant="red"
-                    size="sm"
-                    className="mr-2"
-                    disabled={mutationDeleteBudgetPlanItems.isLoading}
-                    onClick={handleDeleteMultipleBudgetPlan}
-                    isLoading={mutationDeleteBudgetPlanItems.isLoading}
-                  >
-                    Delete
-                  </LoadingButton>
-                )
-              }
-              addOns={
-                profile?.type !== UserType.ApprovalBudgetPlanCapex && (
-                  <Link
-                    href={`/budget-plans/${budgetPlanId}/${budgetPlanGroupId}/edit`}
-                    passHref
-                  >
-                    <Button variant="primary">Edit</Button>
-                  </Link>
-                )
-              }
-              isLoading={dataHookBudgetPlanItemGroupItems.isFetching}
-              selectedSort={selectedSort}
-              selectedRows={selectedRow}
-              hiddenColumns={['id', 'catalog', 'items']}
-              paginateParams={params}
-              onSelectedRowsChanged={(rows) => setSelectedRow(rows)}
-              onSelectedSortChanged={(sort) => {
-                setSelectedSort(sort);
-                setSortingRules(sort);
-              }}
-              onSearch={(keyword) => setSearch(keyword)}
-              onPageSizeChanged={(pageSize) => setPageSize(pageSize)}
-              onChangePage={(page) => setPageNumber(page)}
-            ></DataTable>
-          )}
-        </Row>
       </Panel>
+
+      {auditHook.data?.items && auditHook.data?.items.length > 0 && (
+        <AuditTimeline audit={auditHook.data} />
+      )}
+
+      <Container fluid className="mt-3 px-0">
+        <Panel>
+          <Row>
+            {dataHookBudgetPlanItemGroupItems.data && (
+              <DataTable
+                columns={columns}
+                data={dataHookBudgetPlanItemGroupItems.data}
+                actions={
+                  profile?.type !== UserType.ApprovalBudgetPlanCapex &&
+                  dataHookBudgetPlanItemGroup?.data?.status ===
+                    BudgetPlanItemGroupStatus.Draft && (
+                    <LoadingButton
+                      variant="red"
+                      size="sm"
+                      className="mr-2"
+                      disabled={mutationDeleteBudgetPlanItems.isLoading}
+                      onClick={handleDeleteMultipleBudgetPlan}
+                      isLoading={mutationDeleteBudgetPlanItems.isLoading}
+                    >
+                      Delete
+                    </LoadingButton>
+                  )
+                }
+                addOns={
+                  profile?.type === UserType.ApprovalBudgetPlanCapex ? (
+                    <>
+                      <ApproveModal
+                        onSend={approvalBudgetPlanItemGroups}
+                        classButton="mr-2"
+                      />
+                      <ReviseModal
+                        onSend={approvalBudgetPlanItemGroups}
+                        classButton="mr-2"
+                      />
+                      <RejectModal onSend={approvalBudgetPlanItemGroups} />
+                    </>
+                  ) : (
+                    dataHookBudgetPlanItemGroup?.data?.status ===
+                      BudgetPlanItemGroupStatus.Draft && (
+                      <Link
+                        href={`/budget-plans/${budgetPlanId}/${budgetPlanGroupId}/edit`}
+                        passHref
+                      >
+                        <Button variant="primary">Edit</Button>
+                      </Link>
+                    )
+                  )
+                }
+                isLoading={dataHookBudgetPlanItemGroupItems.isFetching}
+                selectedSort={selectedSort}
+                selectedRows={selectedRow}
+                hiddenColumns={['id', 'catalog', 'items']}
+                paginateParams={params}
+                onSelectedRowsChanged={(rows) => setSelectedRow(rows)}
+                onSelectedSortChanged={(sort) => {
+                  setSelectedSort(sort);
+                  setSortingRules(sort);
+                }}
+                onSearch={(keyword) => setSearch(keyword)}
+                onPageSizeChanged={(pageSize) => setPageSize(pageSize)}
+                onChangePage={(page) => setPageNumber(page)}
+              ></DataTable>
+            )}
+          </Row>
+        </Panel>
+      </Container>
     </DetailLayout>
   );
 };

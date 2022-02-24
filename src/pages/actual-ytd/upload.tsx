@@ -95,7 +95,7 @@ const UploadActualYtd: NextPage = () => {
   return (
     <DetailLayout
       paths={breadCrumb}
-      backButtonClick={() => router.replace('/actual-ytd')}
+      backButtonClick={router.back}
       title="Upload Actual YTD"
     >
       <Panel>

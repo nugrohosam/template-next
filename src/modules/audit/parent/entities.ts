@@ -16,6 +16,7 @@ export type Audit = {
 export enum ResourceType {
   ACCRUED = 'accrued',
   PROPORTIONAL_COST = 'proportional_cost',
+  BUDGET_PLAN_ITEM_GROUP = 'budget_plan_item_group',
 }
 
 export interface AuditPaginateParams extends PaginateParams {

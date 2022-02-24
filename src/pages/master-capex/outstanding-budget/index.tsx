@@ -267,7 +267,7 @@ const OutstandingBudgets: NextPage = () => {
         },
         Cell: ({ cell }: CellProps<outstandingBudget>) => {
           return (
-            <div className="d-flex flex-column">
+            <div className="d-flex flex-column" style={{ minWidth: 150 }}>
               <ConfirmationModal
                 onSend={handleConfirmation}
                 classButton="mb-0"
@@ -300,6 +300,7 @@ const OutstandingBudgets: NextPage = () => {
           <DataTable
             columns={columns}
             data={dataHook.data}
+            classThead="text-nowrap"
             isLoading={dataHook.isFetching}
             hiddenColumns={['id']}
             selectedSort={selectedSort}

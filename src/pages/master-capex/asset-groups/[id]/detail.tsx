@@ -3,6 +3,7 @@ import { PathBreadcrumb } from 'components/ui/Breadcrumb';
 import DetailLayout from 'components/ui/DetailLayout';
 import Loader from 'components/ui/Table/Loader';
 import SimpleTable from 'components/ui/Table/SimpleTable';
+import { PicType } from 'constants/picType';
 import { AssetGroupPics } from 'modules/assetGroup/entities';
 import { useFetchAssetGroupDetail } from 'modules/assetGroup/hook';
 import { NextPage } from 'next';
@@ -10,7 +11,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { Button, Col, Row } from 'react-bootstrap';
-import { Column } from 'react-table';
+import { CellProps, Column } from 'react-table';
 
 const breadCrumb: PathBreadcrumb[] = [
   {
@@ -26,6 +27,13 @@ const breadCrumb: PathBreadcrumb[] = [
 const columns: Column<AssetGroupPics>[] = [
   { Header: 'District', accessor: 'districtCode' },
   { Header: 'Dept', accessor: 'departementCode' },
+  {
+    Header: 'Default for Budget Code',
+    accessor: 'isBudgetCodeDefault',
+    Cell: ({ cell }: CellProps<AssetGroupPics>) => {
+      return cell.row.original.isBudgetCodeDefault ? 'Yes' : 'No';
+    },
+  },
 ];
 
 const DetailAccruedLastMonth: NextPage = () => {
@@ -62,11 +70,32 @@ const DetailAccruedLastMonth: NextPage = () => {
 
         <br />
         <Row>
-          <Col lg={6} className="px-0">
+          <Col lg={12} className="px-0">
+            <h3 className="px-3">PIC HO</h3>
             <SimpleTable
               classTable="table-admin table-inherit"
               columns={columns}
-              items={dataHook?.data?.pics || []}
+              items={
+                dataHook?.data?.pics.filter(
+                  (data) => data.type == PicType.HO
+                ) || []
+              }
+            />
+          </Col>
+        </Row>
+
+        <br />
+        <Row>
+          <Col lg={12} className="px-0">
+            <h3 className="px-3">PIC SITE</h3>
+            <SimpleTable
+              classTable="table-admin table-inherit"
+              columns={columns}
+              items={
+                dataHook?.data?.pics.filter(
+                  (data) => data.type == PicType.SITE
+                ) || []
+              }
             />
           </Col>
         </Row>

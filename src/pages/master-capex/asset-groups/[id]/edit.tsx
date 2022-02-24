@@ -152,7 +152,7 @@ const EditPeriodActual: NextPage = () => {
   return (
     <DetailLayout
       paths={breadCrumb}
-      backButtonClick={() => router.replace(`/master-capex/asset-groups`)}
+      backButtonClick={router.back}
       title="Edit Asset Group"
     >
       {JSON.stringify(myPics)}

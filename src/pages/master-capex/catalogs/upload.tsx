@@ -79,7 +79,7 @@ const UploadCatalog: NextPage = () => {
   return (
     <DetailLayout
       paths={breadCrumb}
-      backButtonClick={() => router.replace('/master-capex/catalogs')}
+      backButtonClick={router.back}
       title="Upload Catalog"
     >
       <Panel>

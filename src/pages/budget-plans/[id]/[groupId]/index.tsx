@@ -235,9 +235,7 @@ const BudgetPlanGroupItemList: NextPage = () => {
   return (
     <DetailLayout
       paths={breadCrumb}
-      backButtonClick={() =>
-        router.replace(`/budget-plans/${budgetPlanId}/detail`)
-      }
+      backButtonClick={router.back}
       title="Detail Budget Plan Item Group"
     >
       <Panel>

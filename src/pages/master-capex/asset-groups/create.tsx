@@ -74,7 +74,7 @@ const CreatePeriodActual: NextPage = () => {
         pics: dataPics.map((val) => {
           return {
             districtCode: val.districtCode,
-            type: val.type,
+            type: val.type.toLowerCase(),
             isBudgetCodeDefault: val.isBudgetCodeDefault,
             departementCode: val.departementCode,
           };
@@ -170,6 +170,7 @@ const CreatePeriodActual: NextPage = () => {
         inputValue: string,
         callback,
         indexTo: number,
+        districtCode: string,
         type: 'site' | 'ho'
       ) => {
         if (!inputValue) {
@@ -177,7 +178,7 @@ const CreatePeriodActual: NextPage = () => {
         } else {
           if (type === 'site') {
             return await fetchNoiDivision({
-              district: myPicsSite[indexTo].districtCode,
+              district: districtCode,
               search: inputValue,
               pageNumber: 1,
               pageSize: 50,
@@ -196,7 +197,7 @@ const CreatePeriodActual: NextPage = () => {
             });
           } else if (type === 'ho') {
             return await fetchNoiDivision({
-              district: myPicsHo[indexTo].districtCode,
+              district: districtCode,
               search: inputValue,
               pageNumber: 1,
               pageSize: 50,
@@ -253,6 +254,34 @@ const CreatePeriodActual: NextPage = () => {
           });
         }
         newPic[indexTo].isBudgetCodeDefault = checked;
+        return newPic;
+      });
+    }
+  };
+
+  const addNewPic = (type: 'site' | 'ho') => {
+    if (type === 'site') {
+      setMyPicsSite((prev) => {
+        const newPic = [...prev];
+        newPic.push({
+          districtCode: '',
+          departementCode: '',
+          type: 'site',
+          isBudgetCodeDefault: false,
+          options: [],
+        });
+        return newPic;
+      });
+    } else if (type === 'ho') {
+      setMyPicsHo((prev) => {
+        const newPic = [...prev];
+        newPic.push({
+          districtCode: '',
+          departementCode: '',
+          type: 'ho',
+          isBudgetCodeDefault: false,
+          options: [],
+        });
         return newPic;
       });
     }
@@ -348,6 +377,7 @@ const CreatePeriodActual: NextPage = () => {
                               inputValue,
                               callback,
                               index,
+                              myPic.districtCode,
                               'ho'
                             );
                           }}
@@ -430,20 +460,9 @@ const CreatePeriodActual: NextPage = () => {
               <Button
                 variant="primary"
                 className="mt-4"
-                onClick={() =>
-                  setMyPicsHo((prev) => [
-                    ...prev,
-                    {
-                      districtCode: '',
-                      departementCode: '',
-                      type: 'ho',
-                      isBudgetCodeDefault: false,
-                      options: [],
-                    },
-                  ])
-                }
+                onClick={() => addNewPic('ho')}
               >
-                Add
+                Add +
               </Button>
             </Col>
           </Row>
@@ -486,7 +505,41 @@ const CreatePeriodActual: NextPage = () => {
                         />
                       </td>
                       <td>
-                        <Select
+                        <AsyncSelect
+                          instanceId="departementCode"
+                          placeholder="Choose Departement"
+                          isClearable={false}
+                          isSearchable
+                          cacheOptions
+                          defaultOptions={myPic.options}
+                          value={myPic.options.find(
+                            (val) => val.value === myPic.departementCode
+                          )}
+                          loadOptions={(inputValue, callback) => {
+                            departementLoadOptions(
+                              inputValue,
+                              callback,
+                              index,
+                              myPic.districtCode,
+                              'site'
+                            );
+                          }}
+                          styles={{
+                            ...customStyles(),
+                            menu: () => ({
+                              zIndex: 99,
+                            }),
+                          }}
+                          onChange={(val) => {
+                            setMyPicsSite((prev) => {
+                              const newPic = [...prev];
+                              newPic[index].departementCode =
+                                (val?.value as string) || '';
+                              return newPic;
+                            });
+                          }}
+                        />
+                        {/* <Select
                           instanceId="departementCode"
                           placeholder="Choose Departement"
                           options={myPic.options}
@@ -507,7 +560,7 @@ const CreatePeriodActual: NextPage = () => {
                               return newPic;
                             });
                           }}
-                        />
+                        /> */}
                       </td>
                       <td>
                         <div className="d-flex justify-content-center">
@@ -550,20 +603,9 @@ const CreatePeriodActual: NextPage = () => {
               <Button
                 variant="primary"
                 className="mt-4"
-                onClick={() =>
-                  setMyPicsSite((prev) => [
-                    ...prev,
-                    {
-                      districtCode: '',
-                      departementCode: '',
-                      type: 'site',
-                      isBudgetCodeDefault: false,
-                      options: [],
-                    },
-                  ])
-                }
+                onClick={() => addNewPic('site')}
               >
-                Add
+                Add +
               </Button>
             </Col>
           </Row>

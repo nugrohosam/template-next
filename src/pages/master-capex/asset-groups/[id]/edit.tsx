@@ -14,7 +14,7 @@ import { useDistrictOptions } from 'modules/custom/useDistrictOptions';
 import { fetchNoiDivision } from 'modules/noi/division/api';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import {
   Button,
   Col,
@@ -26,7 +26,9 @@ import {
 } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import Select from 'react-select';
+import AsyncSelect from 'react-select/async';
 import { toast } from 'react-toastify';
+import { debounce } from 'ts-debounce';
 import { setValidationError, showErrorMessage } from 'utils/helpers';
 import * as yup from 'yup';
 
@@ -69,6 +71,7 @@ const EditPeriodActual: NextPage = () => {
   });
 
   const { data: dataHookAssetGroupDetail } = useFetchAssetGroupDetail(id);
+
   useEffect(() => {
     (async () => {
       if (dataHookAssetGroupDetail) {
@@ -88,7 +91,7 @@ const EditPeriodActual: NextPage = () => {
               (options =
                 resp.items.map((x) => ({
                   value: x.deptCode,
-                  label: x.district,
+                  label: x.name,
                 })) || [])
           );
           return {
@@ -100,23 +103,25 @@ const EditPeriodActual: NextPage = () => {
           };
         });
         const result = await Promise.all(map);
-        setMyPics(result);
+        setMyPicsSite(result.filter((x) => x.type.toLowerCase() === 'site'));
+        setMyPicsHo(result.filter((x) => x.type.toLowerCase() === 'ho'));
       }
     })();
   }, [dataHookAssetGroupDetail, reset]);
 
   const mutation = useUpdateAssetGroup();
   const handleSubmitForm = (data: AssetGroupForm) => {
+    const dataPics = myPicsSite.concat(myPicsHo);
     mutation.mutate(
       {
         idAssetGroup: id,
         data: {
           ...data,
-          pics: myPics.map((val) => {
+          pics: dataPics.map((val) => {
             return {
               districtCode: val.districtCode,
               departementCode: val.departementCode,
-              type: val.type,
+              type: val.type.toLowerCase(),
               isBudgetCodeDefault: val.isBudgetCodeDefault,
             };
           }),
@@ -137,30 +142,151 @@ const EditPeriodActual: NextPage = () => {
     );
   };
 
-  const [myPics, setMyPics] = useState<MyPics[]>([]);
-  const districtChoosed = async (districtCode: string, indexTo: number) => {
+  const [myPicsSite, setMyPicsSite] = useState<MyPics[]>([]);
+  const [myPicsHo, setMyPicsHo] = useState<MyPics[]>([]);
+
+  const districtChoosed = async (
+    districtCode: string,
+    indexTo: number,
+    type: 'site' | 'ho'
+  ) => {
     const result = await fetchNoiDivision({
       district: districtCode,
       pageNumber: 1,
       pageSize: 50,
     });
-    setMyPics((prev) => {
-      return prev.map((val, index) => {
-        if (index === indexTo)
-          val = {
-            districtCode: districtCode,
-            departementCode: '',
-            type: 'site',
-            isBudgetCodeDefault: false,
-            options:
-              result?.items.map((x) => ({
-                value: x.deptCode,
-                label: x.district,
-              })) || [],
-          };
-        return val;
+    if (type === 'site') {
+      setMyPicsSite((prev) => {
+        return prev.map((val, index) => {
+          if (index === indexTo)
+            val = {
+              districtCode: districtCode,
+              departementCode: '',
+              type: 'site',
+              isBudgetCodeDefault: false,
+              options:
+                result?.items.map((x) => ({
+                  value: x.deptCode,
+                  label: x.name,
+                })) || [],
+            };
+          return val;
+        });
       });
-    });
+    } else if (type === 'ho') {
+      setMyPicsHo((prev) => {
+        return prev.map((val, index) => {
+          if (index === indexTo)
+            val = {
+              districtCode: districtCode,
+              departementCode: '',
+              type: 'ho',
+              isBudgetCodeDefault: false,
+              options:
+                result?.items.map((x) => ({
+                  value: x.deptCode,
+                  label: x.name,
+                })) || [],
+            };
+          return val;
+        });
+      });
+    }
+  };
+
+  const departementLoadOptions = useMemo(() => {
+    return debounce(
+      async (
+        inputValue: string,
+        callback,
+        indexTo: number,
+        districtCode: string,
+        type: 'site' | 'ho'
+      ) => {
+        if (!inputValue) {
+          return callback([]);
+        } else {
+          if (type === 'site') {
+            return await fetchNoiDivision({
+              district: districtCode,
+              search: inputValue,
+              pageNumber: 1,
+              pageSize: 50,
+            }).then((response) => {
+              const options = response.items.map((x) => ({
+                value: x.deptCode,
+                label: x.name,
+              }));
+              setMyPicsSite((prev) => {
+                const newPic = [...prev];
+                newPic[indexTo].options = options;
+                return newPic;
+              });
+
+              return callback(options);
+            });
+          } else if (type === 'ho') {
+            return await fetchNoiDivision({
+              district: districtCode,
+              search: inputValue,
+              pageNumber: 1,
+              pageSize: 50,
+            }).then((response) => {
+              const options = response.items.map((x) => ({
+                value: x.deptCode,
+                label: x.name,
+              }));
+              setMyPicsHo((prev) => {
+                const newPic = [...prev];
+                newPic[indexTo].options = options;
+                return newPic;
+              });
+
+              return callback(options);
+            });
+          }
+        }
+      },
+      600
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [setMyPicsHo, setMyPicsSite]);
+
+  const handleChangeBudgetCode = (
+    event: ChangeEvent<HTMLInputElement>,
+    indexTo: number,
+    type: 'site' | 'ho'
+  ) => {
+    const { checked } = event.target;
+    if (type === 'site') {
+      setMyPicsSite((prev) => {
+        const newPic = [...prev];
+        const findCheckedBudgetCode = newPic.find((x) => x.isBudgetCodeDefault);
+        if (findCheckedBudgetCode) {
+          newPic.forEach((val, index) => {
+            if (index !== indexTo) {
+              newPic[index].isBudgetCodeDefault = false;
+            }
+          });
+        }
+        newPic[indexTo].isBudgetCodeDefault = checked;
+        return newPic;
+      });
+    } else if (type === 'ho') {
+      setMyPicsHo((prev) => {
+        const newPic = [...prev];
+        const findCheckedBudgetCode = newPic.find((x) => x.isBudgetCodeDefault);
+        if (findCheckedBudgetCode) {
+          newPic.forEach((val, index) => {
+            if (index !== indexTo) {
+              newPic[index].isBudgetCodeDefault = false;
+            }
+          });
+        }
+        newPic[indexTo].isBudgetCodeDefault = checked;
+        return newPic;
+      });
+    }
   };
 
   return (
@@ -169,13 +295,12 @@ const EditPeriodActual: NextPage = () => {
       backButtonClick={() => router.replace(`/master-capex/asset-groups`)}
       title="Edit Asset Group"
     >
-      {JSON.stringify(myPics)}
       <Panel>
         <Form onSubmit={handleSubmit(handleSubmitForm)}>
           <Row>
             <Col lg={6}>
               <FormGroup>
-                <FormLabel>Asset Group</FormLabel>
+                <FormLabel>Asset Group *</FormLabel>
                 <Input
                   name="assetGroup"
                   control={control}
@@ -188,7 +313,7 @@ const EditPeriodActual: NextPage = () => {
             </Col>
             <Col lg={6}>
               <FormGroup>
-                <FormLabel>Asset Group Code</FormLabel>
+                <FormLabel>Asset Group Code *</FormLabel>
                 <Input
                   name="assetGroupCode"
                   control={control}
@@ -202,87 +327,297 @@ const EditPeriodActual: NextPage = () => {
           </Row>
 
           <br />
-          <Row className="mb-3">
+          <Row className="mb-4">
             <Col lg={12}>
-              <Row>
-                <Table className="table-admin table-inherit" responsive>
-                  <thead>
-                    <tr>
-                      <th>District</th>
-                      <th>Departement</th>
-                      <th>Action</th>
+              <h4>PIC HO</h4>
+            </Col>
+            <Col lg={12}>
+              <Table className="table-admin table-inherit" responsive>
+                <thead>
+                  <tr>
+                    <th>District *</th>
+                    <th>Departement *</th>
+                    <th style={{ width: '250px' }}>Default for Budget Code</th>
+                    <th style={{ width: '250px' }}>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {myPicsHo.map((myPic, index) => (
+                    <tr key={index}>
+                      <td>
+                        <Select
+                          instanceId="districtCode"
+                          placeholder="Choose District"
+                          options={districtOptions}
+                          value={districtOptions.find(
+                            (val) => val.value === myPic.districtCode
+                          )}
+                          styles={{
+                            ...customStyles(),
+                            menu: () => ({
+                              zIndex: 99,
+                            }),
+                          }}
+                          onChange={(val) =>
+                            districtChoosed(val?.value as string, index, 'ho')
+                          }
+                        />
+                      </td>
+                      <td>
+                        <AsyncSelect
+                          instanceId="departementCode"
+                          placeholder="Choose Departement"
+                          isClearable={false}
+                          isSearchable
+                          cacheOptions
+                          defaultOptions={myPic.options}
+                          value={myPic.options.find(
+                            (val) => val.value === myPic.departementCode
+                          )}
+                          loadOptions={(inputValue, callback) => {
+                            departementLoadOptions(
+                              inputValue,
+                              callback,
+                              index,
+                              myPic.districtCode,
+                              'ho'
+                            );
+                          }}
+                          styles={{
+                            ...customStyles(),
+                            menu: () => ({
+                              zIndex: 99,
+                            }),
+                          }}
+                          onChange={(val) => {
+                            setMyPicsHo((prev) => {
+                              const newPic = [...prev];
+                              newPic[index].departementCode =
+                                (val?.value as string) || '';
+                              return newPic;
+                            });
+                          }}
+                        />
+                        {/* <Select
+                          instanceId="departementCode"
+                          placeholder="Choose Departement"
+                          options={myPic.options}
+                          value={myPic.options.find(
+                            (val) => val.value === myPic.departementCode
+                          )}
+                          styles={{
+                            ...customStyles(),
+                            menu: () => ({
+                              zIndex: 99,
+                            }),
+                          }}
+                          onChange={(val) => {
+                            setMyPicsHo((prev) => {
+                              const newPic = [...prev];
+                              newPic[index].departementCode =
+                                (val?.value as string) || '';
+                              return newPic;
+                            });
+                          }}
+                        /> */}
+                      </td>
+                      <td>
+                        <div className="d-flex justify-content-center">
+                          <div className="custom-control custom-checkbox">
+                            <input
+                              type="checkbox"
+                              className="custom-control-input"
+                              id={`budgetCodeHo-${index}`}
+                              checked={myPicsHo[index].isBudgetCodeDefault}
+                              onChange={(e) =>
+                                handleChangeBudgetCode(e, index, 'ho')
+                              }
+                            />
+                            <label className="custom-control-label"></label>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <Button
+                          variant="red"
+                          size="sm"
+                          className="w-100"
+                          disabled={myPicsHo.length <= 1}
+                          onClick={() =>
+                            setMyPicsHo((prev) =>
+                              prev.filter((item, i) => i !== index)
+                            )
+                          }
+                        >
+                          Delete
+                        </Button>
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {myPics.map((myPic, index) => (
-                      <tr key={index}>
-                        <td>
-                          <Select
-                            instanceId="districtCode"
-                            placeholder="Choose District"
-                            options={districtOptions}
-                            value={districtOptions?.find(
-                              (val) => val.value === myPic.districtCode
-                            )}
-                            styles={{
-                              ...customStyles(),
-                              menu: () => ({
-                                zIndex: 99,
-                              }),
-                            }}
-                            onChange={(val) =>
-                              districtChoosed(val?.value as string, index)
-                            }
-                          />
-                        </td>
-                        <td>
-                          <Select
-                            instanceId="departementCode"
-                            placeholder="Choose Departement"
-                            options={myPic.options}
-                            value={myPic.options?.find(
-                              (val) => val.value === myPic.departementCode
-                            )}
-                            styles={{
-                              ...customStyles(),
-                              menu: () => ({
-                                zIndex: 99,
-                              }),
-                            }}
-                            onChange={(val) => {
-                              setMyPics((prev) => {
-                                prev[index].departementCode =
-                                  (val?.value as string) || '';
-                                return prev;
-                              });
-                            }}
-                          />
-                        </td>
-                        <td>
-                          <Button
-                            variant="red"
-                            size="sm"
-                            className="w-100"
-                            onClick={() =>
-                              setMyPics((prev) =>
-                                prev.filter((item, i) => i !== index)
-                              )
-                            }
-                          >
-                            Delete
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </Table>
-              </Row>
+                  ))}
+                </tbody>
+              </Table>
+            </Col>
 
+            <Col lg={12}>
               <Button
                 variant="primary"
                 className="mt-4"
                 onClick={() =>
-                  setMyPics((prev) => [
+                  setMyPicsHo((prev) => [
+                    ...prev,
+                    {
+                      districtCode: '',
+                      departementCode: '',
+                      type: 'ho',
+                      isBudgetCodeDefault: false,
+                      options: [],
+                    },
+                  ])
+                }
+              >
+                Add
+              </Button>
+            </Col>
+          </Row>
+
+          <br />
+          <Row className="mb-4">
+            <Col lg={12}>
+              <h4>PIC SITE</h4>
+            </Col>
+            <Col lg={12}>
+              <Table className="table-admin table-inherit" responsive>
+                <thead>
+                  <tr>
+                    <th>District *</th>
+                    <th>Departement *</th>
+                    <th style={{ width: '250px' }}>Default for Budget Code</th>
+                    <th style={{ width: '250px' }}>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {myPicsSite.map((myPic, index) => (
+                    <tr key={index}>
+                      <td>
+                        <Select
+                          instanceId="districtCode"
+                          placeholder="Choose District"
+                          options={districtOptions}
+                          value={districtOptions.find(
+                            (val) => val.value === myPic.districtCode
+                          )}
+                          styles={{
+                            ...customStyles(),
+                            menu: () => ({
+                              zIndex: 99,
+                            }),
+                          }}
+                          onChange={(val) =>
+                            districtChoosed(val?.value as string, index, 'site')
+                          }
+                        />
+                      </td>
+                      <td>
+                        <AsyncSelect
+                          instanceId="departementCode"
+                          placeholder="Choose Departement"
+                          isClearable={false}
+                          isSearchable
+                          cacheOptions
+                          defaultOptions={myPic.options}
+                          value={myPic.options.find(
+                            (val) => val.value === myPic.departementCode
+                          )}
+                          loadOptions={(inputValue, callback) => {
+                            departementLoadOptions(
+                              inputValue,
+                              callback,
+                              index,
+                              myPic.districtCode,
+                              'site'
+                            );
+                          }}
+                          styles={{
+                            ...customStyles(),
+                            menu: () => ({
+                              zIndex: 99,
+                            }),
+                          }}
+                          onChange={(val) => {
+                            setMyPicsSite((prev) => {
+                              const newPic = [...prev];
+                              newPic[index].departementCode =
+                                (val?.value as string) || '';
+                              return newPic;
+                            });
+                          }}
+                        />
+                        {/* <Select
+                          instanceId="departementCode"
+                          placeholder="Choose Departement"
+                          options={myPic.options}
+                          value={myPic.options.find(
+                            (val) => val.value === myPic.departementCode
+                          )}
+                          styles={{
+                            ...customStyles(),
+                            menu: () => ({
+                              zIndex: 99,
+                            }),
+                          }}
+                          onChange={(val) => {
+                            setMyPicsSite((prev) => {
+                              const newPic = [...prev];
+                              newPic[index].departementCode =
+                                (val?.value as string) || '';
+                              return newPic;
+                            });
+                          }}
+                        /> */}
+                      </td>
+                      <td>
+                        <div className="d-flex justify-content-center">
+                          <div className="custom-control custom-checkbox">
+                            <input
+                              type="checkbox"
+                              className="custom-control-input"
+                              id={`budgetCodeSite-${index}`}
+                              checked={myPicsSite[index].isBudgetCodeDefault}
+                              onChange={(e) =>
+                                handleChangeBudgetCode(e, index, 'site')
+                              }
+                            />
+                            <label className="custom-control-label"></label>
+                          </div>
+                        </div>
+                      </td>
+                      <td>
+                        <Button
+                          variant="red"
+                          size="sm"
+                          className="w-100"
+                          disabled={myPicsSite.length <= 1}
+                          onClick={() =>
+                            setMyPicsSite((prev) =>
+                              prev.filter((item, i) => i !== index)
+                            )
+                          }
+                        >
+                          Delete
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            </Col>
+
+            <Col lg={12}>
+              <Button
+                variant="primary"
+                className="mt-4"
+                onClick={() =>
+                  setMyPicsSite((prev) => [
                     ...prev,
                     {
                       districtCode: '',

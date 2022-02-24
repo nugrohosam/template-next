@@ -54,15 +54,16 @@ const DetailBudgetPlan: NextPage = () => {
     ...params,
     idBudgetPlan: id,
   });
-  const mutationDeleteBudgetPlanItemGroup = useDeleteBudgetPlanItemGroups();
-  const mutationSubmitBudgetPlanItemGroup = useSubmitBudgetPlanItemGroups();
-  const mutationApprovalBudgetPlanItemGroup = useApprovalBudgetPlanItemGroups();
 
+  // TODO: next time bisa dimodulin ke satu file, karena halaman lain juga pakai
+  // submit budget plan item group
+  const mutationSubmitBudgetPlanItemGroup = useSubmitBudgetPlanItemGroups();
   const submitBudgetPlanItemGroups = (ids: Array<string>) => {
     mutationSubmitBudgetPlanItemGroup.mutate(ids, {
       onSuccess: () => {
         setSelectedRow({});
         dataHook.refetch();
+        dataHookBudgetPlanItemGroup.refetch();
         toast('Data Submited!');
       },
       onError: (error) => {
@@ -72,7 +73,6 @@ const DetailBudgetPlan: NextPage = () => {
       },
     });
   };
-
   const handleSubmitMultipleBudgetPlanItemsGroups = () => {
     const ids = getAllIds(
       selectedRow,
@@ -83,11 +83,14 @@ const DetailBudgetPlan: NextPage = () => {
     }
   };
 
+  // delete budget plan item group
+  const mutationDeleteBudgetPlanItemGroup = useDeleteBudgetPlanItemGroups();
   const deleteBudgetPlanItemGroups = (ids: Array<string>) => {
     mutationDeleteBudgetPlanItemGroup.mutate(ids, {
       onSuccess: () => {
         setSelectedRow({});
         dataHook.refetch();
+        dataHookBudgetPlanItemGroup.refetch();
         toast('Data Deleted!');
       },
       onError: (error) => {
@@ -97,7 +100,6 @@ const DetailBudgetPlan: NextPage = () => {
       },
     });
   };
-
   const handleDeleteMultipleBudgetPlanItemsGroups = () => {
     const ids = getAllIds(
       selectedRow,
@@ -108,11 +110,14 @@ const DetailBudgetPlan: NextPage = () => {
     }
   };
 
+  // approve budget plan item group
+  const mutationApprovalBudgetPlanItemGroup = useApprovalBudgetPlanItemGroups();
   const approvalBudgetPlanItemGroups = (data: ApprovalBudgetPlanItemGroup) => {
-    mutationApprovalBudgetPlanItemGroup.mutate(data, {
+    return mutationApprovalBudgetPlanItemGroup.mutate(data, {
       onSuccess: () => {
         setSelectedRow({});
         dataHook.refetch();
+        dataHookBudgetPlanItemGroup.refetch();
         toast('Data Approved!');
       },
       onError: (error) => {
@@ -122,7 +127,6 @@ const DetailBudgetPlan: NextPage = () => {
       },
     });
   };
-
   const handleApprovaltMultipleBudgetPlanItemsGroups = () => {
     const ids = getAllIds(
       selectedRow,

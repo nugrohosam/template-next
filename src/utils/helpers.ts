@@ -82,8 +82,8 @@ export const parseMenuToUrl = (menu: string) => {
       ? '/outstanding-budgets'
       : menu === 'actual YTD'
       ? '/actual-ytd'
-      : menu === 'budget reference'
-      ? '/budget-reference'
+      : menu === 'budget references capex'
+      ? '/budget-references'
       : '/';
   return url;
 };

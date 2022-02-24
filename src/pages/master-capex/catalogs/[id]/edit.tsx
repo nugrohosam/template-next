@@ -126,7 +126,7 @@ const EditCatalog: NextPage = () => {
   return (
     <DetailLayout
       paths={breadCrumb}
-      backButtonClick={() => router.replace(`/master-capex/catalogs`)}
+      backButtonClick={router.back}
       title="Edit Catalog"
     >
       <Panel>

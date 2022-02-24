@@ -91,7 +91,7 @@ const CreatePeriodActual: NextPage = () => {
   return (
     <DetailLayout
       paths={breadCrumb}
-      backButtonClick={() => router.replace(`/budget-plan/${id}/detail`)}
+      backButtonClick={router.back}
       title="Edit Budget Plan"
     >
       <Panel>

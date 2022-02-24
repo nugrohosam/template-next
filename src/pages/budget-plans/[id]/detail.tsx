@@ -208,7 +208,7 @@ const DetailBudgetPlan: NextPage = () => {
   return (
     <DetailLayout
       paths={breadCrumb}
-      backButtonClick={() => router.replace('/budget-plans')}
+      backButtonClick={router.back}
       title="Detail Budget Plan"
     >
       <Panel>

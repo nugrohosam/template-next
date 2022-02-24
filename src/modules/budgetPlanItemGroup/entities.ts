@@ -2,7 +2,7 @@ import { Currency } from 'constants/currency';
 import { BudgetPlanItem } from 'modules/budgetPlanItem/entities';
 
 export enum BudgetPlanItemGroupStatus {
-  Draft = 'draft',
+  Draft = 'DRAFT',
 }
 
 export type BudgetPlanItemGroup = {

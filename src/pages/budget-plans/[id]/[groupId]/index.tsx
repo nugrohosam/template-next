@@ -284,7 +284,9 @@ const BudgetPlanGroupItemList: NextPage = () => {
         </Row>
       </Panel>
 
-      {auditHook.data?.items.length && <AuditTimeline audit={auditHook.data} />}
+      {auditHook.data?.items && auditHook.data?.items.length > 0 && (
+        <AuditTimeline audit={auditHook.data} />
+      )}
 
       <Container fluid className="mt-3 px-0">
         <Panel>

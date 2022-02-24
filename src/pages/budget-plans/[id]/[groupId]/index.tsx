@@ -265,19 +265,23 @@ const BudgetPlanGroupItemList: NextPage = () => {
           <Col lg={6}>
             <h4 className="profile-detail__info--title mb-1">Total USD</h4>
             <h3 className="profile-detail__info--subtitle">
-              {dataHookBudgetPlanItemGroup?.data?.totalAmountUsd}
+              {dataHookBudgetPlanItemGroup?.data?.totalAmountUsd?.toLocaleString(
+                'en-En'
+              )}
             </h3>
           </Col>
           <Col lg={6}>
             <h4 className="profile-detail__info--title mb-1">Total IDR</h4>
             <h3 className="profile-detail__info--subtitle">
-              {dataHookBudgetPlanItemGroup?.data?.totalAmount}
+              {dataHookBudgetPlanItemGroup?.data?.totalAmount?.toLocaleString(
+                'id-Id'
+              )}
             </h3>
           </Col>
         </Row>
       </Panel>
 
-      <AuditTimeline audit={auditHook.data} />
+      {auditHook.data?.items.length && <AuditTimeline audit={auditHook.data} />}
 
       <Container fluid className="mt-3 px-0">
         <Panel>

@@ -23,9 +23,7 @@ const AuditTimeline: React.FC<AuditTimelineProps> = ({ audit }) => {
   };
 
   const getCurrentStatus = (item: Audit) => {
-    const currentStatus = `${parseUndescoreString(item.statusTo)} By ${
-      item.userName
-    }`;
+    const currentStatus = parseUndescoreString(item.statusTo);
 
     return currentStatus;
   };

@@ -1,7 +1,7 @@
 export enum ApprovalStatus {
-  APPROVE = 'approve',
-  REJECT = 'reject',
-  REVISE = 'revise',
+  APPROVE = 'APPROVE',
+  REJECT = 'REJECT',
+  REVISE = 'REVISE',
 }
 
 export type Approval = {

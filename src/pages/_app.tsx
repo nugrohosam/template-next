@@ -3,6 +3,7 @@ import 'styles/scss/main.scss';
 import 'react-datepicker/dist/react-datepicker.css';
 
 import type { AppProps } from 'next/app';
+import Head from 'next/head';
 import { QueryClient, QueryClientProvider } from 'react-query';
 
 import Layout from '../components/ui/Layout';
@@ -17,11 +18,19 @@ const MyApp: React.FC<AppProps> = ({ Component, pageProps }: AppProps) => {
   });
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <Layout>
-        <Component {...pageProps} />
-      </Layout>
-    </QueryClientProvider>
+    <>
+      <Head>
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css"
+        />
+      </Head>
+      <QueryClientProvider client={queryClient}>
+        <Layout>
+          <Component {...pageProps} />
+        </Layout>
+      </QueryClientProvider>
+    </>
   );
 };
 export default MyApp;

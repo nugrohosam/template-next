@@ -1,5 +1,9 @@
 import { BudgetPlanItem } from 'modules/budgetPlanItem/entities';
 
+export enum BudgetPlanItemGroupStatus {
+  Draft = 'draft',
+}
+
 export type BudgetPlanItemGroup = {
   id: string;
   budgetCode: string;

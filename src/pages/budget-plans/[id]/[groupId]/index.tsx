@@ -14,7 +14,10 @@ import { ResourceType } from 'modules/audit/parent/entities';
 import { useFetchAudits } from 'modules/audit/parent/hook';
 import { ItemOfBudgetPlanItem } from 'modules/budgetPlanItem/entities';
 import { useDeleteBudgetPlanitems } from 'modules/budgetPlanItem/hook';
-import { BudgetPlanItemGroupItem } from 'modules/budgetPlanItemGroup/entities';
+import {
+  BudgetPlanItemGroupItem,
+  BudgetPlanItemGroupStatus,
+} from 'modules/budgetPlanItemGroup/entities';
 import {
   useApprovalBudgetPlanItemGroups,
   useFetchBudgetPlanItemGroupDetail,
@@ -287,7 +290,9 @@ const BudgetPlanGroupItemList: NextPage = () => {
                 columns={columns}
                 data={dataHookBudgetPlanItemGroupItems.data}
                 actions={
-                  profile?.type !== UserType.ApprovalBudgetPlanCapex && (
+                  profile?.type !== UserType.ApprovalBudgetPlanCapex &&
+                  dataHookBudgetPlanItemGroup?.data?.status ===
+                    BudgetPlanItemGroupStatus.Draft && (
                     <LoadingButton
                       variant="red"
                       size="sm"
@@ -314,12 +319,15 @@ const BudgetPlanGroupItemList: NextPage = () => {
                       <RejectModal onSend={approvalBudgetPlanItemGroups} />
                     </>
                   ) : (
-                    <Link
-                      href={`/budget-plans/${budgetPlanId}/${budgetPlanGroupId}/edit`}
-                      passHref
-                    >
-                      <Button variant="primary">Edit</Button>
-                    </Link>
+                    dataHookBudgetPlanItemGroup?.data?.status ===
+                      BudgetPlanItemGroupStatus.Draft && (
+                      <Link
+                        href={`/budget-plans/${budgetPlanId}/${budgetPlanGroupId}/edit`}
+                        passHref
+                      >
+                        <Button variant="primary">Edit</Button>
+                      </Link>
+                    )
                   )
                 }
                 isLoading={dataHookBudgetPlanItemGroupItems.isFetching}

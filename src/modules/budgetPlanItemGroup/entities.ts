@@ -23,6 +23,7 @@ export type BudgetPlanItemGroup = {
 export type BudgetPlanItemGroupItem = BudgetPlanItem & {
   detail: string;
   budgetCode: string;
+  assetGroup: string;
 };
 
 export interface ApprovalBudgetPlanItemGroup {

@@ -25,7 +25,7 @@ const UpdateBudgetPlanItems: NextPage = () => {
   const breadCrumb: PathBreadcrumb[] = [
     {
       label: 'Detail',
-      link: `/budget-plans/${budgetPlanId}/detail`,
+      link: `/budget-plans/${budgetPlanId}/${budgetPlanGroupId}`,
     },
     {
       label: 'Create Items',

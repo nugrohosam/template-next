@@ -12,7 +12,6 @@ import { UserType } from 'constants/user';
 import { ApprovalField } from 'modules/approval/entities';
 import { ResourceType } from 'modules/audit/parent/entities';
 import { useFetchAudits } from 'modules/audit/parent/hook';
-import { ItemOfBudgetPlanItem } from 'modules/budgetPlanItem/entities';
 import { getItemByMonth } from 'modules/budgetPlanItem/helpers';
 import { useDeleteBudgetPlanitems } from 'modules/budgetPlanItem/hook';
 import {
@@ -69,6 +68,7 @@ const BudgetPlanGroupItemList: NextPage = () => {
     mutationDeleteBudgetPlanItems.mutate(ids, {
       onSuccess: () => {
         setSelectedRow({});
+        dataHookBudgetPlanItemGroup.refetch();
         dataHookBudgetPlanItemGroupItems.refetch();
         toast('Data Deleted!');
       },
@@ -87,28 +87,6 @@ const BudgetPlanGroupItemList: NextPage = () => {
     if (ids?.length > 0) {
       if (confirm('Delete selected data?')) deleteBudgetPlan(ids);
     }
-  };
-
-  const mutationApprovalBudgetPlanItemGroup = useApprovalBudgetPlanItemGroups();
-  const approvalBudgetPlanItemGroups = (data: ApprovalField) => {
-    mutationApprovalBudgetPlanItemGroup.mutate(
-      {
-        idBudgetPlanItemGroups: [budgetPlanId],
-        status: data.status,
-        remark: data.notes,
-      },
-      {
-        onSuccess: () => {
-          router.push(`/budget-plans/${budgetPlanId}/detail`);
-          toast('Data Approved!');
-        },
-        onError: (error) => {
-          console.error('Failed to approve data', error);
-          toast(error.message, { autoClose: false });
-          showErrorMessage(error);
-        },
-      }
-    );
   };
 
   const auditHook = useFetchAudits({
@@ -134,6 +112,8 @@ const BudgetPlanGroupItemList: NextPage = () => {
     },
     {
       Header: 'Asset Group',
+      accessor: 'assetGroup',
+      minWidth: 200,
       Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) => (
         <div style={{ minWidth: 200 }}>
           {row.values.catalog?.assetGroup?.assetGroup}
@@ -300,28 +280,14 @@ const BudgetPlanGroupItemList: NextPage = () => {
                   )
                 }
                 addOns={
-                  profile?.type === UserType.ApprovalBudgetPlanCapex ? (
-                    <>
-                      <ApproveModal
-                        onSend={approvalBudgetPlanItemGroups}
-                        classButton="mr-2"
-                      />
-                      <ReviseModal
-                        onSend={approvalBudgetPlanItemGroups}
-                        classButton="mr-2"
-                      />
-                      <RejectModal onSend={approvalBudgetPlanItemGroups} />
-                    </>
-                  ) : (
-                    dataHookBudgetPlanItemGroup?.data?.status ===
-                      BudgetPlanItemGroupStatus.Draft && (
-                      <Link
-                        href={`/budget-plans/${budgetPlanId}/${budgetPlanGroupId}/edit`}
-                        passHref
-                      >
-                        <Button variant="primary">Edit</Button>
-                      </Link>
-                    )
+                  dataHookBudgetPlanItemGroup?.data?.status ===
+                    BudgetPlanItemGroupStatus.Draft && (
+                    <Link
+                      href={`/budget-plans/${budgetPlanId}/${budgetPlanGroupId}/edit`}
+                      passHref
+                    >
+                      <Button variant="primary">Edit</Button>
+                    </Link>
                   )
                 }
                 isLoading={dataHookBudgetPlanItemGroupItems.isFetching}

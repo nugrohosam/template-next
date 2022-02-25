@@ -24,7 +24,7 @@ const columns: Column<BudgetReference>[] = [
     accessor: 'balance',
     minWidth: 150,
     Cell: ({ row }: CellProps<BudgetReference>) =>
-      row.values.pricePerUnit?.toLocaleString(
+      row.values.balance?.toLocaleString(
         row.values.currency === Currency.USD ? 'en-En' : 'id-Id'
       ) || '-',
   },
@@ -33,7 +33,7 @@ const columns: Column<BudgetReference>[] = [
     accessor: 'currentBalance',
     minWidth: 200,
     Cell: ({ row }: CellProps<BudgetReference>) =>
-      row.values.pricePerUnit?.toLocaleString(
+      row.values.currentBalance?.toLocaleString(
         row.values.currency === Currency.USD ? 'en-En' : 'id-Id'
       ) || '-',
   },

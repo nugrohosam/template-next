@@ -15,6 +15,6 @@ export const useFetchNoiDivision = (
   params: NoiDivisionPaginateParams
 ): UseQueryResult<Paginate<NoiDivision>, ResponseError> => {
   return useQuery(['noi-division', params], () => fetchNoiDivision(params), {
-    enabled: !!params.search,
+    enabled: false,
   });
 };

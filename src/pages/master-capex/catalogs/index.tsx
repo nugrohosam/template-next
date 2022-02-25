@@ -1,4 +1,4 @@
-import { customStyles } from 'components/form/SingleSelect';
+import { customStyles, SelectOption } from 'components/form/SingleSelect';
 import ButtonActions from 'components/ui/Button/ButtonActions';
 import LoadingButton from 'components/ui/Button/LoadingButton';
 import ContentLayout from 'components/ui/ContentLayout';
@@ -15,7 +15,7 @@ import { NextPage } from 'next';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { Button, Col, Row } from 'react-bootstrap';
-import Select from 'react-select';
+import Select, { OptionsType } from 'react-select';
 import { CellProps, Column, SortingRule } from 'react-table';
 import { toast } from 'react-toastify';
 import { getAllIds, showErrorMessage } from 'utils/helpers';
@@ -140,6 +140,14 @@ const CatalogsIndex: NextPage = () => {
     []
   );
 
+  const handleFilterChange = (val: OptionsType<SelectOption>) => {
+    const params = val.map((item) => {
+      return item.value;
+    });
+
+    setFiltersParams('assetGroupId', params?.join() || '');
+  };
+
   return (
     <ContentLayout
       title="Catalog"
@@ -194,6 +202,7 @@ const CatalogsIndex: NextPage = () => {
                       <p className="mb-1">Asset Group</p>
                       <Select
                         placeholder="Select Asset Group"
+                        isMulti
                         isClearable
                         options={assetGroupOptions}
                         styles={{
@@ -202,12 +211,7 @@ const CatalogsIndex: NextPage = () => {
                             zIndex: 99,
                           }),
                         }}
-                        onChange={(val) =>
-                          setFiltersParams(
-                            'assetGroupId',
-                            (val?.value as string) || ''
-                          )
-                        }
+                        onChange={(val) => handleFilterChange(val)}
                       />
                     </Col>
                   </Row>

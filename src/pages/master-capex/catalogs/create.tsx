@@ -40,7 +40,6 @@ const schema = yup.object().shape({
   assetGroupId: yup.string().required(`Asset Group can't be empty`),
   detail: yup.string().required(`Detail can't be empty`),
   primaryCurrency: yup.mixed().required(),
-  // TODO: price masih hardcode, belum menyesuaikan primaryCurrency
   priceInIdr: yup.string().required(`Price (IDR) can't be empty`),
   priceInUsd: yup.string().required(`Price (USD) can't be empty`),
 });
@@ -99,7 +98,10 @@ const CreateCatalog: NextPage = () => {
 
   useEffect(() => {
     if (data.primaryCurrency === Currency.IDR) {
-      setValue('priceInUsd', data.priceInIdr / currencyRate);
+      setValue(
+        'priceInUsd',
+        Number((data.priceInIdr / currencyRate).toFixed(2))
+      );
     } else if (data.primaryCurrency === Currency.USD) {
       setValue('priceInIdr', data.priceInUsd * currencyRate);
     }

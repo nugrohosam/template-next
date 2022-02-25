@@ -13,6 +13,7 @@ import { ApprovalField } from 'modules/approval/entities';
 import { ResourceType } from 'modules/audit/parent/entities';
 import { useFetchAudits } from 'modules/audit/parent/hook';
 import { ItemOfBudgetPlanItem } from 'modules/budgetPlanItem/entities';
+import { getItemByMonth } from 'modules/budgetPlanItem/helpers';
 import { useDeleteBudgetPlanitems } from 'modules/budgetPlanItem/hook';
 import {
   BudgetPlanItemGroupItem,
@@ -164,74 +165,63 @@ const BudgetPlanGroupItemList: NextPage = () => {
     {
       Header: 'Jan',
       Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) =>
-        row.values.items.find((item: ItemOfBudgetPlanItem) => item.month === 1)
-          ?.quantity || '-',
+        getItemByMonth(row.values.items, 1)?.quantity || '-',
     },
     {
       Header: 'Feb',
       Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) =>
-        row.values.items.find((item: ItemOfBudgetPlanItem) => item.month === 2)
-          ?.quantity || '-',
+        getItemByMonth(row.values.items, 2)?.quantity || '-',
     },
     {
       Header: 'Mar',
       Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) =>
-        row.values.items.find((item: ItemOfBudgetPlanItem) => item.month === 3)
-          ?.quantity || '-',
+        getItemByMonth(row.values.items, 3)?.quantity || '-',
     },
     {
       Header: 'Apr',
+      minWidth: 100,
       Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) =>
-        row.values.items.find((item: ItemOfBudgetPlanItem) => item.month === 4)
-          ?.quantity || '-',
+        getItemByMonth(row.values.items, 4)?.quantity || '-',
     },
     {
       Header: 'Mei',
       Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) =>
-        row.values.items.find((item: ItemOfBudgetPlanItem) => item.month === 5)
-          ?.quantity || '-',
+        getItemByMonth(row.values.items, 5)?.quantity || '-',
     },
     {
       Header: 'Jun',
       Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) =>
-        row.values.items.find((item: ItemOfBudgetPlanItem) => item.month === 6)
-          ?.quantity || '-',
+        getItemByMonth(row.values.items, 6)?.quantity || '-',
     },
     {
       Header: 'Jul',
       Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) =>
-        row.values.items.find((item: ItemOfBudgetPlanItem) => item.month === 7)
-          ?.quantity || '-',
+        getItemByMonth(row.values.items, 7)?.quantity || '-',
     },
     {
       Header: 'Aug',
       Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) =>
-        row.values.items.find((item: ItemOfBudgetPlanItem) => item.month === 8)
-          ?.quantity || '-',
+        getItemByMonth(row.values.items, 8)?.quantity || '-',
     },
     {
       Header: 'Sep',
       Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) =>
-        row.values.items.find((item: ItemOfBudgetPlanItem) => item.month === 9)
-          ?.quantity || '-',
+        getItemByMonth(row.values.items, 9)?.quantity || '-',
     },
     {
       Header: 'Oct',
       Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) =>
-        row.values.items.find((item: ItemOfBudgetPlanItem) => item.month === 10)
-          ?.quantity || '-',
+        getItemByMonth(row.values.items, 10)?.quantity || '-',
     },
     {
       Header: 'Nov',
       Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) =>
-        row.values.items.find((item: ItemOfBudgetPlanItem) => item.month === 11)
-          ?.quantity || '-',
+        getItemByMonth(row.values.items, 11)?.quantity || '-',
     },
     {
       Header: 'Dec',
       Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) =>
-        row.values.items.find((item: ItemOfBudgetPlanItem) => item.month === 12)
-          ?.quantity || '-',
+        getItemByMonth(row.values.items, 12)?.quantity || '-',
     },
   ];
 

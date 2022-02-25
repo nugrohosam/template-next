@@ -5,6 +5,7 @@ import DetailLayout from 'components/ui/DetailLayout';
 import BudgetPlanItemModal from 'components/ui/Modal/BudgetPlanItemModal';
 import SimpleTable from 'components/ui/Table/SimpleTable';
 import { ItemOfBudgetPlanItemForm } from 'modules/budgetPlanItem/entities';
+import { getItemByMonth } from 'modules/budgetPlanItem/helpers';
 import { useUpdateBudgetPlanItems } from 'modules/budgetPlanItem/hook';
 import { useFetchBudgetPlanItemGroupItems } from 'modules/budgetPlanItemGroup/hook';
 import { NextPage } from 'next';
@@ -143,63 +144,63 @@ const UpdateBudgetPlanItems: NextPage = () => {
       {
         Header: 'Jan',
         Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) =>
-          row.values.items[0]?.quantity || '-',
+          getItemByMonth(row.values.items, 1)?.quantity || '-',
       },
       {
         Header: 'Feb',
         Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) =>
-          row.values.items[1]?.quantity || '-',
+          getItemByMonth(row.values.items, 2)?.quantity || '-',
       },
       {
         Header: 'Mar',
         Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) =>
-          row.values.items[2]?.quantity || '-',
+          getItemByMonth(row.values.items, 3)?.quantity || '-',
       },
       {
         Header: 'Apr',
         minWidth: 100,
         Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) =>
-          row.values.items[3]?.quantity || '-',
+          getItemByMonth(row.values.items, 4)?.quantity || '-',
       },
       {
         Header: 'Mei',
         Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) =>
-          row.values.items[4]?.quantity || '-',
+          getItemByMonth(row.values.items, 5)?.quantity || '-',
       },
       {
         Header: 'Jun',
         Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) =>
-          row.values.items[5]?.quantity || '-',
+          getItemByMonth(row.values.items, 6)?.quantity || '-',
       },
       {
         Header: 'Jul',
         Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) =>
-          row.values.items[6]?.quantity || '-',
+          getItemByMonth(row.values.items, 7)?.quantity || '-',
       },
       {
         Header: 'Aug',
         Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) =>
-          row.values.items[7]?.quantity || '-',
+          getItemByMonth(row.values.items, 8)?.quantity || '-',
       },
       {
         Header: 'Sep',
         Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) =>
-          row.values.items[8]?.quantity || '-',
+          getItemByMonth(row.values.items, 9)?.quantity || '-',
       },
       {
         Header: 'Oct',
         Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) =>
-          row.values.items[9]?.quantity || '-',
+          getItemByMonth(row.values.items, 10)?.quantity || '-',
       },
       {
         Header: 'Nov',
         Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) =>
-          row.values.items[10]?.quantity || '-',
+          getItemByMonth(row.values.items, 11)?.quantity || '-',
       },
       {
         Header: 'Dec',
         Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) =>
-          row.values.items[11]?.quantity || '-',
+          getItemByMonth(row.values.items, 12)?.quantity || '-',
       },
     ],
     [setMyBudgetPlanItem]

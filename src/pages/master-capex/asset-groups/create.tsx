@@ -401,28 +401,6 @@ const CreatePeriodActual: NextPage = () => {
                             });
                           }}
                         />
-                        {/* <Select
-                          instanceId="departementCode"
-                          placeholder="Choose Departement"
-                          options={myPic.options}
-                          value={myPic.options.find(
-                            (val) => val.value === myPic.departementCode
-                          )}
-                          styles={{
-                            ...customStyles(),
-                            menu: () => ({
-                              zIndex: 99,
-                            }),
-                          }}
-                          onChange={(val) => {
-                            setMyPicsHo((prev) => {
-                              const newPic = [...prev];
-                              newPic[index].departementCode =
-                                (val?.value as string) || '';
-                              return newPic;
-                            });
-                          }}
-                        /> */}
                       </td>
                       <td>
                         <div className="d-flex justify-content-center">
@@ -548,28 +526,6 @@ const CreatePeriodActual: NextPage = () => {
                             });
                           }}
                         />
-                        {/* <Select
-                          instanceId="departementCode"
-                          placeholder="Choose Departement"
-                          options={myPic.options}
-                          value={myPic.options.find(
-                            (val) => val.value === myPic.departementCode
-                          )}
-                          styles={{
-                            ...customStyles(),
-                            menu: () => ({
-                              zIndex: 99,
-                            }),
-                          }}
-                          onChange={(val) => {
-                            setMyPicsSite((prev) => {
-                              const newPic = [...prev];
-                              newPic[index].departementCode =
-                                (val?.value as string) || '';
-                              return newPic;
-                            });
-                          }}
-                        /> */}
                       </td>
                       <td>
                         <div className="d-flex justify-content-center">

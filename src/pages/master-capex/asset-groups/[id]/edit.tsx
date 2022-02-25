@@ -5,6 +5,7 @@ import { customStyles, SelectOption } from 'components/form/SingleSelect';
 import { PathBreadcrumb } from 'components/ui/Breadcrumb';
 import LoadingButton from 'components/ui/Button/LoadingButton';
 import DetailLayout from 'components/ui/DetailLayout';
+import { PicType } from 'constants/picType';
 import { AssetGroupForm, AssetGroupPics } from 'modules/assetGroup/entities';
 import {
   useFetchAssetGroupDetail,
@@ -103,8 +104,8 @@ const EditPeriodActual: NextPage = () => {
           };
         });
         const result = await Promise.all(map);
-        setMyPicsSite(result.filter((x) => x.type.toLowerCase() === 'site'));
-        setMyPicsHo(result.filter((x) => x.type.toLowerCase() === 'ho'));
+        setMyPicsSite(result.filter((x) => x.type === PicType.SITE));
+        setMyPicsHo(result.filter((x) => x.type === PicType.HO));
       }
     })();
   }, [dataHookAssetGroupDetail, reset]);
@@ -121,7 +122,7 @@ const EditPeriodActual: NextPage = () => {
             return {
               districtCode: val.districtCode,
               departementCode: val.departementCode,
-              type: val.type.toLowerCase(),
+              type: val.type,
               isBudgetCodeDefault: val.isBudgetCodeDefault,
             };
           }),
@@ -148,21 +149,21 @@ const EditPeriodActual: NextPage = () => {
   const districtChoosed = async (
     districtCode: string,
     indexTo: number,
-    type: 'site' | 'ho'
+    type: PicType.SITE | PicType.HO
   ) => {
     const result = await fetchNoiDivision({
       district: districtCode,
       pageNumber: 1,
       pageSize: 50,
     });
-    if (type === 'site') {
+    if (type === PicType.SITE) {
       setMyPicsSite((prev) => {
         return prev.map((val, index) => {
           if (index === indexTo)
             val = {
               districtCode: districtCode,
               departementCode: '',
-              type: 'site',
+              type: PicType.SITE,
               isBudgetCodeDefault: false,
               options:
                 result?.items.map((x) => ({
@@ -173,14 +174,14 @@ const EditPeriodActual: NextPage = () => {
           return val;
         });
       });
-    } else if (type === 'ho') {
+    } else if (type === PicType.HO) {
       setMyPicsHo((prev) => {
         return prev.map((val, index) => {
           if (index === indexTo)
             val = {
               districtCode: districtCode,
               departementCode: '',
-              type: 'ho',
+              type: PicType.HO,
               isBudgetCodeDefault: false,
               options:
                 result?.items.map((x) => ({
@@ -201,12 +202,12 @@ const EditPeriodActual: NextPage = () => {
         callback,
         indexTo: number,
         districtCode: string,
-        type: 'site' | 'ho'
+        type: PicType.SITE | PicType.HO
       ) => {
         if (!inputValue) {
           return callback([]);
         } else {
-          if (type === 'site') {
+          if (type === PicType.SITE) {
             return await fetchNoiDivision({
               district: districtCode,
               search: inputValue,
@@ -225,7 +226,7 @@ const EditPeriodActual: NextPage = () => {
 
               return callback(options);
             });
-          } else if (type === 'ho') {
+          } else if (type === PicType.HO) {
             return await fetchNoiDivision({
               district: districtCode,
               search: inputValue,
@@ -255,10 +256,10 @@ const EditPeriodActual: NextPage = () => {
   const handleChangeBudgetCode = (
     event: ChangeEvent<HTMLInputElement>,
     indexTo: number,
-    type: 'site' | 'ho'
+    type: PicType.SITE | PicType.HO
   ) => {
     const { checked } = event.target;
-    if (type === 'site') {
+    if (type === PicType.SITE) {
       setMyPicsSite((prev) => {
         const newPic = [...prev];
         const findCheckedBudgetCode = newPic.find((x) => x.isBudgetCodeDefault);
@@ -272,7 +273,7 @@ const EditPeriodActual: NextPage = () => {
         newPic[indexTo].isBudgetCodeDefault = checked;
         return newPic;
       });
-    } else if (type === 'ho') {
+    } else if (type === PicType.HO) {
       setMyPicsHo((prev) => {
         const newPic = [...prev];
         const findCheckedBudgetCode = newPic.find((x) => x.isBudgetCodeDefault);
@@ -300,7 +301,7 @@ const EditPeriodActual: NextPage = () => {
           <Row>
             <Col lg={6}>
               <FormGroup>
-                <FormLabel>Asset Group *</FormLabel>
+                <FormLabel className="required">Asset Group</FormLabel>
                 <Input
                   name="assetGroup"
                   control={control}
@@ -313,7 +314,7 @@ const EditPeriodActual: NextPage = () => {
             </Col>
             <Col lg={6}>
               <FormGroup>
-                <FormLabel>Asset Group Code *</FormLabel>
+                <FormLabel className="required">Asset Group Code</FormLabel>
                 <Input
                   name="assetGroupCode"
                   control={control}
@@ -359,7 +360,11 @@ const EditPeriodActual: NextPage = () => {
                             }),
                           }}
                           onChange={(val) =>
-                            districtChoosed(val?.value as string, index, 'ho')
+                            districtChoosed(
+                              val?.value as string,
+                              index,
+                              PicType.HO
+                            )
                           }
                         />
                       </td>
@@ -380,7 +385,7 @@ const EditPeriodActual: NextPage = () => {
                               callback,
                               index,
                               myPic.districtCode,
-                              'ho'
+                              PicType.HO
                             );
                           }}
                           styles={{
@@ -430,7 +435,7 @@ const EditPeriodActual: NextPage = () => {
                               id={`budgetCodeHo-${index}`}
                               checked={myPicsHo[index].isBudgetCodeDefault}
                               onChange={(e) =>
-                                handleChangeBudgetCode(e, index, 'ho')
+                                handleChangeBudgetCode(e, index, PicType.HO)
                               }
                             />
                             <label className="custom-control-label"></label>
@@ -468,7 +473,7 @@ const EditPeriodActual: NextPage = () => {
                     {
                       districtCode: '',
                       departementCode: '',
-                      type: 'ho',
+                      type: PicType.HO,
                       isBudgetCodeDefault: false,
                       options: [],
                     },
@@ -513,7 +518,11 @@ const EditPeriodActual: NextPage = () => {
                             }),
                           }}
                           onChange={(val) =>
-                            districtChoosed(val?.value as string, index, 'site')
+                            districtChoosed(
+                              val?.value as string,
+                              index,
+                              PicType.SITE
+                            )
                           }
                         />
                       </td>
@@ -534,7 +543,7 @@ const EditPeriodActual: NextPage = () => {
                               callback,
                               index,
                               myPic.districtCode,
-                              'site'
+                              PicType.SITE
                             );
                           }}
                           styles={{
@@ -584,7 +593,7 @@ const EditPeriodActual: NextPage = () => {
                               id={`budgetCodeSite-${index}`}
                               checked={myPicsSite[index].isBudgetCodeDefault}
                               onChange={(e) =>
-                                handleChangeBudgetCode(e, index, 'site')
+                                handleChangeBudgetCode(e, index, PicType.SITE)
                               }
                             />
                             <label className="custom-control-label"></label>
@@ -622,7 +631,7 @@ const EditPeriodActual: NextPage = () => {
                     {
                       districtCode: '',
                       departementCode: '',
-                      type: 'site',
+                      type: PicType.SITE,
                       isBudgetCodeDefault: false,
                       options: [],
                     },

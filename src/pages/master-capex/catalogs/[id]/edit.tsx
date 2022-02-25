@@ -71,7 +71,6 @@ const EditCatalog: NextPage = () => {
       assetGroupId: dataHook?.assetGroup.id,
       detail: dataHook?.detail,
       primaryCurrency: dataHook?.primaryCurrency,
-      // TODO: price masih hardcode, belum menyesuaikan primaryCurrency
       priceInIdr: dataHook?.priceInIdr,
       priceInUsd: dataHook?.priceInUsd,
     });
@@ -117,7 +116,10 @@ const EditCatalog: NextPage = () => {
 
   useEffect(() => {
     if (data.primaryCurrency === Currency.IDR) {
-      setValue('priceInUsd', data.priceInIdr / currencyRate);
+      setValue(
+        'priceInUsd',
+        Number((data.priceInIdr / currencyRate).toFixed(2))
+      );
     } else if (data.primaryCurrency === Currency.USD) {
       setValue('priceInIdr', data.priceInUsd * currencyRate);
     }

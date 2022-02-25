@@ -19,6 +19,7 @@ const MyApp: React.FC<AppProps> = ({ Component, pageProps }: AppProps) => {
 
   return (
     <>
+      {/* TODO: ganti icon pakai https://react-icons.github.io/react-icons */}
       <Head>
         <link
           rel="stylesheet"

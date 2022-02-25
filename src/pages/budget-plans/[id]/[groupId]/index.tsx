@@ -98,6 +98,11 @@ const BudgetPlanGroupItemList: NextPage = () => {
     pageSize: 10,
   });
 
+  const userCanDelete =
+    profile?.type !== UserType.ApprovalBudgetPlanCapex &&
+    dataHookBudgetPlanItemGroup?.data?.status ===
+      BudgetPlanItemGroupStatus.Draft;
+
   const columns: Column<BudgetPlanItemGroupItem>[] = [
     { Header: 'ID', accessor: 'id' },
     { Header: 'Catalog', accessor: 'catalog' },
@@ -264,9 +269,7 @@ const BudgetPlanGroupItemList: NextPage = () => {
                 columns={columns}
                 data={dataHookBudgetPlanItemGroupItems.data}
                 actions={
-                  profile?.type !== UserType.ApprovalBudgetPlanCapex &&
-                  dataHookBudgetPlanItemGroup?.data?.status ===
-                    BudgetPlanItemGroupStatus.Draft && (
+                  userCanDelete && (
                     <LoadingButton
                       variant="red"
                       size="sm"
@@ -295,7 +298,9 @@ const BudgetPlanGroupItemList: NextPage = () => {
                 selectedRows={selectedRow}
                 hiddenColumns={['id', 'catalog', 'items']}
                 paginateParams={params}
-                onSelectedRowsChanged={(rows) => setSelectedRow(rows)}
+                {...(userCanDelete && {
+                  onSelectedRowsChanged: (rows) => setSelectedRow(rows),
+                })}
                 onSelectedSortChanged={(sort) => {
                   setSelectedSort(sort);
                   setSortingRules(sort);

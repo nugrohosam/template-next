@@ -9,7 +9,7 @@ import { Button, Col, Row } from 'react-bootstrap';
 
 const breadCrumb: PathBreadcrumb[] = [
   {
-    label: 'Budget Period',
+    label: 'Config Budget Periods',
     link: '/budget-periods',
   },
   {
@@ -28,7 +28,7 @@ const BudgetPeriodDetail: NextPage = () => {
     <DetailLayout
       paths={breadCrumb}
       backButtonClick={router.back}
-      title="Detail Budget"
+      title="Detail Config Budget Period"
     >
       <Panel>
         <Row>
@@ -49,7 +49,17 @@ const BudgetPeriodDetail: NextPage = () => {
         <br />
         <Row>
           <Col lg={6}>
-            <h4 className="profile-detail__info--title mb-1">Open Data</h4>
+            <h4 className="profile-detail__info--title mb-1">Year</h4>
+            <h3 className="profile-detail__info--subtitle">
+              {dataHook?.data?.year}
+            </h3>
+          </Col>
+        </Row>
+
+        <br />
+        <Row>
+          <Col lg={6}>
+            <h4 className="profile-detail__info--title mb-1">Open Date</h4>
             <h3 className="profile-detail__info--subtitle">
               {dataHook?.data?.openDate}
             </h3>

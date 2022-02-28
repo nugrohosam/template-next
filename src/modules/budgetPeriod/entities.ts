@@ -8,3 +8,5 @@ export type BudgetPeriod = {
   openDate: string;
   closeDate: string;
 };
+
+export type BudgetPeriodForm = Omit<BudgetPeriod, 'id'>;

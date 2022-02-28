@@ -3,6 +3,7 @@ import ButtonActions from 'components/ui/Button/ButtonActions';
 import LoadingButton from 'components/ui/Button/LoadingButton';
 import ContentLayout from 'components/ui/ContentLayout';
 import DataTable, { usePaginateParams } from 'components/ui/Table/DataTable';
+import { periodePositionOptions, periodeStatusOptions } from 'constants/period';
 import { BudgetPeriod } from 'modules/budgetPeriod/entities';
 import {
   useDeleteBudgetPeriods,
@@ -33,19 +34,18 @@ const BudgetPeriodIndex: NextPage = () => {
   const mutation = useDeleteBudgetPeriods();
 
   const deleteBudgetPeriod = (ids: Array<string>) => {
-    console.log(ids);
-    // mutation.mutate(ids, {
-    //   onSuccess: () => {
-    //     setSelectedRow({});
-    //     dataHook.refetch();
-    //     toast('Data Deleted!');
-    //   },
-    //   onError: (error) => {
-    //     console.log('Failed to delete data', error);
-    //     toast(error.message, { autoClose: false });
-    //     showErrorMessage(error);
-    //   },
-    // });
+    mutation.mutate(ids, {
+      onSuccess: () => {
+        setSelectedRow({});
+        dataHook.refetch();
+        toast('Data Deleted!');
+      },
+      onError: (error) => {
+        console.log('Failed to delete data', error);
+        toast(error.message, { autoClose: false });
+        showErrorMessage(error);
+      },
+    });
   };
 
   const handleDeleteMultipleBudgetPeriod = () => {
@@ -107,7 +107,7 @@ const BudgetPeriodIndex: NextPage = () => {
 
   return (
     <ContentLayout
-      title="Budget Period"
+      title="Config Budget Periods"
       controls={
         <Link href={`/budget-periods/create`} passHref>
           <Button>+ Create</Button>
@@ -143,10 +143,7 @@ const BudgetPeriodIndex: NextPage = () => {
                       <Select
                         placeholder="Select Status"
                         isClearable
-                        options={[
-                          { label: 'OPEN', value: 'OPEN' },
-                          { label: 'CLOSE', value: 'CLOSE' },
-                        ]}
+                        options={periodeStatusOptions}
                         styles={{
                           ...customStyles(),
                           menu: () => ({
@@ -154,7 +151,10 @@ const BudgetPeriodIndex: NextPage = () => {
                           }),
                         }}
                         onChange={(val) =>
-                          setFiltersParams('status', val?.value || '')
+                          setFiltersParams(
+                            'status',
+                            (val?.value as string) || ''
+                          )
                         }
                       />
                     </Col>
@@ -163,10 +163,7 @@ const BudgetPeriodIndex: NextPage = () => {
                       <Select
                         placeholder="Select Position"
                         isClearable
-                        options={[
-                          { label: 'FINAL', value: 'FINAL' },
-                          { label: 'UNFINAL', value: 'UNFINAL' },
-                        ]}
+                        options={periodePositionOptions}
                         styles={{
                           ...customStyles(),
                           menu: () => ({
@@ -174,7 +171,10 @@ const BudgetPeriodIndex: NextPage = () => {
                           }),
                         }}
                         onChange={(val) =>
-                          setFiltersParams('position', val?.value || '')
+                          setFiltersParams(
+                            'position',
+                            (val?.value as string) || ''
+                          )
                         }
                       />
                     </Col>

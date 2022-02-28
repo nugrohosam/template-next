@@ -1,7 +1,7 @@
 import { Paginate, PaginateParams, ResponseData } from 'modules/common/types';
 import axios from 'utils/axios';
 
-import { BudgetPeriod } from './entities';
+import { BudgetPeriod, BudgetPeriodForm } from './entities';
 
 export const fetchBudgetPeriod = async (
   params: PaginateParams
@@ -27,6 +27,27 @@ export const fetchBudgetPeriodDetail = async (
 ): Promise<BudgetPeriod> => {
   const result = await axios.get<ResponseData<BudgetPeriod>>(
     `v1/budgetperiods/${idBudgetPeriod}`
+  );
+  return result.data.data;
+};
+
+export const createBudgetPeriod = async (
+  data: BudgetPeriodForm
+): Promise<BudgetPeriod> => {
+  const result = await axios.post<ResponseData<BudgetPeriod>>(
+    'v1/budgetperiods',
+    data
+  );
+  return result.data.data;
+};
+
+export const updateBudgetPeriod = async (
+  idBudgetPeriod: string,
+  data: BudgetPeriodForm
+): Promise<BudgetPeriod> => {
+  const result = await axios.put<ResponseData<BudgetPeriod>>(
+    `v1/budgetperiods/${idBudgetPeriod}`,
+    data
   );
   return result.data.data;
 };

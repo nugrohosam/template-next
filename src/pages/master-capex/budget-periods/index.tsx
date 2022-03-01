@@ -93,8 +93,8 @@ const BudgetPeriodIndex: NextPage = () => {
       Cell: ({ cell }: CellProps<BudgetPeriod>) => {
         return (
           <ButtonActions
-            hrefDetail={`/budget-periods/${cell.row.values.id}/detail`}
-            hrefEdit={`/budget-periods/${cell.row.values.id}/edit`}
+            hrefDetail={`/master-capex/budget-periods/${cell.row.values.id}/detail`}
+            hrefEdit={`/master-capex/budget-periods/${cell.row.values.id}/edit`}
             onDelete={() => {
               if (confirm('Delete data?'))
                 deleteBudgetPeriod([cell.row.values.id]);
@@ -109,7 +109,7 @@ const BudgetPeriodIndex: NextPage = () => {
     <ContentLayout
       title="Config Budget Periods"
       controls={
-        <Link href={`/budget-periods/create`} passHref>
+        <Link href={`/master-capex/budget-periods/create`} passHref>
           <Button>+ Create</Button>
         </Link>
       }

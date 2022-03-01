@@ -11,15 +11,11 @@ import {
   periodeTypeOptions,
   periodeYearOptions,
 } from 'constants/period';
-import { BudgetPeriodForm } from 'modules/budgetPeriod/entities';
-import {
-  useFetchBudgetPeriodDetail,
-  useUpdateBudgetPeriod,
-} from 'modules/budgetPeriod/hook';
+import { BudgetPeriod, BudgetPeriodForm } from 'modules/budgetPeriod/entities';
+import { useCreateBudgetPeriod } from 'modules/budgetPeriod/hook';
 import { useDistrictOptions } from 'modules/custom/useDistrictOptions';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
-import { useEffect } from 'react';
 import { Col, Form, FormGroup, FormLabel, Row } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
@@ -29,10 +25,10 @@ import * as yup from 'yup';
 const breadCrumb: PathBreadcrumb[] = [
   {
     label: 'Config Budget Periods',
-    link: '/budget-periods',
+    link: '/master-capex/budget-periods',
   },
   {
-    label: 'Edit',
+    label: 'Create',
     active: true,
   },
 ];
@@ -47,56 +43,37 @@ const schema = yup.object().shape({
   position: yup.string().required(`Position can't be empty`),
 });
 
-const EditBudgetPeriod: NextPage = () => {
+const CreateBudgetPeriod: NextPage = () => {
   const router = useRouter();
-  const id = router.query.id as string;
-
-  const { data: dataHook } = useFetchBudgetPeriodDetail(id);
   const [districtOptions] = useDistrictOptions();
 
-  const mutation = useUpdateBudgetPeriod();
+  const mutation = useCreateBudgetPeriod();
 
   const {
     handleSubmit,
     control,
     setError,
-    reset,
     watch,
     formState: { errors, isValid },
-  } = useForm<BudgetPeriodForm>({
+  } = useForm<BudgetPeriod>({
     mode: 'onChange',
     resolver: yupResolver(schema),
   });
 
   const handleSubmitForm = (data: BudgetPeriodForm) => {
-    mutation.mutate(
-      { idBudgetPeriod: id, data },
-      {
-        onSuccess: () => {
-          router.push('/budget-periods');
-          toast('Data updated!');
-        },
-        onError: (error) => {
-          console.log('Failed to update data', error);
-          setValidationError(error, setError);
-          toast(error.message, { autoClose: false });
-          showErrorMessage(error);
-        },
-      }
-    );
-  };
-
-  useEffect(() => {
-    reset({
-      districtCode: dataHook?.districtCode,
-      type: dataHook?.type,
-      year: dataHook?.year,
-      openDate: dataHook?.openDate,
-      closeDate: dataHook?.closeDate,
-      status: dataHook?.status,
-      position: dataHook?.position,
+    mutation.mutate(data, {
+      onSuccess: () => {
+        router.push('/master-capex/budget-periods');
+        toast('Data created!');
+      },
+      onError: (error) => {
+        console.log('Failed to create data', error);
+        setValidationError(error, setError);
+        toast(error.message, { autoClose: false });
+        showErrorMessage(error);
+      },
     });
-  }, [dataHook, reset]);
+  };
 
   const openDateVal = watch('openDate');
 
@@ -104,7 +81,7 @@ const EditBudgetPeriod: NextPage = () => {
     <DetailLayout
       paths={breadCrumb}
       backButtonClick={router.back}
-      title="Edit Config Budget Period"
+      title="Create Config Budget Period"
     >
       <Panel>
         <Form onSubmit={handleSubmit(handleSubmitForm)}>
@@ -216,7 +193,7 @@ const EditBudgetPeriod: NextPage = () => {
               disabled={!isValid || mutation.isLoading}
               isLoading={mutation.isLoading}
             >
-              Update
+              Create
             </LoadingButton>
           </Col>
         </Form>
@@ -225,4 +202,4 @@ const EditBudgetPeriod: NextPage = () => {
   );
 };
 
-export default EditBudgetPeriod;
+export default CreateBudgetPeriod;

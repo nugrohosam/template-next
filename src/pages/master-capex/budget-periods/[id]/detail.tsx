@@ -10,7 +10,7 @@ import { Button, Col, Row } from 'react-bootstrap';
 const breadCrumb: PathBreadcrumb[] = [
   {
     label: 'Config Budget Periods',
-    link: '/budget-periods',
+    link: '/master-capex/budget-periods',
   },
   {
     label: 'Detail',
@@ -91,7 +91,7 @@ const BudgetPeriodDetail: NextPage = () => {
         <br />
         <Row>
           <Col lg={12}>
-            <Link href={`/budget-periods/${id}/edit`} passHref>
+            <Link href={`/master-capex/budget-periods/${id}/edit`} passHref>
               <Button variant="primary" className="float-right">
                 Edit
               </Button>

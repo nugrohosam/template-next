@@ -21,21 +21,27 @@ export type ItemOfBudgetPlanItem = {
 
 export interface BudgetPlanItemForm {
   idCapexBudgetPlan: string;
-  outstandingPlanPaymentAttachment?: string | null;
-  outstandingRetentionAttachment?: string | null;
+  outstandingPlanPaymentAttachment?: string | Array<File> | null;
+  outstandingRetentionAttachment?: string | Array<File> | null;
   isBuilding: boolean;
   budgetPlanItems: ItemOfBudgetPlanItemForm[];
 }
 
 export interface ItemOfBudgetPlanItemForm {
   idAssetGroup: string;
-  idCapexCatalog: string;
-  pricePerUnit: number;
-  currency: Currency;
+  idCapexCatalog: string | null;
+  pricePerUnit: number | null;
+  currency: Currency | null;
   currencyRate: number;
   totalAmount: number;
   totalAmountUsd: number;
   items: ItemOfBudgetPlanItem[];
+  detail: string | null;
   id?: string;
   catalog?: Catalog;
+}
+
+export interface UploadExcelBudgetPlanItem {
+  idBudgetPlan: string;
+  file: Array<File>;
 }

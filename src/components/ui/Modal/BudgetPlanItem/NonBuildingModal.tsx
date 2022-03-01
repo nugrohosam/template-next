@@ -1,6 +1,5 @@
-// TODO: Next time harus refactor
+// TODO: Next time harus refactor menggunakan https://react-hook-form.com/api/usefieldarray/
 import { yupResolver } from '@hookform/resolvers/yup';
-import Input from 'components/form/Input';
 import SingleSelect, { SelectOption } from 'components/form/SingleSelect';
 import { Currency, currencyOptions } from 'constants/currency';
 import { useFetchAssetGroups } from 'modules/assetGroup/hook';
@@ -17,14 +16,14 @@ import { useForm } from 'react-hook-form';
 import { CellProps, Column } from 'react-table';
 import * as yup from 'yup';
 
-import SimpleTable from '../Table/SimpleTable';
-import ModalBox from '.';
+import SimpleTable from '../../Table/SimpleTable';
+import ModalBox from '..';
 
-interface RejectModalProps {
+interface NonBuildingBudgetPlanItemModalPropsProps {
   onSend: (data: ItemOfBudgetPlanItemForm) => void;
   classButton?: string;
   isEdit?: boolean;
-  inPageUpdate?: { idAssetGroup: string; currency: Currency };
+  inPageUpdate?: { idAssetGroup: string; currency: Currency | null };
   buttonTitle?: string;
   myItem?: ItemOfBudgetPlanItemForm;
 }
@@ -36,7 +35,9 @@ const initMyBudgetPlanItem = () =>
     amount: 0,
   }));
 
-const CreateBudgetPlanItemModal: React.FC<RejectModalProps> = ({
+const NonBuildingBudgetPlanItemModalProps: React.FC<
+  NonBuildingBudgetPlanItemModalPropsProps
+> = ({
   onSend,
   classButton,
   isEdit = false,
@@ -78,7 +79,7 @@ const CreateBudgetPlanItemModal: React.FC<RejectModalProps> = ({
     data.items = myBudgetPlanItem.filter((item) => item.quantity);
     data.totalAmount = +totalAmount();
     data.totalAmountUsd = +totalAmountUsd();
-    data.pricePerUnit = +data.pricePerUnit;
+    data.pricePerUnit = data.pricePerUnit ? +data.pricePerUnit : null;
     data.currencyRate = +data.currencyRate;
     data.catalog = dataHookCatalogs.data?.items.find(
       (item) => item.id === data.idCapexCatalog
@@ -360,4 +361,4 @@ const CreateBudgetPlanItemModal: React.FC<RejectModalProps> = ({
   );
 };
 
-export default CreateBudgetPlanItemModal;
+export default NonBuildingBudgetPlanItemModalProps;

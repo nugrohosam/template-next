@@ -84,6 +84,10 @@ export const parseMenuToUrl = (menu: string) => {
       ? '/actual-ytd'
       : menu === 'budget references capex'
       ? '/budget-references'
+      : menu === 'budget periods'
+      ? '/master-capex/budget-periods'
+      : menu === 'summary'
+      ? '/summary'
       : '/';
   return url;
 };

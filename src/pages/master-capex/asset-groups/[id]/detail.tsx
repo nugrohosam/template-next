@@ -31,7 +31,20 @@ const columns: Column<AssetGroupPics>[] = [
     Header: 'Default for Budget Code',
     accessor: 'isBudgetCodeDefault',
     Cell: ({ cell }: CellProps<AssetGroupPics>) => {
-      return cell.row.original.isBudgetCodeDefault ? 'Yes' : 'No';
+      return (
+        <div className="d-flex justify-content-center">
+          <div className="custom-control custom-checkbox">
+            <input
+              type="checkbox"
+              className="custom-control-input"
+              checked={cell.row.original.isBudgetCodeDefault}
+              readOnly
+              disabled
+            />
+            <label className="custom-control-label"></label>
+          </div>
+        </div>
+      );
     },
   },
 ];

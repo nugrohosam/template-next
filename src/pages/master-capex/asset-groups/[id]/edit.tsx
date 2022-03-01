@@ -91,8 +91,8 @@ const EditPeriodActual: NextPage = () => {
             (resp) =>
               (options =
                 resp.items.map((x) => ({
-                  value: x.deptCode,
-                  label: x.name,
+                  value: x.deptNfs,
+                  label: x.deptNfs,
                 })) || [])
           );
           return {
@@ -167,8 +167,8 @@ const EditPeriodActual: NextPage = () => {
               isBudgetCodeDefault: false,
               options:
                 result?.items.map((x) => ({
-                  value: x.deptCode,
-                  label: x.name,
+                  value: x.deptNfs,
+                  label: x.deptNfs,
                 })) || [],
             };
           return val;
@@ -185,8 +185,8 @@ const EditPeriodActual: NextPage = () => {
               isBudgetCodeDefault: false,
               options:
                 result?.items.map((x) => ({
-                  value: x.deptCode,
-                  label: x.name,
+                  value: x.deptNfs,
+                  label: x.deptNfs,
                 })) || [],
             };
           return val;
@@ -215,8 +215,8 @@ const EditPeriodActual: NextPage = () => {
               pageSize: 50,
             }).then((response) => {
               const options = response.items.map((x) => ({
-                value: x.deptCode,
-                label: x.name,
+                value: x.deptNfs,
+                label: x.deptNfs,
               }));
               setMyPicsSite((prev) => {
                 const newPic = [...prev];
@@ -234,8 +234,8 @@ const EditPeriodActual: NextPage = () => {
               pageSize: 50,
             }).then((response) => {
               const options = response.items.map((x) => ({
-                value: x.deptCode,
-                label: x.name,
+                value: x.deptNfs,
+                label: x.deptNfs,
               }));
               setMyPicsHo((prev) => {
                 const newPic = [...prev];

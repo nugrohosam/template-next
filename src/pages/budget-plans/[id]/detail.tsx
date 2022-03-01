@@ -2,10 +2,13 @@ import Panel from 'components/form/Panel';
 import { PathBreadcrumb } from 'components/ui/Breadcrumb';
 import LoadingButton from 'components/ui/Button/LoadingButton';
 import DetailLayout from 'components/ui/DetailLayout';
+import ApproveModal from 'components/ui/Modal/ApproveModal';
+import RejectModal from 'components/ui/Modal/RejectModal';
+import ReviseModal from 'components/ui/Modal/ReviseModal';
 import DataTable, { usePaginateParams } from 'components/ui/Table/DataTable';
 import Loader from 'components/ui/Table/Loader';
 import { UserType } from 'constants/user';
-import { ApprovalStatus } from 'modules/approval/entities';
+import { ApprovalField, ApprovalStatus } from 'modules/approval/entities';
 import { useFetchBudgetPlanDetail } from 'modules/budgetPlan/hook';
 import {
   ApprovalBudgetPlanItemGroup,
@@ -110,24 +113,35 @@ const DetailBudgetPlan: NextPage = () => {
     }
   };
 
-  // approve budget plan item group
+  // approval budget plan item group
   const mutationApprovalBudgetPlanItemGroup = useApprovalBudgetPlanItemGroups();
-  const approvalBudgetPlanItemGroups = (data: ApprovalBudgetPlanItemGroup) => {
-    return mutationApprovalBudgetPlanItemGroup.mutate(data, {
-      onSuccess: () => {
-        setSelectedRow({});
-        dataHook.refetch();
-        dataHookBudgetPlanItemGroup.refetch();
-        toast('Data Approved!');
+  const approvalBudgetPlanItemGroups = (
+    data: ApprovalField & { idBudgetPlanItemGroups: string[] }
+  ) => {
+    mutationApprovalBudgetPlanItemGroup.mutate(
+      {
+        idBudgetPlanItemGroups: data.idBudgetPlanItemGroups,
+        status: data.status,
+        remark: data.notes,
       },
-      onError: (error) => {
-        console.error('Failed to approve data', error);
-        toast(error.message, { autoClose: false });
-        showErrorMessage(error);
-      },
-    });
+      {
+        onSuccess: () => {
+          router.push(`/budget-plans/${id}/detail`);
+          dataHook.refetch();
+          dataHookBudgetPlanItemGroup.refetch();
+          toast('Data Approved!');
+        },
+        onError: (error) => {
+          console.error('Failed to approve data', error);
+          toast(error.message, { autoClose: false });
+          showErrorMessage(error);
+        },
+      }
+    );
   };
-  const handleApprovaltMultipleBudgetPlanItemsGroups = () => {
+  const handleApprovaltMultipleBudgetPlanItemsGroups = (
+    data: ApprovalField
+  ) => {
     const ids = getAllIds(
       selectedRow,
       dataHookBudgetPlanItemGroup.data
@@ -135,7 +149,8 @@ const DetailBudgetPlan: NextPage = () => {
     if (ids?.length > 0) {
       approvalBudgetPlanItemGroups({
         idBudgetPlanItemGroups: ids,
-        status: ApprovalStatus.APPROVE,
+        status: data.status,
+        notes: data.notes,
       });
     }
   };
@@ -297,15 +312,25 @@ const DetailBudgetPlan: NextPage = () => {
                   )}
 
                   {profile?.type === UserType.ApprovalBudgetPlanCapex ? (
-                    <LoadingButton
-                      size="sm"
-                      className="mr-2"
-                      disabled={mutationApprovalBudgetPlanItemGroup.isLoading}
-                      onClick={handleApprovaltMultipleBudgetPlanItemsGroups}
-                      isLoading={mutationApprovalBudgetPlanItemGroup.isLoading}
-                    >
-                      Approve
-                    </LoadingButton>
+                    <>
+                      <ApproveModal
+                        onSend={(data) =>
+                          handleApprovaltMultipleBudgetPlanItemsGroups(data)
+                        }
+                        classButton="mr-2"
+                      />
+                      <ReviseModal
+                        onSend={(data) =>
+                          handleApprovaltMultipleBudgetPlanItemsGroups(data)
+                        }
+                        classButton="mr-2"
+                      />
+                      <RejectModal
+                        onSend={(data) =>
+                          handleApprovaltMultipleBudgetPlanItemsGroups(data)
+                        }
+                      />
+                    </>
                   ) : (
                     <LoadingButton
                       size="sm"

@@ -2,7 +2,7 @@ import Panel from 'components/form/Panel';
 import { PathBreadcrumb } from 'components/ui/Breadcrumb';
 import LoadingButton from 'components/ui/Button/LoadingButton';
 import DetailLayout from 'components/ui/DetailLayout';
-import BudgetPlanItemModal from 'components/ui/Modal/BudgetPlanItemModal';
+import BudgetPlanItemModal from 'components/ui/Modal/BudgetPlanItem/NonBuildingModal';
 import SimpleTable from 'components/ui/Table/SimpleTable';
 import { ItemOfBudgetPlanItemForm } from 'modules/budgetPlanItem/entities';
 import { getItemByMonth } from 'modules/budgetPlanItem/helpers';

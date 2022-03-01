@@ -1,15 +1,21 @@
+import Checkbox from 'components/form/Checkbox';
 import Panel from 'components/form/Panel';
 import { PathBreadcrumb } from 'components/ui/Breadcrumb';
 import LoadingButton from 'components/ui/Button/LoadingButton';
 import DetailLayout from 'components/ui/DetailLayout';
-import BudgetPlanItemModal from 'components/ui/Modal/BudgetPlanItemModal';
+import IsBuildingBudgetPlanItemModal from 'components/ui/Modal/BudgetPlanItem/IsBuildingModal';
+import NonBuildingBudgetPlanItemModal from 'components/ui/Modal/BudgetPlanItem/NonBuildingModal';
 import SimpleTable from 'components/ui/Table/SimpleTable';
-import { ItemOfBudgetPlanItemForm } from 'modules/budgetPlanItem/entities';
+import {
+  BudgetPlanItemForm,
+  ItemOfBudgetPlanItemForm,
+} from 'modules/budgetPlanItem/entities';
 import { useCreateBudgetPlanItems } from 'modules/budgetPlanItem/hook';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { Button, Col, Row } from 'react-bootstrap';
+import { useForm } from 'react-hook-form';
 import { CellProps, Column } from 'react-table';
 import { toast } from 'react-toastify';
 import { showErrorMessage } from 'utils/helpers';
@@ -144,12 +150,14 @@ const CreatePeriodActual: NextPage = () => {
     );
   };
 
+  const { control, getValues, watch } = useForm<BudgetPlanItemForm>();
+  const watchIsBuilding = watch('isBuilding');
   const submitCreateBudgetPlanItems = () => {
     mutation.mutate(
       {
         idCapexBudgetPlan: id,
         // TODO: isBuilding, outstandingPlanPaymentAttachment, outstandingRetentionAttachment masih hardcode
-        isBuilding: false,
+        isBuilding: getValues('isBuilding'),
         outstandingPlanPaymentAttachment: null,
         outstandingRetentionAttachment: null,
         budgetPlanItems: myBudgetPlanItem,
@@ -191,11 +199,29 @@ const CreatePeriodActual: NextPage = () => {
             ]}
             onSelectedRowsChanged={(rows) => setSelectedRow(rows)}
             addOns={
-              <BudgetPlanItemModal
-                onSend={(data) =>
-                  setMyBudgetPlanItem((prev) => [...prev, data])
-                }
-              ></BudgetPlanItemModal>
+              <div className="d-flex align-items-center">
+                <div className="mr-2">
+                  <Checkbox
+                    label="Is Building"
+                    name="isBuilding"
+                    control={control}
+                    defaultValue={false}
+                  ></Checkbox>
+                </div>
+                {watchIsBuilding ? (
+                  <IsBuildingBudgetPlanItemModal
+                    onSend={(data) =>
+                      setMyBudgetPlanItem((prev) => [...prev, data])
+                    }
+                  ></IsBuildingBudgetPlanItemModal>
+                ) : (
+                  <NonBuildingBudgetPlanItemModal
+                    onSend={(data) =>
+                      setMyBudgetPlanItem((prev) => [...prev, data])
+                    }
+                  ></NonBuildingBudgetPlanItemModal>
+                )}
+              </div>
             }
             actions={
               <>

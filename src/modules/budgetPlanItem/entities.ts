@@ -29,13 +29,14 @@ export interface BudgetPlanItemForm {
 
 export interface ItemOfBudgetPlanItemForm {
   idAssetGroup: string;
-  idCapexCatalog: string;
-  pricePerUnit: number;
+  idCapexCatalog: string | null;
+  pricePerUnit: number | null;
   currency: Currency;
   currencyRate: number;
   totalAmount: number;
   totalAmountUsd: number;
   items: ItemOfBudgetPlanItem[];
+  detail: string | null;
   id?: string;
   catalog?: Catalog;
 }

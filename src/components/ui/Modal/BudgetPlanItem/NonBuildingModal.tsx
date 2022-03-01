@@ -23,7 +23,7 @@ interface NonBuildingBudgetPlanItemModalPropsProps {
   onSend: (data: ItemOfBudgetPlanItemForm) => void;
   classButton?: string;
   isEdit?: boolean;
-  inPageUpdate?: { idAssetGroup: string; currency: Currency };
+  inPageUpdate?: { idAssetGroup: string; currency: Currency | null };
   buttonTitle?: string;
   myItem?: ItemOfBudgetPlanItemForm;
 }

@@ -20,31 +20,30 @@ import ModalBox from '..';
 interface IsBuildingBudgetPlanItemModalProps {
   onSend: (data: ItemOfBudgetPlanItemForm) => void;
   classButton?: string;
-  isEdit?: boolean;
-  inPageUpdate?: { idAssetGroup: string; currency: Currency };
   buttonTitle?: string;
-  myItem?: ItemOfBudgetPlanItemForm;
 }
 
-const initMyBudgetPlanItem = () =>
-  [...Array(12).keys()].map((item) => ({
+const initDefaultValues = () => ({
+  idAssetGroup: '',
+  currency: null,
+  detail: null,
+  pricePerUnit: null,
+  idCapexCatalog: null,
+  // TODO: currenctRate masih dummy
+  currencyRate: 10000,
+  items: [...Array(12).keys()].map((item) => ({
     month: item + 1,
     quantity: 0,
-  }));
+  })),
+});
 
 const IsBuildingBudgetPlanItemModal: React.FC<
   IsBuildingBudgetPlanItemModalProps
-> = ({
-  onSend,
-  classButton,
-  isEdit = false,
-  inPageUpdate,
-  buttonTitle = '+ Add Item',
-  myItem,
-}) => {
+> = ({ onSend, classButton, buttonTitle = '+ Add Item' }) => {
   const schema = yup.object().shape({
     idAssetGroup: yup.string().required(),
     currency: yup.string().required(),
+    detail: yup.string().required().nullable(),
   });
 
   const [kurs, setKurs] = useState<number>(14500);
@@ -55,21 +54,15 @@ const IsBuildingBudgetPlanItemModal: React.FC<
     formState: { errors },
     watch,
     resetField,
-    setValue,
     reset,
-    getValues,
   } = useForm<ItemOfBudgetPlanItemForm>({
+    shouldUnregister: false,
     mode: 'onChange',
     resolver: yupResolver(schema),
-    defaultValues: {
-      pricePerUnit: null,
-      idCapexCatalog: null,
-      // TODO: currenctRate masih dummy
-      currencyRate: 10000,
-      items: initMyBudgetPlanItem(),
-    },
+    delayError: 500,
+    defaultValues: initDefaultValues(),
   });
-  const { fields, append } = useFieldArray({
+  const { fields } = useFieldArray({
     control,
     name: 'items',
   });
@@ -81,7 +74,7 @@ const IsBuildingBudgetPlanItemModal: React.FC<
     data.totalAmountUsd = +totalAmountUsd();
 
     onSend(data);
-    reset();
+    reset(initDefaultValues());
   };
 
   // asset group options
@@ -123,7 +116,8 @@ const IsBuildingBudgetPlanItemModal: React.FC<
         ),
       },
     ],
-    [control, errors.items]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [control, errors.items, watchItems]
   );
 
   const totalAmount = () => {
@@ -208,7 +202,11 @@ const IsBuildingBudgetPlanItemModal: React.FC<
         <Col lg={6}>
           <FormGroup>
             <FormLabel>Total IDR</FormLabel>
-            <FormControl type="text" value={totalAmount()} disabled />
+            <FormControl
+              type="text"
+              value={totalAmount().toLocaleString('id-Id')}
+              disabled
+            />
           </FormGroup>
         </Col>
         <Col lg={6}>
@@ -216,7 +214,7 @@ const IsBuildingBudgetPlanItemModal: React.FC<
             <FormLabel>Total USD</FormLabel>
             <FormControl
               type="text"
-              value={totalAmountUsd().toLocaleString('en-EN')}
+              value={totalAmountUsd().toLocaleString('en-En')}
               disabled
             />
           </FormGroup>

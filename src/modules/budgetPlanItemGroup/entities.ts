@@ -5,6 +5,11 @@ export enum BudgetPlanItemGroupStatus {
   Draft = 'DRAFT',
 }
 
+export enum BuildingAttachmentType {
+  OutstandingPlanPayment = 'OUTSTANDING PLAN PAYMENT',
+  OutstandingRetention = 'OUTSTANDING RETENTION',
+}
+
 export type BudgetPlanItemGroup = {
   id: string;
   budgetCode: string;
@@ -34,3 +39,15 @@ export interface ApprovalBudgetPlanItemGroup {
   status: string;
   remark?: string;
 }
+
+export type BuildingAttachment = {
+  id: string;
+  type: string;
+  districtCode: string;
+  detail: string;
+  currency: string;
+  currentPeriodIdr: number;
+  currentPeriodUsd: number;
+  mbIdr: number;
+  mbUsd: number;
+};

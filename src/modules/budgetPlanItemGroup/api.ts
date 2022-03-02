@@ -5,6 +5,8 @@ import {
   ApprovalBudgetPlanItemGroup,
   BudgetPlanItemGroup,
   BudgetPlanItemGroupItem,
+  BuildingAttachment,
+  BuildingAttachmentType,
 } from './entities';
 
 export interface BudgetPlanItemGroupsParams extends PaginateParams {
@@ -67,6 +69,22 @@ export const approvalBudgetPlanItemGroups = async (
   const result = await axios.put<ResponseData<null>>(
     'v1/budgetplanitemgroups/approval',
     data
+  );
+  return result.data.data;
+};
+
+export interface BuildingAttachmentParams extends PaginateParams {
+  type: BuildingAttachmentType;
+}
+export const fetchBuildingAttachments = async (
+  idBudgetPlanItemGroup: string,
+  params: BuildingAttachmentParams
+): Promise<Paginate<BuildingAttachment>> => {
+  const result = await axios.get<ResponseData<Paginate<BuildingAttachment>>>(
+    `v1/budgetplanitemgroups/${idBudgetPlanItemGroup}/buildingattachments`,
+    {
+      params,
+    }
   );
   return result.data.data;
 };

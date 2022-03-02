@@ -2,14 +2,10 @@ import Panel from 'components/form/Panel';
 import { PathBreadcrumb } from 'components/ui/Breadcrumb';
 import LoadingButton from 'components/ui/Button/LoadingButton';
 import DetailLayout from 'components/ui/DetailLayout';
-import ApproveModal from 'components/ui/Modal/ApproveModal';
-import RejectModal from 'components/ui/Modal/RejectModal';
-import ReviseModal from 'components/ui/Modal/ReviseModal';
 import DataTable, { usePaginateParams } from 'components/ui/Table/DataTable';
 import Loader from 'components/ui/Table/Loader';
 import AuditTimeline from 'components/ui/Timeline/AuditTimeline';
 import { UserType } from 'constants/user';
-import { ApprovalField } from 'modules/approval/entities';
 import { ResourceType } from 'modules/audit/parent/entities';
 import { useFetchAudits } from 'modules/audit/parent/hook';
 import { getItemByMonth } from 'modules/budgetPlanItem/helpers';
@@ -17,11 +13,13 @@ import { useDeleteBudgetPlanitems } from 'modules/budgetPlanItem/hook';
 import {
   BudgetPlanItemGroupItem,
   BudgetPlanItemGroupStatus,
+  BuildingAttachment,
+  BuildingAttachmentType,
 } from 'modules/budgetPlanItemGroup/entities';
 import {
-  useApprovalBudgetPlanItemGroups,
   useFetchBudgetPlanItemGroupDetail,
   useFetchBudgetPlanItemGroupItems,
+  useFetchBuildingAttachments,
 } from 'modules/budgetPlanItemGroup/hook';
 import { useDecodeToken } from 'modules/custom/useDecodeToken';
 import type { NextPage } from 'next';
@@ -60,6 +58,16 @@ const BudgetPlanGroupItemList: NextPage = () => {
   const dataHookBudgetPlanItemGroupItems = useFetchBudgetPlanItemGroupItems(
     budgetPlanGroupId,
     params
+  );
+
+  const dataHookOutstandingPlanPayment = useFetchBuildingAttachments(
+    budgetPlanGroupId,
+    { ...params, type: BuildingAttachmentType.OutstandingPlanPayment }
+  );
+
+  const dataHookOutstandingRetention = useFetchBuildingAttachments(
+    budgetPlanGroupId,
+    { ...params, type: BuildingAttachmentType.OutstandingRetention }
   );
 
   // handle delete
@@ -210,12 +218,34 @@ const BudgetPlanGroupItemList: NextPage = () => {
     },
   ];
 
+  const columnOutstanding: Column<BuildingAttachment>[] = [
+    { Header: 'District', accessor: 'districtCode', minWidth: 150 },
+    { Header: 'Detail', accessor: 'detail', minWidth: 300 },
+    { Header: 'Currency', accessor: 'currency', minWidth: 150 },
+    {
+      Header: 'Currency Period (IDR)',
+      accessor: 'currentPeriodIdr',
+      minWidth: 250,
+    },
+    {
+      Header: 'Currency Period (USD)',
+      accessor: 'currentPeriodUsd',
+      minWidth: 250,
+    },
+    { Header: 'MB 2022 (IDR)', accessor: 'mbIdr', minWidth: 200 },
+    { Header: 'MB 2022 (USD)', accessor: 'mbUsd', minWidth: 200 },
+  ];
+
   return (
     <DetailLayout
       paths={breadCrumb}
       backButtonClick={router.back}
       title="Detail Budget Plan Item Group"
     >
+      {auditHook.data?.items && auditHook.data?.items.length > 0 && (
+        <AuditTimeline audit={auditHook.data} />
+      )}
+
       <Panel>
         {dataHookBudgetPlanItemGroup.isLoading && <Loader size="sm" />}
 
@@ -255,64 +285,122 @@ const BudgetPlanGroupItemList: NextPage = () => {
             </h3>
           </Col>
         </Row>
+
+        <br />
+
+        <Row>
+          {dataHookBudgetPlanItemGroupItems.data && (
+            <DataTable
+              columns={columns}
+              data={dataHookBudgetPlanItemGroupItems.data}
+              actions={
+                userCanDelete && (
+                  <LoadingButton
+                    variant="red"
+                    size="sm"
+                    className="mr-2"
+                    disabled={mutationDeleteBudgetPlanItems.isLoading}
+                    onClick={handleDeleteMultipleBudgetPlan}
+                    isLoading={mutationDeleteBudgetPlanItems.isLoading}
+                  >
+                    Delete
+                  </LoadingButton>
+                )
+              }
+              addOns={
+                dataHookBudgetPlanItemGroup?.data?.status ===
+                  BudgetPlanItemGroupStatus.Draft && (
+                  <Link
+                    href={`/budget-plans/${budgetPlanId}/${budgetPlanGroupId}/edit`}
+                    passHref
+                  >
+                    <Button variant="primary">Edit</Button>
+                  </Link>
+                )
+              }
+              isLoading={dataHookBudgetPlanItemGroupItems.isFetching}
+              selectedSort={selectedSort}
+              selectedRows={selectedRow}
+              hiddenColumns={['id', 'catalog', 'items']}
+              paginateParams={params}
+              {...(userCanDelete && {
+                onSelectedRowsChanged: (rows) => setSelectedRow(rows),
+              })}
+              onSelectedSortChanged={(sort) => {
+                setSelectedSort(sort);
+                setSortingRules(sort);
+              }}
+              onSearch={(keyword) => setSearch(keyword)}
+              onPageSizeChanged={(pageSize) => setPageSize(pageSize)}
+              onChangePage={(page) => setPageNumber(page)}
+            ></DataTable>
+          )}
+        </Row>
       </Panel>
 
-      {auditHook.data?.items && auditHook.data?.items.length > 0 && (
-        <AuditTimeline audit={auditHook.data} />
-      )}
+      {true && (
+        <>
+          <div className="mt-3">
+            <Panel>
+              <Row>
+                <Col lg={12} className="d-md-flex mb-32 align-items-center">
+                  <h3 className="mb-3 mb-md-0 text__blue">
+                    Outstanding Plan Payment
+                  </h3>
+                </Col>
 
-      <Container fluid className="mt-3 px-0">
-        <Panel>
-          <Row>
-            {dataHookBudgetPlanItemGroupItems.data && (
-              <DataTable
-                columns={columns}
-                data={dataHookBudgetPlanItemGroupItems.data}
-                actions={
-                  userCanDelete && (
-                    <LoadingButton
-                      variant="red"
-                      size="sm"
-                      className="mr-2"
-                      disabled={mutationDeleteBudgetPlanItems.isLoading}
-                      onClick={handleDeleteMultipleBudgetPlan}
-                      isLoading={mutationDeleteBudgetPlanItems.isLoading}
-                    >
-                      Delete
-                    </LoadingButton>
-                  )
-                }
-                addOns={
-                  dataHookBudgetPlanItemGroup?.data?.status ===
-                    BudgetPlanItemGroupStatus.Draft && (
-                    <Link
-                      href={`/budget-plans/${budgetPlanId}/${budgetPlanGroupId}/edit`}
-                      passHref
-                    >
-                      <Button variant="primary">Edit</Button>
-                    </Link>
-                  )
-                }
-                isLoading={dataHookBudgetPlanItemGroupItems.isFetching}
-                selectedSort={selectedSort}
-                selectedRows={selectedRow}
-                hiddenColumns={['id', 'catalog', 'items']}
-                paginateParams={params}
-                {...(userCanDelete && {
-                  onSelectedRowsChanged: (rows) => setSelectedRow(rows),
-                })}
-                onSelectedSortChanged={(sort) => {
-                  setSelectedSort(sort);
-                  setSortingRules(sort);
-                }}
-                onSearch={(keyword) => setSearch(keyword)}
-                onPageSizeChanged={(pageSize) => setPageSize(pageSize)}
-                onChangePage={(page) => setPageNumber(page)}
-              ></DataTable>
-            )}
-          </Row>
-        </Panel>
-      </Container>
+                {dataHookOutstandingPlanPayment.data && (
+                  <DataTable
+                    columns={columnOutstanding}
+                    data={dataHookOutstandingPlanPayment.data}
+                    isLoading={dataHookOutstandingPlanPayment.isFetching}
+                    selectedSort={selectedSort}
+                    selectedRows={selectedRow}
+                    paginateParams={params}
+                    onSelectedSortChanged={(sort) => {
+                      setSelectedSort(sort);
+                      setSortingRules(sort);
+                    }}
+                    onSearch={(keyword) => setSearch(keyword)}
+                    onPageSizeChanged={(pageSize) => setPageSize(pageSize)}
+                    onChangePage={(page) => setPageNumber(page)}
+                  ></DataTable>
+                )}
+              </Row>
+            </Panel>
+          </div>
+
+          <div className="mt-3">
+            <Panel>
+              <Row>
+                <Col lg={12} className="d-md-flex mb-32 align-items-center">
+                  <h3 className="mb-3 mb-md-0 text__blue">
+                    Outstanding Retention
+                  </h3>
+                </Col>
+
+                {dataHookOutstandingRetention.data && (
+                  <DataTable
+                    columns={columnOutstanding}
+                    data={dataHookOutstandingRetention.data}
+                    isLoading={dataHookOutstandingRetention.isFetching}
+                    selectedSort={selectedSort}
+                    selectedRows={selectedRow}
+                    paginateParams={params}
+                    onSelectedSortChanged={(sort) => {
+                      setSelectedSort(sort);
+                      setSortingRules(sort);
+                    }}
+                    onSearch={(keyword) => setSearch(keyword)}
+                    onPageSizeChanged={(pageSize) => setPageSize(pageSize)}
+                    onChangePage={(page) => setPageNumber(page)}
+                  ></DataTable>
+                )}
+              </Row>
+            </Panel>
+          </div>
+        </>
+      )}
     </DetailLayout>
   );
 };

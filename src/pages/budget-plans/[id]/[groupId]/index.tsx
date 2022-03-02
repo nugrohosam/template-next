@@ -8,7 +8,7 @@ import AuditTimeline from 'components/ui/Timeline/AuditTimeline';
 import { UserType } from 'constants/user';
 import { ResourceType } from 'modules/audit/parent/entities';
 import { useFetchAudits } from 'modules/audit/parent/hook';
-import { getItemByMonth } from 'modules/budgetPlanItem/helpers';
+import { getValueItemByMonth } from 'modules/budgetPlanItem/helpers';
 import { useDeleteBudgetPlanitems } from 'modules/budgetPlanItem/hook';
 import {
   BudgetPlanItemGroupItem,
@@ -121,7 +121,7 @@ const BudgetPlanGroupItemList: NextPage = () => {
       accessor: 'detail',
       minWidth: 300,
       Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) =>
-        row.values.catalog?.detail,
+        row.values.catalog?.detail || '-',
     },
     {
       Header: 'Asset Group',
@@ -129,7 +129,7 @@ const BudgetPlanGroupItemList: NextPage = () => {
       minWidth: 200,
       Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) => (
         <div style={{ minWidth: 200 }}>
-          {row.values.catalog?.assetGroup?.assetGroup}
+          {row.values.catalog?.assetGroup?.assetGroup || '-'}
         </div>
       ),
     },
@@ -157,64 +157,160 @@ const BudgetPlanGroupItemList: NextPage = () => {
     },
     {
       Header: 'Jan',
-      Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) =>
-        getItemByMonth(row.values.items, 1)?.quantity || '-',
+      Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) => (
+        <div style={{ minWidth: 100 }}>
+          {getValueItemByMonth(
+            row.values.items,
+            1,
+            !row.values.catalog,
+            row.values.currency
+          )}
+        </div>
+      ),
     },
     {
       Header: 'Feb',
-      Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) =>
-        getItemByMonth(row.values.items, 2)?.quantity || '-',
+      Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) => (
+        <div style={{ minWidth: 100 }}>
+          {getValueItemByMonth(
+            row.values.items,
+            2,
+            !row.values.catalog,
+            row.values.currency
+          )}
+        </div>
+      ),
     },
     {
       Header: 'Mar',
-      Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) =>
-        getItemByMonth(row.values.items, 3)?.quantity || '-',
+      Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) => (
+        <div style={{ minWidth: 100 }}>
+          {getValueItemByMonth(
+            row.values.items,
+            3,
+            !row.values.catalog,
+            row.values.currency
+          )}
+        </div>
+      ),
     },
     {
       Header: 'Apr',
       minWidth: 100,
-      Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) =>
-        getItemByMonth(row.values.items, 4)?.quantity || '-',
+      Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) => (
+        <div style={{ minWidth: 100 }}>
+          {getValueItemByMonth(
+            row.values.items,
+            4,
+            !row.values.catalog,
+            row.values.currency
+          )}
+        </div>
+      ),
     },
     {
       Header: 'Mei',
-      Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) =>
-        getItemByMonth(row.values.items, 5)?.quantity || '-',
+      Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) => (
+        <div style={{ minWidth: 100 }}>
+          {getValueItemByMonth(
+            row.values.items,
+            5,
+            !row.values.catalog,
+            row.values.currency
+          )}
+        </div>
+      ),
     },
     {
       Header: 'Jun',
-      Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) =>
-        getItemByMonth(row.values.items, 6)?.quantity || '-',
+      Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) => (
+        <div style={{ minWidth: 100 }}>
+          {getValueItemByMonth(
+            row.values.items,
+            6,
+            !row.values.catalog,
+            row.values.currency
+          )}
+        </div>
+      ),
     },
     {
       Header: 'Jul',
-      Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) =>
-        getItemByMonth(row.values.items, 7)?.quantity || '-',
+      Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) => (
+        <div style={{ minWidth: 100 }}>
+          {getValueItemByMonth(
+            row.values.items,
+            7,
+            !row.values.catalog,
+            row.values.currency
+          )}
+        </div>
+      ),
     },
     {
       Header: 'Aug',
-      Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) =>
-        getItemByMonth(row.values.items, 8)?.quantity || '-',
+      Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) => (
+        <div style={{ minWidth: 100 }}>
+          {getValueItemByMonth(
+            row.values.items,
+            8,
+            !row.values.catalog,
+            row.values.currency
+          )}
+        </div>
+      ),
     },
     {
       Header: 'Sep',
-      Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) =>
-        getItemByMonth(row.values.items, 9)?.quantity || '-',
+      Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) => (
+        <div style={{ minWidth: 100 }}>
+          {getValueItemByMonth(
+            row.values.items,
+            9,
+            !row.values.catalog,
+            row.values.currency
+          )}
+        </div>
+      ),
     },
     {
       Header: 'Oct',
-      Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) =>
-        getItemByMonth(row.values.items, 10)?.quantity || '-',
+      Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) => (
+        <div style={{ minWidth: 100 }}>
+          {getValueItemByMonth(
+            row.values.items,
+            10,
+            !row.values.catalog,
+            row.values.currency
+          )}
+        </div>
+      ),
     },
     {
       Header: 'Nov',
-      Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) =>
-        getItemByMonth(row.values.items, 11)?.quantity || '-',
+      Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) => (
+        <div style={{ minWidth: 100 }}>
+          {getValueItemByMonth(
+            row.values.items,
+            11,
+            !row.values.catalog,
+            row.values.currency
+          )}
+        </div>
+      ),
     },
     {
       Header: 'Dec',
-      Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) =>
-        getItemByMonth(row.values.items, 12)?.quantity || '-',
+      Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) => (
+        <div style={{ minWidth: 100 }}>
+          {getValueItemByMonth(
+            row.values.items,
+            12,
+            !row.values.catalog,
+            row.values.currency
+          )}
+        </div>
+      ),
     },
   ];
 

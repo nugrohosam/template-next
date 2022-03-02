@@ -85,7 +85,11 @@ export const useFetchBuildingAttachments = (
   idBudgetPlanItemGroup: string,
   params: BuildingAttachmentParams
 ): UseQueryResult<Paginate<BuildingAttachment>, ResponseError> => {
-  return useQuery(['building-attachments', params], () =>
-    fetchBuildingAttachments(idBudgetPlanItemGroup, params)
+  return useQuery(
+    ['building-attachments', params],
+    () => fetchBuildingAttachments(idBudgetPlanItemGroup, params),
+    {
+      enabled: !!idBudgetPlanItemGroup,
+    }
   );
 };

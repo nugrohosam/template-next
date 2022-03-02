@@ -338,7 +338,7 @@ const BudgetPlanGroupItemList: NextPage = () => {
         </Row>
       </Panel>
 
-      {true && (
+      {dataHookBudgetPlanItemGroup.data?.isBuilding && (
         <>
           <div className="mt-3">
             <Panel>

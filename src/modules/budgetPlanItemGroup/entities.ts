@@ -13,6 +13,9 @@ export type BudgetPlanItemGroup = {
   item: number;
   totalAmount: number;
   totalAmountUsd: number;
+  outstandingPlanPaymentAttachment: string;
+  outstandingRetentionAttachment: string;
+  isBuilding: boolean;
   workflowApprovalLevel: number;
   workflowApprovalNrp: [];
   workflowApprovalPosition: [];

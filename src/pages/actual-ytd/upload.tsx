@@ -44,9 +44,8 @@ const UploadActualYtd: NextPage = () => {
   const router = useRouter();
   const uploadMutation = useUploadActualYtd();
   const downloadTemplateExcelMutation = useDownloadTemplateExcel();
-  const date = new Date();
-  const year = date.getFullYear().toString();
-  const period = date.getMonth() <= 6 ? 'S1' : 'S2';
+  const year = new Date().getFullYear().toString();
+  const period = 'S2'; // TODO: get from API
 
   const {
     handleSubmit,

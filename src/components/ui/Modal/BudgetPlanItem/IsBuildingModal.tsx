@@ -73,7 +73,6 @@ const IsBuildingBudgetPlanItemModal: React.FC<
     data.totalAmount = +totalAmount();
     data.totalAmountUsd = +totalAmountUsd();
 
-    console.log(data);
     data.items = data.items
       .map((item) => ({ ...item, amount: +item.amount }))
       .filter((item) => item.amount);

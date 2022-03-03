@@ -6,6 +6,7 @@ import LoadingButton from 'components/ui/Button/LoadingButton';
 import DetailLayout from 'components/ui/DetailLayout';
 import BudgetPlanItemModal from 'components/ui/Modal/BudgetPlanItem/BudgetPlanItemModal';
 import SimpleTable from 'components/ui/Table/SimpleTable';
+import { useDownloadAttachmentHelpers } from 'modules/attachment/helpers';
 import { useUploadAttachment } from 'modules/attachment/hook';
 import {
   BudgetPlanItemForm,
@@ -44,6 +45,7 @@ const UpdateBudgetPlanItems: NextPage = () => {
     },
   ];
 
+  const { handleDownloadAttachment } = useDownloadAttachmentHelpers();
   const dataHookBudgetPlanItemGroup =
     useFetchBudgetPlanItemGroupDetail(budgetPlanGroupId);
   const dataHookBudgetPlanItemGroupItems =
@@ -110,6 +112,7 @@ const UpdateBudgetPlanItems: NextPage = () => {
           console.error('Failed to update data', error);
           toast(error.message, { autoClose: false });
           showErrorMessage(error);
+          setValidationError(error, setError);
         },
       }
     );
@@ -462,6 +465,20 @@ const UpdateBudgetPlanItems: NextPage = () => {
                     >
                       <p>Download Template</p>
                     </Button>
+                    <Button
+                      variant="link"
+                      className="mt-2 p-0 font-xs"
+                      onClick={() =>
+                        handleDownloadAttachment({
+                          fileName:
+                            dataHookBudgetPlanItemGroup.data
+                              ?.outstandingPlanPaymentAttachment || '',
+                          module: 'budget plan',
+                        })
+                      }
+                    >
+                      <p>Download Your Previous file</p>
+                    </Button>
                   </FormGroup>
                 </Col>
 
@@ -497,6 +514,20 @@ const UpdateBudgetPlanItems: NextPage = () => {
                       }
                     >
                       <p>Download Template</p>
+                    </Button>
+                    <Button
+                      variant="link"
+                      className="mt-2 p-0 font-xs"
+                      onClick={() =>
+                        handleDownloadAttachment({
+                          fileName:
+                            dataHookBudgetPlanItemGroup.data
+                              ?.outstandingRetentionAttachment || '',
+                          module: 'budget plan',
+                        })
+                      }
+                    >
+                      <p>Download Your Previous file</p>
                     </Button>
                   </FormGroup>
                 </Col>

@@ -9,16 +9,19 @@ import {
 import {
   approvalBudgetPlanItemGroups,
   BudgetPlanItemGroupsParams,
+  BuildingAttachmentParams,
   deleteBudgetPlanItemGroups,
   fetchBudgetPlanItemGroupDetail,
   fetchBudgetPlanItemGroupItems,
   fetchBudgetPlanItemGroups,
+  fetchBuildingAttachments,
   submitBudgetPlanItemGroups,
 } from './api';
 import {
   ApprovalBudgetPlanItemGroup,
   BudgetPlanItemGroup,
   BudgetPlanItemGroupItem,
+  BuildingAttachment,
 } from './entities';
 
 export const useFetchBudgetPlanItemGroups = (
@@ -76,4 +79,17 @@ export const useApprovalBudgetPlanItemGroups = (): UseMutationResult<
   ApprovalBudgetPlanItemGroup
 > => {
   return useMutation((data) => approvalBudgetPlanItemGroups(data));
+};
+
+export const useFetchBuildingAttachments = (
+  idBudgetPlanItemGroup: string,
+  params: BuildingAttachmentParams
+): UseQueryResult<Paginate<BuildingAttachment>, ResponseError> => {
+  return useQuery(
+    ['building-attachments', params],
+    () => fetchBuildingAttachments(idBudgetPlanItemGroup, params),
+    {
+      enabled: !!idBudgetPlanItemGroup,
+    }
+  );
 };

@@ -26,7 +26,7 @@ interface IsBuildingBudgetPlanItemModalProps {
 const initDefaultValues = () => ({
   idAssetGroup: '',
   currency: null,
-  detail: null,
+  detail: '',
   pricePerUnit: null,
   idCapexCatalog: null,
   // TODO: currenctRate masih dummy
@@ -73,6 +73,9 @@ const IsBuildingBudgetPlanItemModal: React.FC<
     data.totalAmount = +totalAmount();
     data.totalAmountUsd = +totalAmountUsd();
 
+    data.items = data.items
+      .map((item) => ({ ...item, amount: +item.amount }))
+      .filter((item) => item.amount);
     onSend(data);
     reset(initDefaultValues());
   };
@@ -165,7 +168,6 @@ const IsBuildingBudgetPlanItemModal: React.FC<
             <SingleSelect
               name="idAssetGroup"
               control={control}
-              defaultValue=""
               placeholder="Asset Group"
               options={assetGroupOptions}
               error={errors.idAssetGroup?.message}
@@ -179,7 +181,6 @@ const IsBuildingBudgetPlanItemModal: React.FC<
             <SingleSelect
               name="currency"
               control={control}
-              defaultValue=""
               placeholder="Currency"
               options={currencyOptions}
               error={errors.currency?.message}

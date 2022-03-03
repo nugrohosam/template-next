@@ -75,7 +75,7 @@ const CreatePeriodActual: NextPage = () => {
     setMyBudgetPlanItem([]);
     resetField('outstandingPlanPaymentAttachment');
     resetField('outstandingRetentionAttachment');
-  }, [watchIsBuilding]);
+  }, [resetField, watchIsBuilding]);
 
   const mutationCreateBudgetPlanItems = useCreateBudgetPlanItems();
   const mutationUploadAttachment = useUploadAttachment();
@@ -448,9 +448,7 @@ const CreatePeriodActual: NextPage = () => {
                       variant="link"
                       className="mt-2 p-0 font-xs"
                       onClick={() =>
-                        handleDownloadTemplate(
-                          'outstanding plan payment attachment'
-                        )
+                        handleDownloadTemplate('outstanding plan payment')
                       }
                     >
                       <p>Download Template</p>

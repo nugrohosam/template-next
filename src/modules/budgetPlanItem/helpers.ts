@@ -16,7 +16,8 @@ export function getValueItemByMonth(
   if (!foundItem) return '-';
 
   if (isBuilding) {
-    return +foundItem.amount?.toLocaleString(
+    const amount = +foundItem.amount;
+    return amount?.toLocaleString(
       currency === Currency.USD ? 'en-En' : 'id-Id'
     );
   } else {

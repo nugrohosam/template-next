@@ -7,8 +7,9 @@ import {
   ItemOfBudgetPlanItem,
   ItemOfBudgetPlanItemForm,
 } from 'modules/budgetPlanItem/entities';
+import { useKurs } from 'modules/custom/useKurs';
 import moment from 'moment';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { Col, FormControl, FormGroup, FormLabel, Row } from 'react-bootstrap';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { CellProps, Column } from 'react-table';
@@ -20,7 +21,10 @@ import ModalBox from '..';
 interface IsBuildingBudgetPlanItemModalProps {
   onSend: (data: ItemOfBudgetPlanItemForm) => void;
   classButton?: string;
+  isEdit?: boolean;
+  inPageUpdate?: { idAssetGroup: string; currency: Currency | null };
   buttonTitle?: string;
+  myItem?: ItemOfBudgetPlanItemForm;
 }
 
 const initDefaultValues = () => ({
@@ -39,14 +43,21 @@ const initDefaultValues = () => ({
 
 const IsBuildingBudgetPlanItemModal: React.FC<
   IsBuildingBudgetPlanItemModalProps
-> = ({ onSend, classButton, buttonTitle = '+ Add Item' }) => {
+> = ({
+  onSend,
+  classButton,
+  isEdit = false,
+  inPageUpdate,
+  buttonTitle = '+ Add Item',
+  myItem,
+}) => {
+  const { kurs } = useKurs();
+
   const schema = yup.object().shape({
     idAssetGroup: yup.string().required(),
     currency: yup.string().required(),
     detail: yup.string().required().nullable(),
   });
-
-  const [kurs, setKurs] = useState<number>(14500);
 
   const {
     handleSubmit,
@@ -141,6 +152,25 @@ const IsBuildingBudgetPlanItemModal: React.FC<
     return watchCurrency === Currency.IDR ? total / kurs : total;
   };
 
+  const onModalOpened = () => {
+    if (isEdit) {
+      reset({
+        idAssetGroup: myItem?.idAssetGroup,
+        idCapexCatalog: myItem?.idCapexCatalog,
+        pricePerUnit: myItem?.pricePerUnit,
+        currency: myItem?.currency,
+        currencyRate: myItem?.currencyRate,
+        id: myItem?.id,
+        items: myItem?.items.map((prev) => {
+          const foundMonth = myItem?.items.find(
+            (item) => item.month === prev.month
+          );
+          return foundMonth || prev;
+        }),
+      });
+    }
+  };
+
   return (
     <ModalBox
       buttonTitle={buttonTitle}
@@ -151,6 +181,7 @@ const IsBuildingBudgetPlanItemModal: React.FC<
       wordingSubmit="Save"
       dialogClassName="modal-90w"
       onSend={handleSubmit(handleSubmitForm)}
+      onClikModal={onModalOpened}
     >
       <Row>
         <Col lg={6}>

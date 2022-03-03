@@ -44,7 +44,7 @@ export const useFetchBudgetPlanItemGroupDetail = (
 
 export const useFetchBudgetPlanItemGroupItems = (
   idBudgetPlanItemGroup: string,
-  params: PaginateParams
+  params?: PaginateParams
 ): UseQueryResult<Paginate<BudgetPlanItemGroupItem>, ResponseError> => {
   return useQuery(
     ['budget-plan-item-group-items', idBudgetPlanItemGroup, params],

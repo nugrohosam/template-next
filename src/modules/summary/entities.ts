@@ -1,0 +1,20 @@
+export type AssetGroupSummary = {
+  idBudgetPlan: string;
+  districtCode: string;
+  actualYtdCurrentPeriod: number;
+  outstandingPrPo: number;
+  outstandingBudgets: number;
+  totalOutstanding: number;
+  totalEstimateFullYearCurrentPeriod: number;
+  adjustmentOutstandingPrPo: number;
+  adjustmentOutstandingBudgets: number;
+  totalAdjustmentCurrentPeriod: number;
+  outstandingPlanS2CurrentPeriod: number;
+  estimateOutlookFyCurrentPeriod: number;
+  approvalCapex: number;
+  carryOverPrPreviousPeriod: number;
+  carryOverPlanPreviousPeriod: number;
+  totalMb: number;
+  mbVsOlFyCurrentPeriod: number;
+  mbVsOlFyCurrentPeriodPercentage: number;
+};

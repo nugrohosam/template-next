@@ -31,7 +31,7 @@ const initDefaultValues = () => ({
   idAssetGroup: '',
   currency: null,
   detail: '',
-  pricePerUnit: null,
+  pricePerUnit: 0,
   idCapexCatalog: null,
   // TODO: currenctRate masih dummy
   currencyRate: 10000,
@@ -84,9 +84,7 @@ const IsBuildingBudgetPlanItemModal: React.FC<
     data.totalAmount = +totalAmount();
     data.totalAmountUsd = +totalAmountUsd();
 
-    data.items = data.items
-      .map((item) => ({ ...item, amount: +item.amount }))
-      .filter((item) => item.amount);
+    data.items = data.items.map((item) => ({ ...item, amount: +item.amount }));
     onSend(data);
     reset(initDefaultValues());
   };

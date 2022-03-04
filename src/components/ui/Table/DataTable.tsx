@@ -204,7 +204,7 @@ function DataTable<T extends object = {}>({
                           className: (column as any).className,
                           style: {
                             ...(column as any).style,
-                            minWidth: column.minWidth,
+                            minWidth: column.minWidth || 200,
                           },
                         },
                         column.getSortByToggleProps(),

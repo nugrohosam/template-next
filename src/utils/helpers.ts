@@ -7,7 +7,7 @@ export const getAllIds = (
   data: Paginate<any> | undefined
 ) => {
   if (!data) {
-    return;
+    return [];
   }
 
   const ids = Object.keys(selectedRow)

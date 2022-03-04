@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import React from 'react';
-import { Button, ButtonProps } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
+import { BsFillEyeFill, BsPencilSquare, BsTrash2Fill } from 'react-icons/bs';
 
 interface ButtonActionsProps {
   hrefDetail?: string;
@@ -19,20 +20,20 @@ const ButtonActions: React.FC<ButtonActionsProps> = ({
         {hrefDetail && (
           <Link href={hrefDetail} passHref>
             <Button className="d-flex mr-2">
-              <i className="bi-eye align-self-center"></i>
+              <BsFillEyeFill className="align-self-center" />
             </Button>
           </Link>
         )}
         {hrefEdit && (
           <Link href={hrefEdit} passHref>
             <Button className="mr-2 d-flex" variant="info">
-              <i className="bi-pencil-square align-self-center"></i>
+              <BsPencilSquare className="align-self-center" />
             </Button>
           </Link>
         )}
         {onDelete && (
           <Button className="d-flex" variant="red" onClick={onDelete}>
-            <i className="bi-trash align-self-center"></i>
+            <BsTrash2Fill className="align-self-center" />
           </Button>
         )}
       </div>

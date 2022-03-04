@@ -5,7 +5,6 @@ import {
   ConfirmationField,
   OutstandingPrPoConfirmation,
 } from 'modules/outstandingprpo/entities';
-import { useState } from 'react';
 import { Col, Form, Row } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
@@ -25,6 +24,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   const schema = yup.object().shape({
     adjustmentCurrentPeriod: yup.string().required(),
     amountAdjustment: yup.string().required(),
+    remark: yup.string().required(`Remark can't be empty!`),
   });
 
   const {
@@ -42,8 +42,6 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
 
   const options = adjustmentCurrentPeriodOptions;
 
-  const [amountAdjustment, setAmountAdjustment] = useState(0);
-
   const handleAdjustmentChange = (value: string | number | boolean) => {
     if (value !== '0') {
       setValue('amountAdjustment', confirmData.amountAdjustment);
@@ -57,10 +55,13 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
       buttonTitle="Confirm"
       title="Confirmation"
       onSend={handleSubmit(onSend)}
+      isError={errors}
     >
       <Form>
         <Row>
-          <Col lg={6}>Adjustment Current Period</Col>
+          <Col lg={6} className="required">
+            Adjustment Current Period
+          </Col>
           <Col lg={6}>
             <SingleSelect
               name="adjustmentCurrentPeriod"
@@ -75,7 +76,9 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
 
         <br />
         <Row>
-          <Col lg={6}>Amount Adjustment</Col>
+          <Col lg={6} className="required">
+            Amount Adjustment
+          </Col>
           <Col lg={6}>
             <Input
               name="amountAdjustment"
@@ -89,7 +92,9 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
 
         <br />
         <Row>
-          <Col lg={6}>Remark</Col>
+          <Col lg={6} className="required">
+            Remark
+          </Col>
           <Col lg={6}>
             <Input
               as="textarea"

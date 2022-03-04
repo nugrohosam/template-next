@@ -43,7 +43,6 @@ const Header: React.FC<NavbarProps> = ({
           </a>
         </div>
         <Nav className="dropdown-user ml-auto d-flex flex-row mr-3 mr-lg-0">
-          <MessageDropdown />
           <NotificationDropdown />
           <ProfileDropdown />
         </Nav>

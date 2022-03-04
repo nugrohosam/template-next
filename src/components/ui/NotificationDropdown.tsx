@@ -1,4 +1,5 @@
 import { Paginate } from 'modules/common/types';
+import { useDecodeToken } from 'modules/custom/useDecodeToken';
 import {
   fetchNotifications,
   readNotifications,
@@ -16,10 +17,11 @@ const NotificationDropdown: React.FC = () => {
   const [notifications, setNotifications] = useState<Paginate<Notification>>();
   const [loading, setLoading] = useState<boolean>(false);
   const [pageSize, setPageSize] = useState<number>(10);
+  const [profile] = useDecodeToken();
 
   const loadNotifications = () => {
     setLoading(true);
-    fetchNotifications({ pageSize: 10 })
+    fetchNotifications({ userId: profile?.id, pageSize: 10 })
       .then((response) => {
         setPageSize(10);
         setNotifications(response);
@@ -36,7 +38,10 @@ const NotificationDropdown: React.FC = () => {
         Math.floor(e.currentTarget.scrollTop) + e.currentTarget.offsetHeight ===
         e.currentTarget.scrollHeight
       ) {
-        fetchNotifications({ pageSize: pageSize + 10 }).then((response) => {
+        fetchNotifications({
+          userId: profile?.id,
+          pageSize: pageSize + 10,
+        }).then((response) => {
           setPageSize((prevState) => (prevState as number) + 10);
           setNotifications(response);
         });
@@ -45,13 +50,15 @@ const NotificationDropdown: React.FC = () => {
   };
 
   const readNotification = (notification: Notification) => {
-    // readNotifications(notification.id).then(() => {
-    if (notification.resourceType === 'approval_accrued') {
-      router.push(`/accrued/${notification.resourceId}/detail`);
-    } else if (notification.resourceType === 'approval_proportional_cost') {
-      router.push(`/proportionalcost/${notification.resourceId}/detail`);
-    }
-    // });
+    readNotifications(notification.id).then(() => {
+      if (notification.resourceType === 'budget_plan_item_group') {
+        router.push(`/budget-plans/${notification.resourceId}`);
+      } else if (notification.resourceType === 'unbudget') {
+        router.push(`/unbudgets/${notification.resourceId}/detail`);
+      } else if (notification.resourceType === 'overbudget') {
+        router.push(`/overbudgets/${notification.resourceId}/detail`);
+      }
+    });
   };
 
   return (

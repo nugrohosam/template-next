@@ -3,8 +3,12 @@ import axios from 'utils/axios';
 
 import { Notification } from './entities';
 
+export interface FetchNotifParams extends PaginateParams {
+  userId?: string;
+}
+
 export const fetchNotifications = async (
-  params: PaginateParams
+  params: FetchNotifParams
 ): Promise<Paginate<Notification>> => {
   const result = await axios.get<ResponseData<Paginate<Notification>>>(
     `v1/notifications`,

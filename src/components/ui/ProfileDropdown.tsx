@@ -53,21 +53,6 @@ const ProfileDropdown: React.FC = () => {
             </div>
           </div>
         </Dropdown.Header>
-        <Dropdown.Item className="dropdown-profile__link">
-          <div className="dropdown-profile__item">
-            <Image
-              src="/images/menu_nav_icon/account.svg"
-              width={22}
-              height={22}
-              alt="Profile"
-            />
-            <div className="dropdown-profile__name">
-              <h5 className="text__blue dropdown-profile__link-title">
-                Profile
-              </h5>
-            </div>
-          </div>
-        </Dropdown.Item>
         <Dropdown.Item
           className="dropdown-profile__link"
           onClick={handleLogout}
@@ -82,15 +67,6 @@ const ProfileDropdown: React.FC = () => {
             <div className="dropdown-profile__name">
               <h5 className="text__blue dropdown-profile__link-title">
                 Log Out
-              </h5>
-            </div>
-          </div>
-        </Dropdown.Item>
-        <Dropdown.Item>
-          <div className="dropdown-profile__item">
-            <div className="dropdown-profile__name">
-              <h5 className="text__blue dropdown-profile__link-title">
-                Term and Condition
               </h5>
             </div>
           </div>

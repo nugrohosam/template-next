@@ -2,10 +2,6 @@ import { Currency } from 'constants/currency';
 
 import { ItemOfBudgetPlanItem } from './entities';
 
-export function getItemByMonth(items: ItemOfBudgetPlanItem[], month: number) {
-  return items.find((item) => item.month == month);
-}
-
 export function getValueItemByMonth(
   items: ItemOfBudgetPlanItem[],
   month: number,

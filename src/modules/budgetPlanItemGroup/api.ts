@@ -33,7 +33,7 @@ export const fetchBudgetPlanItemGroupDetail = async (
 
 export const fetchBudgetPlanItemGroupItems = async (
   idBudgetPlanItemGroup: string,
-  params: PaginateParams
+  params?: PaginateParams
 ): Promise<Paginate<BudgetPlanItemGroupItem>> => {
   const result = await axios.get<
     ResponseData<Paginate<BudgetPlanItemGroupItem>>

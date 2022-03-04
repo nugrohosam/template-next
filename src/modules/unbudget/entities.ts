@@ -1,4 +1,5 @@
 import { Currency } from 'constants/currency';
+import { AssetGroup } from 'modules/assetGroup/entities';
 import { Catalog } from 'modules/catalog/entities';
 
 export type Unbudget = {
@@ -24,6 +25,11 @@ export type UnbudgetDetail = Unbudget & {
   unbudgetImpactIfNotRealized: string;
   unbudgetAttachment: string;
   isBuilding: boolean;
+  districtCode: string;
+  divisionCode: string;
+  departmentCode: string;
+  periodYear: number;
+  periodType: string;
 };
 
 export type UnbudgetItem = {
@@ -38,6 +44,7 @@ export type UnbudgetItem = {
   totalAmountUsd: number;
   items: ItemOfUnbudgetItem[];
   createdAt: string;
+  assetGroup: AssetGroup;
 };
 
 export type ItemOfUnbudgetItem = {

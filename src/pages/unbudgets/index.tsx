@@ -96,7 +96,7 @@ const UnbudgetList: NextPage = () => {
       Cell: ({ cell }: CellProps<Unbudget>) => {
         return (
           <ButtonActions
-            hrefDetail={`/master-capex/catalogs/${cell.row.values.id}/detail`}
+            hrefDetail={`/unbudgets/${cell.row.values.id}/detail`}
           ></ButtonActions>
         );
       },

@@ -1,7 +1,7 @@
 import { Paginate, PaginateParams, ResponseData } from 'modules/common/types';
 import axios from 'utils/axios';
 
-import { Unbudget, UnbudgetDetail } from './entities';
+import { Unbudget, UnbudgetDetail, UnbudgetItem } from './entities';
 
 export const fetchUnbudgets = async (
   params: PaginateParams
@@ -18,6 +18,17 @@ export const fetchUnbudgetDetail = async (
 ): Promise<UnbudgetDetail> => {
   const result = await axios.get<ResponseData<UnbudgetDetail>>(
     `v1/unbudgets/${idUnbudget}`
+  );
+  return result.data.data;
+};
+
+export const fetchUnbudgetItems = async (
+  idUnbudget: string,
+  params: PaginateParams
+): Promise<Paginate<UnbudgetItem>> => {
+  const result = await axios.get<ResponseData<Paginate<UnbudgetItem>>>(
+    `v1/unbudgets/${idUnbudget}/items`,
+    { params }
   );
   return result.data.data;
 };

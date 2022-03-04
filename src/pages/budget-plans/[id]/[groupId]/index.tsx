@@ -99,7 +99,7 @@ const BudgetPlanGroupItemList: NextPage = () => {
 
   const auditHook = useFetchAudits({
     resourceId: budgetPlanGroupId,
-    resourceType: ResourceType.BUDGET_PLAN_ITEM_GROUP,
+    resourceType: ResourceType.BudgetPlanItemGroup,
     orderBy: 'asc',
     order: 'created_at',
     pageNumber: 1,

@@ -29,38 +29,36 @@ const AuditTimeline: React.FC<AuditTimelineProps> = ({ audit }) => {
   };
 
   return (
-    <div className="mt-3">
-      <Panel>
-        <Row>
-          {audit?.items.map((item, index) => {
-            return (
-              <div key={index} style={{ display: 'contents' }}>
-                {index === 0 && (
-                  <Col lg={12}>
-                    <div>
-                      <p className="profile-detail__info--title mb-1">
-                        Current Status
-                      </p>
-                      <p className="profile-detail__info--title font-weight-bold text- mb-1">
-                        {getCurrentStatus(audit.items[lastIndex])}
-                      </p>
-                      <p className="profile-detail__info--title mb-1">
-                        {audit?.items[lastIndex].createdAt}
-                      </p>
-                    </div>
-                  </Col>
-                )}
-                <TimeLine
-                  key={item.id}
-                  size={auditLength}
-                  tooltip={getTooltip(item)}
-                ></TimeLine>
-              </div>
-            );
-          })}
-        </Row>
-      </Panel>
-    </div>
+    <Panel>
+      <Row>
+        {audit?.items.map((item, index) => {
+          return (
+            <div key={index} style={{ display: 'contents' }}>
+              {index === 0 && (
+                <Col lg={12}>
+                  <div>
+                    <p className="profile-detail__info--title mb-1">
+                      Current Status
+                    </p>
+                    <p className="profile-detail__info--title font-weight-bold text- mb-1">
+                      {getCurrentStatus(audit.items[lastIndex])}
+                    </p>
+                    <p className="profile-detail__info--title mb-1">
+                      {audit?.items[lastIndex].createdAt}
+                    </p>
+                  </div>
+                </Col>
+              )}
+              <TimeLine
+                key={item.id}
+                size={auditLength}
+                tooltip={getTooltip(item)}
+              ></TimeLine>
+            </div>
+          );
+        })}
+      </Row>
+    </Panel>
   );
 };
 

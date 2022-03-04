@@ -1,117 +1,57 @@
 import Panel from 'components/form/Panel';
 import { PathBreadcrumb } from 'components/ui/Breadcrumb';
-import LoadingButton from 'components/ui/Button/LoadingButton';
 import DetailLayout from 'components/ui/DetailLayout';
 import DataTable, { usePaginateParams } from 'components/ui/Table/DataTable';
 import Loader from 'components/ui/Table/Loader';
 import AuditTimeline from 'components/ui/Timeline/AuditTimeline';
-import { UserType } from 'constants/user';
+import { useDownloadAttachmentHelpers } from 'modules/attachment/helpers';
 import { ResourceType } from 'modules/audit/parent/entities';
 import { useFetchAudits } from 'modules/audit/parent/hook';
 import { getValueItemByMonth } from 'modules/budgetPlanItem/helpers';
-import { useDeleteBudgetPlanitems } from 'modules/budgetPlanItem/hook';
+import { UnbudgetItem } from 'modules/unbudget/entities';
 import {
-  BudgetPlanItemGroupItem,
-  BudgetPlanItemGroupStatus,
-  BuildingAttachment,
-  BuildingAttachmentType,
-} from 'modules/budgetPlanItemGroup/entities';
-import {
-  useFetchBudgetPlanItemGroupDetail,
-  useFetchBudgetPlanItemGroupItems,
-  useFetchBuildingAttachments,
-} from 'modules/budgetPlanItemGroup/hook';
-import { useDecodeToken } from 'modules/custom/useDecodeToken';
+  useFetchUnbudgetDetail,
+  useFetchUnbudgetItems,
+} from 'modules/unbudget/hook';
 import type { NextPage } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
-import { Button, Col, Container, Row } from 'react-bootstrap';
+import { Button, Col, Row } from 'react-bootstrap';
 import { CellProps, Column, SortingRule } from 'react-table';
-import { toast } from 'react-toastify';
-import { getAllIds, showErrorMessage } from 'utils/helpers';
 
-const BudgetPlanGroupItemList: NextPage = () => {
-  const [profile] = useDecodeToken();
+const breadCrumb: PathBreadcrumb[] = [
+  {
+    label: 'Unbudgets',
+    link: `/unbudgets`,
+  },
+  {
+    label: 'Detail',
+    active: true,
+  },
+];
+
+const UnbudgetDetails: NextPage = () => {
   const router = useRouter();
-  const budgetPlanId = router.query.id as string;
-  const budgetPlanGroupId = router.query.groupId as string;
+  const unbudgetId = router.query.id as string;
 
-  const breadCrumb: PathBreadcrumb[] = [
-    {
-      label: 'Detail Budget Plan',
-      link: `/budget-plans/${budgetPlanId}/detail`,
-    },
-    {
-      label: 'Detail',
-      active: true,
-    },
-  ];
-
-  const [selectedRow, setSelectedRow] = useState<Record<string, boolean>>({});
   const [selectedSort, setSelectedSort] = useState<SortingRule<any>[]>([]);
   const { params, setPageNumber, setPageSize, setSearch, setSortingRules } =
     usePaginateParams();
 
-  const dataHookBudgetPlanItemGroup =
-    useFetchBudgetPlanItemGroupDetail(budgetPlanGroupId);
-  const dataHookBudgetPlanItemGroupItems = useFetchBudgetPlanItemGroupItems(
-    budgetPlanGroupId,
-    params
-  );
-
-  const dataHookOutstandingPlanPayment = useFetchBuildingAttachments(
-    budgetPlanGroupId,
-    { ...params, type: BuildingAttachmentType.OutstandingPlanPayment }
-  );
-
-  const dataHookOutstandingRetention = useFetchBuildingAttachments(
-    budgetPlanGroupId,
-    { ...params, type: BuildingAttachmentType.OutstandingRetention }
-  );
-
-  // handle delete
-  const mutationDeleteBudgetPlanItems = useDeleteBudgetPlanitems();
-  const deleteBudgetPlan = (ids: string[]) => {
-    mutationDeleteBudgetPlanItems.mutate(ids, {
-      onSuccess: () => {
-        setSelectedRow({});
-        dataHookBudgetPlanItemGroup.refetch();
-        dataHookBudgetPlanItemGroupItems.refetch();
-        toast('Data Deleted!');
-      },
-      onError: (error) => {
-        console.error('Failed to Delete data', error);
-        toast(error.message, { autoClose: false });
-        showErrorMessage(error);
-      },
-    });
-  };
-  const handleDeleteMultipleBudgetPlan = () => {
-    const ids = getAllIds(
-      selectedRow,
-      dataHookBudgetPlanItemGroupItems.data
-    ) as string[];
-    if (ids?.length > 0) {
-      if (confirm('Delete selected data?')) deleteBudgetPlan(ids);
-    }
-  };
-
+  const dataHookUnbudgetDetail = useFetchUnbudgetDetail(unbudgetId);
+  const dataHookUnbudgetItems = useFetchUnbudgetItems(unbudgetId, params);
+  const { handleDownloadAttachment } = useDownloadAttachmentHelpers();
   const auditHook = useFetchAudits({
-    resourceId: budgetPlanGroupId,
-    resourceType: ResourceType.BUDGET_PLAN_ITEM_GROUP,
+    resourceId: unbudgetId,
+    resourceType: ResourceType.Unbudget,
     orderBy: 'asc',
     order: 'created_at',
     pageNumber: 1,
     pageSize: 10,
   });
 
-  const userCanDelete =
-    profile?.type !== UserType.ApprovalBudgetPlanCapex &&
-    dataHookBudgetPlanItemGroup?.data?.status ===
-      BudgetPlanItemGroupStatus.Draft;
-
-  const columns: Column<BudgetPlanItemGroupItem>[] = [
+  const columns: Column<UnbudgetItem>[] = [
     { Header: 'ID', accessor: 'id' },
     { Header: 'Catalog', accessor: 'catalog' },
     { Header: 'Items', accessor: 'items' },
@@ -120,14 +60,13 @@ const BudgetPlanGroupItemList: NextPage = () => {
       Header: 'Detail',
       accessor: 'detail',
       minWidth: 300,
-      Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) =>
+      Cell: ({ row }: CellProps<UnbudgetItem>) =>
         row.values.catalog?.detail || '-',
     },
     {
       Header: 'Asset Group',
       accessor: 'assetGroup',
-      minWidth: 200,
-      Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) => (
+      Cell: ({ row }: CellProps<UnbudgetItem>) => (
         <div style={{ minWidth: 200 }}>
           {row.values.catalog?.assetGroup?.assetGroup || '-'}
         </div>
@@ -137,27 +76,24 @@ const BudgetPlanGroupItemList: NextPage = () => {
     {
       Header: 'Price/Unit',
       accessor: 'pricePerUnit',
-      minWidth: 200,
-      Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) =>
+      Cell: ({ row }: CellProps<UnbudgetItem>) =>
         row.values.pricePerUnit.toLocaleString('id-Id'),
     },
     {
       Header: 'Total USD',
       accessor: 'totalAmountUsd',
-      minWidth: 200,
-      Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) =>
+      Cell: ({ row }: CellProps<UnbudgetItem>) =>
         row.values.totalAmountUsd.toLocaleString('en-EN'),
     },
     {
       Header: 'Total IDR',
       accessor: 'totalAmount',
-      minWidth: 200,
-      Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) =>
+      Cell: ({ row }: CellProps<UnbudgetItem>) =>
         row.values.totalAmount.toLocaleString('id-Id'),
     },
     {
       Header: 'Jan',
-      Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) => (
+      Cell: ({ row }: CellProps<UnbudgetItem>) => (
         <div style={{ minWidth: 100 }}>
           {getValueItemByMonth(
             row.values.items,
@@ -170,7 +106,7 @@ const BudgetPlanGroupItemList: NextPage = () => {
     },
     {
       Header: 'Feb',
-      Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) => (
+      Cell: ({ row }: CellProps<UnbudgetItem>) => (
         <div style={{ minWidth: 100 }}>
           {getValueItemByMonth(
             row.values.items,
@@ -183,7 +119,7 @@ const BudgetPlanGroupItemList: NextPage = () => {
     },
     {
       Header: 'Mar',
-      Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) => (
+      Cell: ({ row }: CellProps<UnbudgetItem>) => (
         <div style={{ minWidth: 100 }}>
           {getValueItemByMonth(
             row.values.items,
@@ -197,7 +133,7 @@ const BudgetPlanGroupItemList: NextPage = () => {
     {
       Header: 'Apr',
       minWidth: 100,
-      Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) => (
+      Cell: ({ row }: CellProps<UnbudgetItem>) => (
         <div style={{ minWidth: 100 }}>
           {getValueItemByMonth(
             row.values.items,
@@ -210,7 +146,7 @@ const BudgetPlanGroupItemList: NextPage = () => {
     },
     {
       Header: 'Mei',
-      Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) => (
+      Cell: ({ row }: CellProps<UnbudgetItem>) => (
         <div style={{ minWidth: 100 }}>
           {getValueItemByMonth(
             row.values.items,
@@ -223,7 +159,7 @@ const BudgetPlanGroupItemList: NextPage = () => {
     },
     {
       Header: 'Jun',
-      Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) => (
+      Cell: ({ row }: CellProps<UnbudgetItem>) => (
         <div style={{ minWidth: 100 }}>
           {getValueItemByMonth(
             row.values.items,
@@ -236,7 +172,7 @@ const BudgetPlanGroupItemList: NextPage = () => {
     },
     {
       Header: 'Jul',
-      Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) => (
+      Cell: ({ row }: CellProps<UnbudgetItem>) => (
         <div style={{ minWidth: 100 }}>
           {getValueItemByMonth(
             row.values.items,
@@ -249,7 +185,7 @@ const BudgetPlanGroupItemList: NextPage = () => {
     },
     {
       Header: 'Aug',
-      Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) => (
+      Cell: ({ row }: CellProps<UnbudgetItem>) => (
         <div style={{ minWidth: 100 }}>
           {getValueItemByMonth(
             row.values.items,
@@ -262,7 +198,7 @@ const BudgetPlanGroupItemList: NextPage = () => {
     },
     {
       Header: 'Sep',
-      Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) => (
+      Cell: ({ row }: CellProps<UnbudgetItem>) => (
         <div style={{ minWidth: 100 }}>
           {getValueItemByMonth(
             row.values.items,
@@ -275,7 +211,7 @@ const BudgetPlanGroupItemList: NextPage = () => {
     },
     {
       Header: 'Oct',
-      Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) => (
+      Cell: ({ row }: CellProps<UnbudgetItem>) => (
         <div style={{ minWidth: 100 }}>
           {getValueItemByMonth(
             row.values.items,
@@ -288,7 +224,7 @@ const BudgetPlanGroupItemList: NextPage = () => {
     },
     {
       Header: 'Nov',
-      Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) => (
+      Cell: ({ row }: CellProps<UnbudgetItem>) => (
         <div style={{ minWidth: 100 }}>
           {getValueItemByMonth(
             row.values.items,
@@ -301,7 +237,7 @@ const BudgetPlanGroupItemList: NextPage = () => {
     },
     {
       Header: 'Dec',
-      Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) => (
+      Cell: ({ row }: CellProps<UnbudgetItem>) => (
         <div style={{ minWidth: 100 }}>
           {getValueItemByMonth(
             row.values.items,
@@ -314,116 +250,120 @@ const BudgetPlanGroupItemList: NextPage = () => {
     },
   ];
 
-  const columnOutstanding: Column<BuildingAttachment>[] = [
-    { Header: 'District', accessor: 'districtCode', minWidth: 150 },
-    { Header: 'Detail', accessor: 'detail', minWidth: 300 },
-    { Header: 'Currency', accessor: 'currency', minWidth: 150 },
-    {
-      Header: 'Currency Period (IDR)',
-      accessor: 'currentPeriodIdr',
-      minWidth: 250,
-    },
-    {
-      Header: 'Currency Period (USD)',
-      accessor: 'currentPeriodUsd',
-      minWidth: 250,
-    },
-    { Header: 'MB 2022 (IDR)', accessor: 'mbIdr', minWidth: 200 },
-    { Header: 'MB 2022 (USD)', accessor: 'mbUsd', minWidth: 200 },
-  ];
-
   return (
     <DetailLayout
       paths={breadCrumb}
       backButtonClick={router.back}
-      title="Detail Budget Plan Item Group"
+      title="Detail Unbudget"
     >
       <Panel>
-        {dataHookBudgetPlanItemGroup.isLoading && <Loader size="sm" />}
+        {dataHookUnbudgetDetail.isLoading && <Loader size="sm" />}
 
         <Row>
-          <Col lg={12}>
-            <h4 className="profile-detail__info--title mb-1">Budget Code</h4>
+          <Col lg={6}>
+            <h4 className="profile-detail__info--title mb-1">District</h4>
             <h3 className="profile-detail__info--subtitle">
-              {dataHookBudgetPlanItemGroup?.data?.budgetCode}
+              {dataHookUnbudgetDetail?.data?.districtCode || '-'}
             </h3>
           </Col>
           <Col lg={6}>
-            <h4 className="profile-detail__info--title mb-1">Currency</h4>
+            <h4 className="profile-detail__info--title mb-1">Divisi</h4>
             <h3 className="profile-detail__info--subtitle">
-              {dataHookBudgetPlanItemGroup?.data?.currency}
+              {dataHookUnbudgetDetail?.data?.divisionCode || '-'}
             </h3>
           </Col>
           <Col lg={6}>
-            <h4 className="profile-detail__info--title mb-1">Status</h4>
+            <h4 className="profile-detail__info--title mb-1">Departemen</h4>
             <h3 className="profile-detail__info--subtitle">
-              {dataHookBudgetPlanItemGroup?.data?.status}
+              {dataHookUnbudgetDetail?.data?.departmentCode || '-'}
+            </h3>
+          </Col>
+        </Row>
+        <Row>
+          <Col lg={6}>
+            <h4 className="profile-detail__info--title mb-1">Year</h4>
+            <h3 className="profile-detail__info--subtitle">
+              {dataHookUnbudgetDetail?.data?.periodYear || '-'}
             </h3>
           </Col>
           <Col lg={6}>
-            <h4 className="profile-detail__info--title mb-1">Total USD</h4>
+            <h4 className="profile-detail__info--title mb-1">Period</h4>
             <h3 className="profile-detail__info--subtitle">
-              {dataHookBudgetPlanItemGroup?.data?.totalAmountUsd?.toLocaleString(
-                'en-En'
-              )}
+              {dataHookUnbudgetDetail?.data?.periodType || '-'}
             </h3>
           </Col>
           <Col lg={6}>
-            <h4 className="profile-detail__info--title mb-1">Total IDR</h4>
+            <h4 className="profile-detail__info--title mb-1">
+              Latar Belakang Kebutuhan Capex
+            </h4>
             <h3 className="profile-detail__info--subtitle">
-              {dataHookBudgetPlanItemGroup?.data?.totalAmount?.toLocaleString(
-                'id-Id'
-              )}
+              {dataHookUnbudgetDetail?.data?.unbudgetBackground || '-'}
+            </h3>
+          </Col>
+          <Col lg={6}>
+            <h4 className="profile-detail__info--title mb-1">
+              Dampak Jika Tidak Realisasi
+            </h4>
+            <h3 className="profile-detail__info--subtitle">
+              {dataHookUnbudgetDetail?.data?.unbudgetImpactIfNotRealized || '-'}
+            </h3>
+          </Col>
+          <Col lg={6}>
+            <h4 className="profile-detail__info--title mb-1">
+              Unbudget Attachment
+            </h4>
+            <h3 className="profile-detail__info--subtitle">
+              <Button
+                variant="link"
+                className="p-0"
+                size="sm"
+                onClick={() =>
+                  handleDownloadAttachment({
+                    fileName: dataHookUnbudgetDetail?.data
+                      ?.unbudgetAttachment as string,
+                    module: 'unbudget',
+                  })
+                }
+              >
+                <p className="mb-0">
+                  {dataHookUnbudgetDetail?.data?.unbudgetAttachment}
+                </p>
+              </Button>
             </h3>
           </Col>
         </Row>
 
         <br />
 
-        {auditHook.data?.items && auditHook.data?.items.length > 0 && (
-          <AuditTimeline audit={auditHook.data} />
-        )}
-
-        <br />
-
         <Row>
-          {dataHookBudgetPlanItemGroupItems.data && (
+          <Col lg={12}>
+            <Link href={`/unbudgets/${unbudgetId}/edit`} passHref>
+              <Button variant="primary" className="float-right">
+                Edit
+              </Button>
+            </Link>
+          </Col>
+        </Row>
+      </Panel>
+
+      <br />
+
+      {auditHook.data?.items && auditHook.data?.items.length > 0 && (
+        <AuditTimeline audit={auditHook.data} />
+      )}
+
+      <br />
+
+      <Panel>
+        <Row>
+          {dataHookUnbudgetItems.data && (
             <DataTable
               columns={columns}
-              data={dataHookBudgetPlanItemGroupItems.data}
-              actions={
-                userCanDelete && (
-                  <LoadingButton
-                    variant="red"
-                    size="sm"
-                    className="mr-2"
-                    disabled={mutationDeleteBudgetPlanItems.isLoading}
-                    onClick={handleDeleteMultipleBudgetPlan}
-                    isLoading={mutationDeleteBudgetPlanItems.isLoading}
-                  >
-                    Delete
-                  </LoadingButton>
-                )
-              }
-              addOns={
-                dataHookBudgetPlanItemGroup?.data?.status ===
-                  BudgetPlanItemGroupStatus.Draft && (
-                  <Link
-                    href={`/budget-plans/${budgetPlanId}/${budgetPlanGroupId}/edit`}
-                    passHref
-                  >
-                    <Button variant="primary">Edit</Button>
-                  </Link>
-                )
-              }
-              isLoading={dataHookBudgetPlanItemGroupItems.isFetching}
+              data={dataHookUnbudgetItems.data}
+              isLoading={dataHookUnbudgetItems.isFetching}
               selectedSort={selectedSort}
-              selectedRows={selectedRow}
               hiddenColumns={['id', 'catalog', 'items']}
               paginateParams={params}
-              {...(userCanDelete && {
-                onSelectedRowsChanged: (rows) => setSelectedRow(rows),
-              })}
               onSelectedSortChanged={(sort) => {
                 setSelectedSort(sort);
                 setSortingRules(sort);
@@ -435,72 +375,8 @@ const BudgetPlanGroupItemList: NextPage = () => {
           )}
         </Row>
       </Panel>
-
-      {dataHookBudgetPlanItemGroup.data?.isBuilding && (
-        <>
-          <div className="mt-3">
-            <Panel>
-              <Row>
-                <Col lg={12} className="d-md-flex mb-32 align-items-center">
-                  <h3 className="mb-3 mb-md-0 text__blue">
-                    Outstanding Plan Payment
-                  </h3>
-                </Col>
-
-                {dataHookOutstandingPlanPayment.data && (
-                  <DataTable
-                    columns={columnOutstanding}
-                    data={dataHookOutstandingPlanPayment.data}
-                    isLoading={dataHookOutstandingPlanPayment.isFetching}
-                    selectedSort={selectedSort}
-                    selectedRows={selectedRow}
-                    paginateParams={params}
-                    onSelectedSortChanged={(sort) => {
-                      setSelectedSort(sort);
-                      setSortingRules(sort);
-                    }}
-                    onSearch={(keyword) => setSearch(keyword)}
-                    onPageSizeChanged={(pageSize) => setPageSize(pageSize)}
-                    onChangePage={(page) => setPageNumber(page)}
-                  ></DataTable>
-                )}
-              </Row>
-            </Panel>
-          </div>
-
-          <div className="mt-3">
-            <Panel>
-              <Row>
-                <Col lg={12} className="d-md-flex mb-32 align-items-center">
-                  <h3 className="mb-3 mb-md-0 text__blue">
-                    Outstanding Retention
-                  </h3>
-                </Col>
-
-                {dataHookOutstandingRetention.data && (
-                  <DataTable
-                    columns={columnOutstanding}
-                    data={dataHookOutstandingRetention.data}
-                    isLoading={dataHookOutstandingRetention.isFetching}
-                    selectedSort={selectedSort}
-                    selectedRows={selectedRow}
-                    paginateParams={params}
-                    onSelectedSortChanged={(sort) => {
-                      setSelectedSort(sort);
-                      setSortingRules(sort);
-                    }}
-                    onSearch={(keyword) => setSearch(keyword)}
-                    onPageSizeChanged={(pageSize) => setPageSize(pageSize)}
-                    onChangePage={(page) => setPageNumber(page)}
-                  ></DataTable>
-                )}
-              </Row>
-            </Panel>
-          </div>
-        </>
-      )}
     </DetailLayout>
   );
 };
 
-export default BudgetPlanGroupItemList;
+export default UnbudgetDetails;

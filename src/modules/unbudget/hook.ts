@@ -9,10 +9,11 @@ import {
 import {
   deleteUnbudgets,
   fetchUnbudgetDetail,
+  fetchUnbudgetItems,
   fetchUnbudgets,
   submitUnbudgets,
 } from './api';
-import { Unbudget, UnbudgetDetail } from './entities';
+import { Unbudget, UnbudgetDetail, UnbudgetItem } from './entities';
 
 export const useFetchUnbudgets = (
   params: PaginateParams
@@ -27,6 +28,15 @@ export const useFetchUnbudgetDetail = (
     ['unbudget-detail', idUnbudget],
     () => fetchUnbudgetDetail(idUnbudget),
     { enabled: !!idUnbudget }
+  );
+};
+
+export const useFetchUnbudgetItems = (
+  idUnbudget: string,
+  params: PaginateParams
+): UseQueryResult<Paginate<UnbudgetItem>, ResponseError> => {
+  return useQuery(['unbudget-items', params], () =>
+    fetchUnbudgetItems(idUnbudget, params)
   );
 };
 

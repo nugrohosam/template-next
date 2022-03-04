@@ -6,7 +6,6 @@ import { useDownloadCatalogExcel } from './hook';
 
 export const useDownloadAttachmentHelpers = () => {
   const downloadAttachmanetMutation = useDownloadCatalogExcel();
-
   const handleDownloadAttachment = (params: DownloadAttachmentParams) => {
     downloadAttachmanetMutation.mutate(params, {
       onSuccess: () => {
@@ -20,5 +19,5 @@ export const useDownloadAttachmentHelpers = () => {
     });
   };
 
-  return { handleDownloadAttachment };
+  return { downloadAttachmanetMutation, handleDownloadAttachment };
 };

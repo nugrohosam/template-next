@@ -4,7 +4,7 @@ import DetailLayout from 'components/ui/DetailLayout';
 import DataTable, { usePaginateParams } from 'components/ui/Table/DataTable';
 import Loader from 'components/ui/Table/Loader';
 import AuditTimeline from 'components/ui/Timeline/AuditTimeline';
-import { useDownloadAttachmentHelpers } from 'modules/attachment/helpers';
+import { useAttachmentHelpers } from 'modules/attachment/helpers';
 import { ResourceType } from 'modules/audit/parent/entities';
 import { useFetchAudits } from 'modules/audit/parent/hook';
 import { getValueItemByMonth } from 'modules/budgetPlanItem/helpers';
@@ -41,7 +41,7 @@ const UnbudgetDetails: NextPage = () => {
 
   const dataHookUnbudgetDetail = useFetchUnbudgetDetail(unbudgetId);
   const dataHookUnbudgetItems = useFetchUnbudgetItems(unbudgetId, params);
-  const { handleDownloadAttachment } = useDownloadAttachmentHelpers();
+  const { handleDownloadAttachment } = useAttachmentHelpers();
   const auditHook = useFetchAudits({
     resourceId: unbudgetId,
     resourceType: ResourceType.Unbudget,

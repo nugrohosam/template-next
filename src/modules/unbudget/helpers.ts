@@ -48,7 +48,7 @@ export const useUnbudgetHelpers = () => {
   const submitUnbudgetsMutation = useSubmitUnbudgets();
   const handleSubmitUnbudgets = (ids: string[]) => {
     return new Promise((resolve, reject) => {
-      return submitUnbudgetsMutation.mutate(ids, {
+      submitUnbudgetsMutation.mutate(ids, {
         onSuccess: (result) => {
           resolve(result);
           toast('Data Submited!');

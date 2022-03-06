@@ -3,7 +3,7 @@ import { PeriodeType } from 'constants/period';
 import { ItemOfBudgetPlanItemForm } from 'modules/budgetPlanItem/entities';
 import React from 'react';
 
-// import IsBuildingModal from './IsBuildingModal';
+import IsBuildingModal from './IsBuildingModal';
 import NonBuildingModal from './NonBuildingModal';
 
 export interface UnbudgetModalProps {
@@ -42,8 +42,7 @@ const UnbudgetModal: React.FC<UnbudgetModalProps> = ({
     <>
       <></>
       {isBuilding ? (
-        // <IsBuildingModal {...props}></IsBuildingModal>
-        <div></div>
+        <IsBuildingModal {...props}></IsBuildingModal>
       ) : (
         <NonBuildingModal {...props}></NonBuildingModal>
       )}

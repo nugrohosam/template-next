@@ -24,28 +24,24 @@ import { UnbudgetModalProps } from './UnbudgetModal';
 
 const initDefaultValues = () => ({
   idAssetGroup: '',
-  idCapexCatalog: '',
-  pricePerUnit: 0,
   currency: null,
-  detail: null,
-  totalAmount: 0,
-  totalAmountUsd: 0,
+  detail: '',
+  pricePerUnit: 0,
+  idCapexCatalog: null,
   currencyRate: 10000, // TODO: currenctRate masih dummy
   items: [...Array(12).keys()].map((item) => ({
     month: item + 1,
-    amount: 0,
+    quantity: 0,
   })),
 });
 
 const schema = yup.object().shape({
   idAssetGroup: yup.string().required(),
-  idCapexCatalog: yup.string().required(),
-  pricePerUnit: yup.number().required(),
   currency: yup.string().required().nullable(),
-  currencyRate: yup.number().required(),
+  detail: yup.string().required().nullable(),
 });
 
-const NonBuildingUnbudgetModal: React.FC<UnbudgetModalProps> = ({
+const IsBuildingUnbudgetModal: React.FC<UnbudgetModalProps> = ({
   onSend,
   classButton,
   buttonTitle,
@@ -79,25 +75,17 @@ const NonBuildingUnbudgetModal: React.FC<UnbudgetModalProps> = ({
     idCapexCatalog: watchIdCapexCatalog,
     items: watchItems,
   } = watch();
-  const controlledFields = fields.map((field, index) => {
-    return {
-      ...watchItems[index],
-      amount: +watchItems[index].quantity * (watchPricePerUnit || 0),
-    };
-  });
 
   const handleSubmitForm = (data: BudgetPlanItemOfUnbudgetForm) => {
-    data.items = controlledFields.map((item) => ({
+    data.items = watchItems.map((item) => ({
       month: item.month,
-      quantity: +item.quantity || 0,
-      amount: item.amount || 0,
+      quantity: item.quantity,
+      amount: +item.amount || 0,
     }));
     data.totalAmount = totalAmount(Currency.IDR);
     data.totalAmountUsd = totalAmount(Currency.USD);
-    data.catalog = catalogOptions.find(
-      (item) => item.id === data.idCapexCatalog
-    );
 
+    console.log(data);
     onSend(data);
     reset(initDefaultValues());
   };
@@ -107,33 +95,11 @@ const NonBuildingUnbudgetModal: React.FC<UnbudgetModalProps> = ({
   const assetGroupOptions = useAssetGroupOptions();
   const catalogOptions = useCatalogOptions(watchIdAssetGroup);
 
-  const changeCatalog = (idCapexCatalog: string) => {
-    const found = catalogOptions.find((item) => item.id === idCapexCatalog);
-    if (watchCurrency && found) {
-      setValue(
-        'pricePerUnit',
-        watchCurrency === Currency.IDR ? found?.priceInIdr : found?.priceInUsd
-      );
-    }
-  };
-
-  const changeCurrency = (currency: Currency) => {
-    const found = catalogOptions.find(
-      (item) => item.id === watchIdCapexCatalog
-    );
-    if (watchIdCapexCatalog && found) {
-      setValue(
-        'pricePerUnit',
-        currency === Currency.IDR ? found?.priceInIdr : found?.priceInUsd
-      );
-    }
-  };
-
   const totalAmount = (currency: Currency) => {
     if (!watchCurrency) return 0;
-    const total = controlledFields
+    const total = watchItems
       .filter((item) => item.amount)
-      .map((item) => item.amount)
+      .map((item) => +item.amount)
       .reduce((previousValue, currentValue) => previousValue + currentValue, 0);
 
     if (currency === Currency.USD) {
@@ -167,44 +133,27 @@ const NonBuildingUnbudgetModal: React.FC<UnbudgetModalProps> = ({
             .format('MMMM'),
       },
       {
-        Header: 'Quantity',
-        accessor: 'quantity',
+        Header: 'Amount',
+        accessor: 'amount',
         Cell: ({ row }: CellProps<ItemOfUnbudgetItem>) => (
           <Input
-            name={`items.${row.index}.quantity`}
+            name={`items.${row.index}.amount`}
             control={control}
             defaultValue=""
             type="number"
-            placeholder="Quantity"
+            placeholder="Amount"
             disabled={setDisabledQuantity(row.values.month)}
             error={
               (errors.items?.length &&
-                errors.items[row.index].quantity?.message) ||
+                errors.items[row.index].amount?.message) ||
               ''
             }
           />
         ),
       },
-      {
-        Header: 'Amount',
-        accessor: 'amount',
-        Cell: ({ row }: CellProps<ItemOfUnbudgetItem>) => (
-          <FormControl
-            type="text"
-            value={
-              row.values.amount
-                ? row.values.amount.toLocaleString(
-                    watchCurrency === Currency.USD ? 'en-En' : 'id-Id'
-                  )
-                : 0
-            }
-            disabled
-          />
-        ),
-      },
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [control, errors.items, watchCurrency]
+    [control, errors.items]
   );
 
   return (
@@ -238,27 +187,6 @@ const NonBuildingUnbudgetModal: React.FC<UnbudgetModalProps> = ({
               placeholder="Asset Group"
               options={assetGroupOptions}
               error={errors.idAssetGroup?.message}
-              onChange={() => {
-                resetField('idCapexCatalog');
-                resetField('currency');
-                resetField('currencyRate');
-                resetField('pricePerUnit');
-                resetField('items');
-              }}
-            />
-          </FormGroup>
-        </Col>
-        <Col lg={6}>
-          <FormGroup>
-            <FormLabel>Katalog</FormLabel>
-            <SingleSelect
-              name="idCapexCatalog"
-              control={control}
-              defaultValue=""
-              placeholder="Katalog"
-              options={catalogOptions}
-              error={errors.idCapexCatalog?.message}
-              onChange={(val) => changeCatalog(val.value as string)}
             />
           </FormGroup>
         </Col>
@@ -268,24 +196,22 @@ const NonBuildingUnbudgetModal: React.FC<UnbudgetModalProps> = ({
             <SingleSelect
               name="currency"
               control={control}
-              defaultValue=""
               placeholder="Currency"
               options={currencyOptions}
               error={errors.currency?.message}
-              onChange={(val) => changeCurrency(val.value as Currency)}
             />
           </FormGroup>
         </Col>
-        <Col lg={6}>
+        <Col lg={12}>
           <FormGroup>
-            <FormLabel>Price/Unit</FormLabel>
+            <FormLabel className="required">Detail</FormLabel>
             <Input
-              name="pricePerUnit"
+              name="detail"
               control={control}
-              defaultValue={0}
-              type="number"
-              disabled
-              error={errors.pricePerUnit?.message}
+              defaultValue=""
+              type="text"
+              placeholder="Detail"
+              error={errors.detail?.message}
             />
           </FormGroup>
         </Col>
@@ -315,11 +241,11 @@ const NonBuildingUnbudgetModal: React.FC<UnbudgetModalProps> = ({
         <SimpleTable
           classTable="table-admin table-inherit"
           columns={columns}
-          items={controlledFields}
+          items={fields}
         />
       </Row>
     </ModalBox>
   );
 };
 
-export default NonBuildingUnbudgetModal;
+export default IsBuildingUnbudgetModal;

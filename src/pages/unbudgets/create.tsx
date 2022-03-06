@@ -9,13 +9,15 @@ import DetailLayout from 'components/ui/DetailLayout';
 import UnbudgetModal from 'components/ui/Modal/Unbudget/UnbudgetModal';
 import SimpleTable from 'components/ui/Table/SimpleTable';
 import { PeriodeType } from 'constants/period';
+import { useAttachmentHelpers } from 'modules/attachment/helpers';
 import { ItemOfBudgetPlanItemForm } from 'modules/budgetPlanItem/entities';
 import { getValueItemByMonth } from 'modules/budgetPlanItem/helpers';
+import { useDownloadTemplateHelpers } from 'modules/downloadTemplate/helpers';
 import { UnbudgetForm } from 'modules/unbudget/entities';
 import { useUnbudgetHelpers } from 'modules/unbudget/helpers';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Button, Col, Form, FormGroup, FormLabel, Row } from 'react-bootstrap';
 import { FieldError, useFieldArray, useForm } from 'react-hook-form';
 import { CellProps, Column } from 'react-table';
@@ -52,6 +54,9 @@ const CreatePeriodActual: NextPage = () => {
     setError,
     formState: { errors, isValid },
     handleSubmit,
+    clearErrors,
+    setValue,
+    getValues,
   } = useForm<UnbudgetForm>({
     mode: 'onChange',
     resolver: yupResolver(schema),
@@ -61,18 +66,35 @@ const CreatePeriodActual: NextPage = () => {
       outstandingRetentionAttachment: null,
     },
   });
-  const { fields, remove, append } = useFieldArray({
+  const { fields, remove, append, replace } = useFieldArray({
     control,
     name: 'budgetPlanItems',
   });
   const { isBuilding: watchIsBuilding, budgetPlanItems: watchBudgetPlanItems } =
     watch();
 
+  useEffect(() => {
+    replace([]);
+  }, [replace, watchIsBuilding]);
+
   const { mutationCreateUnbudget, handleSubmitCreateUnbudget } =
     useUnbudgetHelpers();
   const submitCreateUnbudget = (data: UnbudgetForm) => {
+    delete data.unbudgetAttachmentFile;
+    delete data.outstandingPlanPaymentAttachmentFile;
+    delete data.outstandingRetentionAttachmentFile;
+
     handleSubmitCreateUnbudget(data)
       .then(() => router.push(`/unbudgets`))
+      .catch((error) => setValidationError(error, setError));
+  };
+  const { handleDownloadTemplate } = useDownloadTemplateHelpers();
+
+  const { handleUploadAttachment } = useAttachmentHelpers();
+  const uploadAttachment = (attachment: keyof UnbudgetForm) => {
+    const file = getValues(`${attachment}File` as keyof UnbudgetForm);
+    handleUploadAttachment(file as File[], 'unbudget')
+      .then((result) => setValue(attachment, result.name))
       .catch((error) => setValidationError(error, setError));
   };
 
@@ -353,11 +375,21 @@ const CreatePeriodActual: NextPage = () => {
               <FormGroup>
                 <FormLabel className="required">Unbudget Attachment</FormLabel>
                 <FileInput
-                  name="unbudgetAttachment"
+                  name="unbudgetAttachmentFile"
                   control={control}
                   placeholder="Upload Excel File"
                   error={(errors.unbudgetAttachment as FieldError)?.message}
                 />
+                <Button
+                  variant="link"
+                  className="mt-2 p-0 font-xs"
+                  onClick={() => {
+                    clearErrors('unbudgetAttachment');
+                    uploadAttachment('unbudgetAttachment');
+                  }}
+                >
+                  <p>Upload</p>
+                </Button>
               </FormGroup>
             </Col>
           </Row>
@@ -402,6 +434,84 @@ const CreatePeriodActual: NextPage = () => {
             />
           </Row>
 
+          {watchIsBuilding && (
+            <>
+              <br />
+
+              <Row>
+                <Col lg={6}>
+                  <FormGroup>
+                    <FormLabel>Oustanding Plan Payment</FormLabel>
+                    <FileInput
+                      name="outstandingPlanPaymentAttachmentFile"
+                      control={control}
+                      placeholder="Upload Excel File"
+                      error={
+                        (errors.outstandingPlanPaymentAttachment as FieldError)
+                          ?.message
+                      }
+                    />
+                    <Button
+                      variant="link"
+                      className="mt-2 p-0 font-xs"
+                      onClick={() => {
+                        clearErrors('outstandingPlanPaymentAttachment');
+                        uploadAttachment('outstandingPlanPaymentAttachment');
+                      }}
+                    >
+                      <p className="mb-0">Upload</p>
+                    </Button>
+                    <br />
+                    <Button
+                      variant="link"
+                      className="mt-2 p-0 font-xs"
+                      onClick={() =>
+                        handleDownloadTemplate('outstanding plan payment')
+                      }
+                    >
+                      <p>Download Template</p>
+                    </Button>
+                  </FormGroup>
+                </Col>
+
+                <Col lg={6}>
+                  <FormGroup>
+                    <FormLabel>Oustanding Retention</FormLabel>
+                    <FileInput
+                      name="outstandingRetentionAttachmentFile"
+                      control={control}
+                      placeholder="Upload Excel File"
+                      error={
+                        (errors.outstandingRetentionAttachment as FieldError)
+                          ?.message
+                      }
+                    />
+                    <Button
+                      variant="link"
+                      className="mt-2 p-0 font-xs"
+                      onClick={() => {
+                        clearErrors('outstandingRetentionAttachment');
+                        uploadAttachment('outstandingRetentionAttachment');
+                      }}
+                    >
+                      <p className="mb-0">Upload</p>
+                    </Button>
+                    <br />
+                    <Button
+                      variant="link"
+                      className="mt-2 p-0 font-xs"
+                      onClick={() =>
+                        handleDownloadTemplate('outstanding retention')
+                      }
+                    >
+                      <p>Download Template</p>
+                    </Button>
+                  </FormGroup>
+                </Col>
+              </Row>
+            </>
+          )}
+
           <br />
 
           <Col lg={12} className="d-flex pr-sm-0 justify-content-end">
@@ -409,7 +519,6 @@ const CreatePeriodActual: NextPage = () => {
               variant="primary"
               type="submit"
               disabled={
-                isValid ||
                 mutationCreateUnbudget.isLoading ||
                 watchBudgetPlanItems?.length === 0
               }

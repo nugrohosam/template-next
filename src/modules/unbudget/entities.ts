@@ -61,6 +61,11 @@ export interface UnbudgetForm {
   outstandingRetentionAttachment?: string | null;
   isBuilding: boolean;
   budgetPlanItems: BudgetPlanItemOfUnbudgetForm[];
+
+  // Save File
+  unbudgetAttachmentFile?: File[];
+  outstandingPlanPaymentAttachmentFile?: File[] | null;
+  outstandingRetentionAttachmentFile?: File[] | null;
 }
 
 export interface BudgetPlanItemOfUnbudgetForm {

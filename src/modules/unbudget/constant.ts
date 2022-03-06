@@ -3,6 +3,7 @@ export enum UnbudgetStatus {
   Cancel = 'CANCEL',
   Waiting = 'WAITING',
   Approval = 'APPROVAL',
+  Revise = 'REVISE',
 }
 
 export const UnbudgetStatusOptions = [

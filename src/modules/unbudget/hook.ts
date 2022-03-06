@@ -7,6 +7,7 @@ import {
 } from 'react-query';
 
 import {
+  cancelUnbudgets,
   createUnbudget,
   deleteUnbudgets,
   fetchUnbudgetDetail,
@@ -85,4 +86,12 @@ export const useSubmitUnbudgets = (): UseMutationResult<
   string[]
 > => {
   return useMutation((idUnbudgets) => submitUnbudgets(idUnbudgets));
+};
+
+export const useCancelUnbudgets = (): UseMutationResult<
+  null,
+  ResponseError,
+  string[]
+> => {
+  return useMutation((idUnbudgets) => cancelUnbudgets(idUnbudgets));
 };

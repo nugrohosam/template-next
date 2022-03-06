@@ -72,3 +72,10 @@ export const submitUnbudgets = async (idUnbudgets: string[]): Promise<null> => {
   });
   return result.data.data;
 };
+
+export const cancelUnbudgets = async (idUnbudgets: string[]): Promise<null> => {
+  const result = await axios.patch<ResponseData<null>>('v1/unbudgets/cancel', {
+    idUnbudgets,
+  });
+  return result.data.data;
+};

@@ -3,7 +3,10 @@ import ButtonActions from 'components/ui/Button/ButtonActions';
 import LoadingButton from 'components/ui/Button/LoadingButton';
 import ContentLayout from 'components/ui/ContentLayout';
 import DataTable, { usePaginateParams } from 'components/ui/Table/DataTable';
-import { UnbudgetStatusOptions } from 'modules/unbudget/constant';
+import {
+  UnbudgetStatus,
+  UnbudgetStatusOptions,
+} from 'modules/unbudget/constant';
 import { Unbudget } from 'modules/unbudget/entities';
 import { useUnbudgetHelpers } from 'modules/unbudget/helpers';
 import { useFetchUnbudgets } from 'modules/unbudget/hook';
@@ -19,6 +22,7 @@ import { getAllIds } from 'utils/helpers';
 enum ActionUnbudget {
   Submit = 'SUBMIT',
   Delete = 'DELETE',
+  Cancel = 'CANCEL',
 }
 
 const UnbudgetList: NextPage = () => {
@@ -39,37 +43,47 @@ const UnbudgetList: NextPage = () => {
     handleDeleteUnbudgets,
     submitUnbudgetsMutation,
     handleSubmitUnbudgets,
+    cancelUnbudgetsMutation,
+    handleCancelUnbudgets,
   } = useUnbudgetHelpers();
 
   const handleActionMultipleUnbudget = async (action: ActionUnbudget) => {
     const ids = getAllIds(selectedRow, dataHookUnbudgets.data);
     if (ids?.length > 0) {
-      action === ActionUnbudget.Submit
-        ? await handleSubmitUnbudgets(ids)
-        : await handleDeleteUnbudgets(ids);
+      if (action === ActionUnbudget.Submit) await handleSubmitUnbudgets(ids);
+      else if (action === ActionUnbudget.Delete)
+        await handleDeleteUnbudgets(ids);
+      else if (action === ActionUnbudget.Cancel)
+        await handleCancelUnbudgets(ids);
+
       setSelectedRow({});
       dataHookUnbudgets.refetch();
     }
   };
 
+  const canSubmit = (status: string) =>
+    status === UnbudgetStatus.Draft || status === UnbudgetStatus.Revise;
+  const canDelete = (status: string) =>
+    status === UnbudgetStatus.Draft || status === UnbudgetStatus.Cancel;
+  const canCancel = (status: string) =>
+    status === UnbudgetStatus.Draft || status === UnbudgetStatus.Revise;
+  const canEdit = (status: string) =>
+    status === UnbudgetStatus.Draft || status === UnbudgetStatus.Revise;
+
+  const disableMultipleAction = (canAction: (item: string) => void) => {
+    const items =
+      Object.keys(selectedRow).map(
+        (index) => dataHookUnbudgets.data?.items[parseInt(index)].status
+      ) || [];
+
+    return !items.every((item) => canAction(item || ''));
+  };
+
   const columns: Column<Unbudget>[] = [
-    {
-      Header: 'ID',
-      accessor: 'id',
-    },
-    {
-      Header: 'Budget Code',
-      accessor: 'budgetCode',
-      minWidth: 300,
-    },
-    {
-      Header: 'Units',
-      accessor: 'item',
-    },
-    {
-      Header: 'Currency',
-      accessor: 'currency',
-    },
+    { Header: 'ID', accessor: 'id' },
+    { Header: 'Budget Code', accessor: 'budgetCode', minWidth: 300 },
+    { Header: 'Units', accessor: 'item' },
+    { Header: 'Currency', accessor: 'currency' },
     {
       Header: 'Total USD',
       accessor: 'totalAmountUsd',
@@ -102,12 +116,29 @@ const UnbudgetList: NextPage = () => {
     },
     {
       Header: 'Actions',
-      Cell: ({ cell }: CellProps<Unbudget>) => {
+      Cell: ({ row }: CellProps<Unbudget>) => {
         return (
-          <ButtonActions
-            hrefDetail={`/unbudgets/${cell.row.values.id}/detail`}
-            hrefEdit={`/unbudgets/${cell.row.values.id}/edit`}
-          ></ButtonActions>
+          <>
+            <ButtonActions
+              hrefDetail={`/unbudgets/${row.values.id}/detail`}
+              hrefEdit={`/unbudgets/${row.values.id}/edit`}
+              disableEdit={!canEdit(row.values.status)}
+              onDelete={() => handleDeleteUnbudgets([row.values.id])}
+              disableDelete={!canDelete(row.values.status)}
+            />
+            <LoadingButton
+              size="sm"
+              className="mt-2 w-100"
+              disabled={
+                cancelUnbudgetsMutation.isLoading ||
+                !canCancel(row.values.status)
+              }
+              isLoading={cancelUnbudgetsMutation.isLoading}
+              onClick={() => handleCancelUnbudgets([row.values.id])}
+            >
+              Cancel
+            </LoadingButton>
+          </>
         );
       },
     },
@@ -133,24 +164,44 @@ const UnbudgetList: NextPage = () => {
                   variant="red"
                   size="sm"
                   className="mr-2"
-                  disabled={deleteUnbudgetsMutation.isLoading}
+                  disabled={
+                    deleteUnbudgetsMutation.isLoading ||
+                    disableMultipleAction(canDelete)
+                  }
+                  isLoading={deleteUnbudgetsMutation.isLoading}
                   onClick={() =>
                     handleActionMultipleUnbudget(ActionUnbudget.Delete)
                   }
-                  isLoading={deleteUnbudgetsMutation.isLoading}
                 >
                   Delete
                 </LoadingButton>
                 <LoadingButton
                   size="sm"
                   className="mr-2"
-                  disabled={submitUnbudgetsMutation.isLoading}
+                  disabled={
+                    submitUnbudgetsMutation.isLoading ||
+                    disableMultipleAction(canSubmit)
+                  }
+                  isLoading={submitUnbudgetsMutation.isLoading}
                   onClick={() =>
                     handleActionMultipleUnbudget(ActionUnbudget.Submit)
                   }
-                  isLoading={submitUnbudgetsMutation.isLoading}
                 >
                   Submit
+                </LoadingButton>
+                <LoadingButton
+                  size="sm"
+                  className="mr-2"
+                  disabled={
+                    cancelUnbudgetsMutation.isLoading ||
+                    disableMultipleAction(canCancel)
+                  }
+                  isLoading={cancelUnbudgetsMutation.isLoading}
+                  onClick={() =>
+                    handleActionMultipleUnbudget(ActionUnbudget.Cancel)
+                  }
+                >
+                  Cancel
                 </LoadingButton>
               </>
             }

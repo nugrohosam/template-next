@@ -3,6 +3,7 @@ import { showErrorMessage } from 'utils/helpers';
 
 import { UnbudgetForm } from './entities';
 import {
+  useCancelUnbudgets,
   useCreateUnbudget,
   useDeleteUnbudgets,
   useSubmitUnbudgets,
@@ -88,6 +89,24 @@ export const useUnbudgetHelpers = () => {
     });
   };
 
+  const cancelUnbudgetsMutation = useCancelUnbudgets();
+  const handleCancelUnbudgets = (ids: string[]) => {
+    return new Promise((resolve, reject) => {
+      cancelUnbudgetsMutation.mutate(ids, {
+        onSuccess: (result) => {
+          resolve(result);
+          toast('Data Canceled!');
+        },
+        onError: (error) => {
+          reject(error);
+          console.error('Failed to cancel data', error);
+          toast(error.message, { autoClose: false });
+          showErrorMessage(error);
+        },
+      });
+    });
+  };
+
   return {
     mutationCreateUnbudget,
     handleSubmitCreateUnbudget,
@@ -97,5 +116,7 @@ export const useUnbudgetHelpers = () => {
     handleDeleteUnbudgets,
     submitUnbudgetsMutation,
     handleSubmitUnbudgets,
+    cancelUnbudgetsMutation,
+    handleCancelUnbudgets,
   };
 };

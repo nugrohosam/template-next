@@ -7,13 +7,20 @@ import {
 } from 'react-query';
 
 import {
+  createUnbudget,
   deleteUnbudgets,
   fetchUnbudgetDetail,
   fetchUnbudgetItems,
   fetchUnbudgets,
   submitUnbudgets,
+  updateUnbudget,
 } from './api';
-import { Unbudget, UnbudgetDetail, UnbudgetItem } from './entities';
+import {
+  Unbudget,
+  UnbudgetDetail,
+  UnbudgetForm,
+  UnbudgetItem,
+} from './entities';
 
 export const useFetchUnbudgets = (
   params: PaginateParams
@@ -37,6 +44,28 @@ export const useFetchUnbudgetItems = (
 ): UseQueryResult<Paginate<UnbudgetItem>, ResponseError> => {
   return useQuery(['unbudget-items', params], () =>
     fetchUnbudgetItems(idUnbudget, params)
+  );
+};
+
+export const useCreateUnbudget = (): UseMutationResult<
+  UnbudgetDetail,
+  ResponseError,
+  UnbudgetForm
+> => {
+  return useMutation(createUnbudget);
+};
+
+export interface UpdateUnbudgetParams {
+  idUnbudget: string;
+  data: UnbudgetForm;
+}
+export const useUpdateBudgetPlanItems = (): UseMutationResult<
+  UnbudgetDetail,
+  ResponseError,
+  UpdateUnbudgetParams
+> => {
+  return useMutation(({ idUnbudget, data }) =>
+    updateUnbudget(idUnbudget, data)
   );
 };
 

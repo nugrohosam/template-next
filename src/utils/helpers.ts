@@ -76,6 +76,8 @@ export const parseMenuToUrl = (menu: string) => {
       ? '/master-capex/outstanding-budget'
       : menu === 'budget plans'
       ? '/budget-plans'
+      : menu === 'unbudgets'
+      ? '/unbudgets'
       : menu === 'outstanding pr po'
       ? '/outstanding-pr-po'
       : menu === 'outstanding budgets'

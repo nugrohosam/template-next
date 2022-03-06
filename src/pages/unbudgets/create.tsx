@@ -1,0 +1,427 @@
+import { yupResolver } from '@hookform/resolvers/yup';
+import Checkbox from 'components/form/Checkbox';
+import FileInput from 'components/form/FileInput';
+import Input from 'components/form/Input';
+import Panel from 'components/form/Panel';
+import { PathBreadcrumb } from 'components/ui/Breadcrumb';
+import LoadingButton from 'components/ui/Button/LoadingButton';
+import DetailLayout from 'components/ui/DetailLayout';
+import UnbudgetModal from 'components/ui/Modal/Unbudget/UnbudgetModal';
+import SimpleTable from 'components/ui/Table/SimpleTable';
+import { PeriodeType } from 'constants/period';
+import { ItemOfBudgetPlanItemForm } from 'modules/budgetPlanItem/entities';
+import { getValueItemByMonth } from 'modules/budgetPlanItem/helpers';
+import { UnbudgetForm } from 'modules/unbudget/entities';
+import { useUnbudgetHelpers } from 'modules/unbudget/helpers';
+import { NextPage } from 'next';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
+import { Button, Col, Form, FormGroup, FormLabel, Row } from 'react-bootstrap';
+import { FieldError, useFieldArray, useForm } from 'react-hook-form';
+import { CellProps, Column } from 'react-table';
+import { setValidationError } from 'utils/helpers';
+import * as yup from 'yup';
+
+// TODO: period masih hardcode
+const periodNow = PeriodeType.Mb;
+
+const breadCrumb: PathBreadcrumb[] = [
+  {
+    label: 'Unbudgets',
+    link: `/unbudgets`,
+  },
+  {
+    label: 'Create',
+    active: true,
+  },
+];
+
+const schema = yup.object().shape({
+  unbudgetBackground: yup.string().required(),
+  unbudgetImpactIfNotRealized: yup.string().required(),
+  unbudgetAttachment: yup.string().required(),
+});
+
+const CreatePeriodActual: NextPage = () => {
+  const router = useRouter();
+  const [selectedRow, setSelectedRow] = useState<Record<string, boolean>>({});
+
+  const {
+    control,
+    watch,
+    setError,
+    formState: { errors, isValid },
+    handleSubmit,
+  } = useForm<UnbudgetForm>({
+    mode: 'onChange',
+    resolver: yupResolver(schema),
+    delayError: 500,
+    defaultValues: {
+      outstandingPlanPaymentAttachment: null,
+      outstandingRetentionAttachment: null,
+    },
+  });
+  const { fields, remove, append } = useFieldArray({
+    control,
+    name: 'budgetPlanItems',
+  });
+  const { isBuilding: watchIsBuilding, budgetPlanItems: watchBudgetPlanItems } =
+    watch();
+
+  const { mutationCreateUnbudget, handleSubmitCreateUnbudget } =
+    useUnbudgetHelpers();
+  const submitCreateUnbudget = (data: UnbudgetForm) => {
+    handleSubmitCreateUnbudget(data)
+      .then(() => router.push(`/unbudgets`))
+      .catch((error) => setValidationError(error, setError));
+  };
+
+  const columns: Column<ItemOfBudgetPlanItemForm>[] = [
+    { Header: 'Catalog', accessor: 'catalog' },
+    { Header: 'Items', accessor: 'items' },
+    {
+      Header: 'Detail',
+      accessor: 'detail',
+      minWidth: 300,
+      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) => (
+        <div style={{ minWidth: 300 }}>
+          {(watchIsBuilding ? row.values.detail : row.values.catalog?.detail) ||
+            '-'}
+        </div>
+      ),
+    },
+    {
+      Header: 'Currency',
+      accessor: 'currency',
+      minWidth: 150,
+    },
+    {
+      Header: 'Price/Unit',
+      accessor: 'pricePerUnit',
+      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) =>
+        row.values.pricePerUnit?.toLocaleString('id-Id') || '-',
+    },
+    {
+      Header: 'Total USD',
+      accessor: 'totalAmountUsd',
+      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) =>
+        row.values.totalAmountUsd?.toLocaleString('en-EN') || '-',
+    },
+    {
+      Header: 'Total IDR',
+      accessor: 'totalAmount',
+      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) =>
+        row.values.totalAmount?.toLocaleString('id-Id') || '-',
+    },
+    {
+      Header: 'Jan',
+      minWidth: 100,
+      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) => (
+        <div style={{ minWidth: 100 }}>
+          {getValueItemByMonth(
+            row.values.items,
+            1,
+            watchIsBuilding,
+            row.values.currency
+          )}
+        </div>
+      ),
+    },
+    {
+      Header: 'Feb',
+      minWidth: 100,
+      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) => (
+        <div style={{ minWidth: 100 }}>
+          {getValueItemByMonth(
+            row.values.items,
+            2,
+            watchIsBuilding,
+            row.values.currency
+          )}
+        </div>
+      ),
+    },
+    {
+      Header: 'Mar',
+      minWidth: 100,
+      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) => (
+        <div style={{ minWidth: 100 }}>
+          {getValueItemByMonth(
+            row.values.items,
+            3,
+            watchIsBuilding,
+            row.values.currency
+          )}
+        </div>
+      ),
+    },
+    {
+      Header: 'Apr',
+      minWidth: 100,
+      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) => (
+        <div style={{ minWidth: 100 }}>
+          {getValueItemByMonth(
+            row.values.items,
+            4,
+            watchIsBuilding,
+            row.values.currency
+          )}
+        </div>
+      ),
+    },
+    {
+      Header: 'Mei',
+      minWidth: 100,
+      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) => (
+        <div style={{ minWidth: 100 }}>
+          {getValueItemByMonth(
+            row.values.items,
+            5,
+            watchIsBuilding,
+            row.values.currency
+          )}
+        </div>
+      ),
+    },
+    {
+      Header: 'Jun',
+      minWidth: 100,
+      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) => (
+        <div style={{ minWidth: 100 }}>
+          {getValueItemByMonth(
+            row.values.items,
+            6,
+            watchIsBuilding,
+            row.values.currency
+          )}
+        </div>
+      ),
+    },
+    {
+      Header: 'Jul',
+      minWidth: 100,
+      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) => (
+        <div style={{ minWidth: 100 }}>
+          {getValueItemByMonth(
+            row.values.items,
+            7,
+            watchIsBuilding,
+            row.values.currency
+          )}
+        </div>
+      ),
+    },
+    {
+      Header: 'Aug',
+      minWidth: 100,
+      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) => (
+        <div style={{ minWidth: 100 }}>
+          {getValueItemByMonth(
+            row.values.items,
+            8,
+            watchIsBuilding,
+            row.values.currency
+          )}
+        </div>
+      ),
+    },
+    {
+      Header: 'Sep',
+      minWidth: 100,
+      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) => (
+        <div style={{ minWidth: 100 }}>
+          {getValueItemByMonth(
+            row.values.items,
+            9,
+            watchIsBuilding,
+            row.values.currency
+          )}
+        </div>
+      ),
+    },
+    {
+      Header: 'Oct',
+      minWidth: 100,
+      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) => (
+        <div style={{ minWidth: 100 }}>
+          {getValueItemByMonth(
+            row.values.items,
+            10,
+            watchIsBuilding,
+            row.values.currency
+          )}
+        </div>
+      ),
+    },
+    {
+      Header: 'Nov',
+      minWidth: 100,
+      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) => (
+        <div style={{ minWidth: 100 }}>
+          {getValueItemByMonth(
+            row.values.items,
+            11,
+            watchIsBuilding,
+            row.values.currency
+          )}
+        </div>
+      ),
+    },
+    {
+      Header: 'Dec',
+      minWidth: 100,
+      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) => (
+        <div style={{ minWidth: 100 }}>
+          {getValueItemByMonth(
+            row.values.items,
+            12,
+            watchIsBuilding,
+            row.values.currency
+          )}
+        </div>
+      ),
+    },
+  ];
+
+  return (
+    <DetailLayout
+      paths={breadCrumb}
+      backButtonClick={router.back}
+      title="Unbudget Create"
+    >
+      <Panel>
+        <Form onSubmit={handleSubmit(submitCreateUnbudget)}>
+          <Row>
+            <Col lg={6}>
+              <h4 className="profile-detail__info--title mb-1">District</h4>
+              <h3 className="profile-detail__info--subtitle">JIEP</h3>
+            </Col>
+            <Col lg={6}>
+              <h4 className="profile-detail__info--title mb-1">Divisi</h4>
+              <h3 className="profile-detail__info--subtitle">FATB</h3>
+            </Col>
+            <Col lg={6}>
+              <h4 className="profile-detail__info--title mb-1">Departemen</h4>
+              <h3 className="profile-detail__info--subtitle">TREA</h3>
+            </Col>
+          </Row>
+          <Row>
+            <Col lg={6}>
+              <h4 className="profile-detail__info--title mb-1">Year</h4>
+              <h3 className="profile-detail__info--subtitle">2022</h3>
+            </Col>
+            <Col lg={6}>
+              <h4 className="profile-detail__info--title mb-1">Period</h4>
+              <h3 className="profile-detail__info--subtitle">{periodNow}</h3>
+            </Col>
+          </Row>
+
+          <br />
+
+          <Row>
+            <Col lg={6}>
+              <FormGroup>
+                <FormLabel className="required">
+                  Latar Belakang Kebutuhan Capex
+                </FormLabel>
+                <Input
+                  name="unbudgetBackground"
+                  control={control}
+                  defaultValue=""
+                  type="text"
+                  placeholder="Latar Belakang Kebutuhan Capex"
+                  error={errors.unbudgetBackground?.message}
+                />
+              </FormGroup>
+            </Col>
+            <Col lg={6}>
+              <FormGroup>
+                <FormLabel className="required">
+                  Dampak Jika Tidak Realisasi
+                </FormLabel>
+                <Input
+                  name="unbudgetImpactIfNotRealized"
+                  control={control}
+                  defaultValue=""
+                  type="text"
+                  placeholder="Dampak Jika Tidak Realisasi"
+                  error={errors.unbudgetImpactIfNotRealized?.message}
+                />
+              </FormGroup>
+            </Col>
+            <Col lg={6}>
+              <FormGroup>
+                <FormLabel className="required">Unbudget Attachment</FormLabel>
+                <FileInput
+                  name="unbudgetAttachment"
+                  control={control}
+                  placeholder="Upload Excel File"
+                  error={(errors.unbudgetAttachment as FieldError)?.message}
+                />
+              </FormGroup>
+            </Col>
+          </Row>
+
+          <br />
+
+          <Row>
+            <SimpleTable
+              classTable="table-admin table-inherit"
+              columns={columns}
+              items={fields}
+              selectedRows={selectedRow}
+              hiddenColumns={['catalog', 'items']}
+              onSelectedRowsChanged={(rows) => setSelectedRow(rows)}
+              addOns={
+                <div className="d-flex align-items-center">
+                  <div className="mr-2">
+                    <Checkbox
+                      label="Asset Building"
+                      name="isBuilding"
+                      control={control}
+                      defaultValue={false}
+                    ></Checkbox>
+                  </div>
+                  <UnbudgetModal
+                    isBuilding={watchIsBuilding}
+                    period={periodNow}
+                    onSend={append}
+                  ></UnbudgetModal>
+                </div>
+              }
+              actions={
+                <Button
+                  variant="red"
+                  size="sm"
+                  className="mr-2"
+                  onClick={() => remove(+Object.keys(selectedRow))}
+                >
+                  Delete
+                </Button>
+              }
+            />
+          </Row>
+
+          <br />
+
+          <Col lg={12} className="d-flex pr-sm-0 justify-content-end">
+            <LoadingButton
+              variant="primary"
+              type="submit"
+              disabled={
+                isValid ||
+                mutationCreateUnbudget.isLoading ||
+                watchBudgetPlanItems?.length === 0
+              }
+              isLoading={mutationCreateUnbudget.isLoading}
+            >
+              Create
+            </LoadingButton>
+          </Col>
+        </Form>
+      </Panel>
+    </DetailLayout>
+  );
+};
+
+export default CreatePeriodActual;

@@ -52,3 +52,26 @@ export type ItemOfUnbudgetItem = {
   quantity: number;
   amount: number;
 };
+
+export interface UnbudgetForm {
+  unbudgetBackground: string;
+  unbudgetImpactIfNotRealized: string;
+  unbudgetAttachment: string;
+  outstandingPlanPaymentAttachment?: string | null;
+  outstandingRetentionAttachment?: string | null;
+  isBuilding: boolean;
+  budgetPlanItems: BudgetPlanItemOfUnbudgetForm[];
+}
+
+export interface BudgetPlanItemOfUnbudgetForm {
+  idAssetGroup: string;
+  idCapexCatalog: string | null;
+  pricePerUnit: number | null;
+  currency: Currency | null;
+  currencyRate: number;
+  totalAmount: number;
+  totalAmountUsd: number;
+  detail: string | null;
+  items: ItemOfUnbudgetItem[];
+  catalog?: Catalog;
+}

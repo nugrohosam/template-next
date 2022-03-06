@@ -1,7 +1,12 @@
 import { Paginate, PaginateParams, ResponseData } from 'modules/common/types';
 import axios from 'utils/axios';
 
-import { Unbudget, UnbudgetDetail, UnbudgetItem } from './entities';
+import {
+  Unbudget,
+  UnbudgetDetail,
+  UnbudgetForm,
+  UnbudgetItem,
+} from './entities';
 
 export const fetchUnbudgets = async (
   params: PaginateParams
@@ -29,6 +34,27 @@ export const fetchUnbudgetItems = async (
   const result = await axios.get<ResponseData<Paginate<UnbudgetItem>>>(
     `v1/unbudgets/${idUnbudget}/items`,
     { params }
+  );
+  return result.data.data;
+};
+
+export const createUnbudget = async (
+  data: UnbudgetForm
+): Promise<UnbudgetDetail> => {
+  const result = await axios.post<ResponseData<UnbudgetDetail>>(
+    'v1/unbudgets',
+    data
+  );
+  return result.data.data;
+};
+
+export const updateUnbudget = async (
+  idUnbudget: string,
+  data: UnbudgetForm
+): Promise<UnbudgetDetail> => {
+  const result = await axios.put<ResponseData<UnbudgetDetail>>(
+    `v1/unbudgets/${idUnbudget}`,
+    data
   );
   return result.data.data;
 };

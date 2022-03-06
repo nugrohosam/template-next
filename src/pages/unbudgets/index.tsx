@@ -97,6 +97,7 @@ const UnbudgetList: NextPage = () => {
         return (
           <ButtonActions
             hrefDetail={`/unbudgets/${cell.row.values.id}/detail`}
+            hrefEdit={`/unbudgets/${cell.row.values.id}/edit`}
           ></ButtonActions>
         );
       },

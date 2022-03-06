@@ -6,6 +6,7 @@ import {
   useCreateUnbudget,
   useDeleteUnbudgets,
   useSubmitUnbudgets,
+  useUpdateUnbudget,
 } from './hook';
 
 export const useUnbudgetHelpers = () => {
@@ -14,16 +15,40 @@ export const useUnbudgetHelpers = () => {
     return new Promise((resolve, reject) => {
       mutationCreateUnbudget.mutate(data, {
         onSuccess: (result) => {
-          toast('Data created!');
           resolve(result);
+          toast('Data created!');
         },
         onError: (error) => {
+          reject(error);
           console.error('Failed to create data', error);
           toast(error.message, { autoClose: false });
           showErrorMessage(error);
-          reject(error);
         },
       });
+    });
+  };
+
+  const mutationUpdateUnbudget = useUpdateUnbudget();
+  const handleUpdateCreateUnbudget = (
+    idUnbudget: string,
+    data: UnbudgetForm
+  ) => {
+    return new Promise((resolve, reject) => {
+      mutationUpdateUnbudget.mutate(
+        { idUnbudget, data },
+        {
+          onSuccess: (result) => {
+            resolve(result);
+            toast('Data updated!');
+          },
+          onError: (error) => {
+            reject(error);
+            console.error('Failed to update data', error);
+            toast(error.message, { autoClose: false });
+            showErrorMessage(error);
+          },
+        }
+      );
     });
   };
 
@@ -32,14 +57,14 @@ export const useUnbudgetHelpers = () => {
     return new Promise((resolve, reject) => {
       deleteUnbudgetsMutation.mutate(ids, {
         onSuccess: (result) => {
-          toast('Data Deleted!');
           resolve(result);
+          toast('Data Deleted!');
         },
         onError: (error) => {
+          reject(error);
           console.error('Failed to Delete data', error);
           toast(error.message, { autoClose: false });
           showErrorMessage(error);
-          reject(error);
         },
       });
     });
@@ -66,6 +91,8 @@ export const useUnbudgetHelpers = () => {
   return {
     mutationCreateUnbudget,
     handleSubmitCreateUnbudget,
+    mutationUpdateUnbudget,
+    handleUpdateCreateUnbudget,
     deleteUnbudgetsMutation,
     handleDeleteUnbudgets,
     submitUnbudgetsMutation,

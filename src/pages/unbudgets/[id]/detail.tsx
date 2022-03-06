@@ -257,8 +257,6 @@ const UnbudgetDetails: NextPage = () => {
       title="Detail Unbudget"
     >
       <Panel>
-        {dataHookUnbudgetDetail.isLoading && <Loader size="sm" />}
-
         <Row>
           <Col lg={6}>
             <h4 className="profile-detail__info--title mb-1">District</h4>
@@ -292,6 +290,52 @@ const UnbudgetDetails: NextPage = () => {
               {dataHookUnbudgetDetail?.data?.periodType || '-'}
             </h3>
           </Col>
+        </Row>
+      </Panel>
+
+      <br />
+
+      <Panel>
+        {dataHookUnbudgetDetail.isLoading && <Loader size="sm" />}
+
+        <Row>
+          <Col lg={12}>
+            <h4 className="profile-detail__info--title mb-1">Budget Code</h4>
+            <h3 className="profile-detail__info--subtitle">
+              {dataHookUnbudgetDetail?.data?.budgetCode || '-'}
+            </h3>
+          </Col>
+          <Col lg={6}>
+            <h4 className="profile-detail__info--title mb-1">Currency</h4>
+            <h3 className="profile-detail__info--subtitle">
+              {dataHookUnbudgetDetail?.data?.currency || '-'}
+            </h3>
+          </Col>
+          <Col lg={6}>
+            <h4 className="profile-detail__info--title mb-1">Status</h4>
+            <h3 className="profile-detail__info--subtitle">
+              {dataHookUnbudgetDetail?.data?.status || '-'}
+            </h3>
+          </Col>
+          <Col lg={6}>
+            <h4 className="profile-detail__info--title mb-1">Total USD</h4>
+            <h3 className="profile-detail__info--subtitle">
+              {dataHookUnbudgetDetail?.data?.totalAmountUsd?.toLocaleString(
+                'en-En'
+              ) || '-'}
+            </h3>
+          </Col>
+          <Col lg={6}>
+            <h4 className="profile-detail__info--title mb-1">Total IDR</h4>
+            <h3 className="profile-detail__info--subtitle">
+              {dataHookUnbudgetDetail?.data?.totalAmount?.toLocaleString(
+                'id-Id'
+              ) || '-'}
+            </h3>
+          </Col>
+        </Row>
+
+        <Row>
           <Col lg={6}>
             <h4 className="profile-detail__info--title mb-1">
               Latar Belakang Kebutuhan Capex
@@ -346,10 +390,11 @@ const UnbudgetDetails: NextPage = () => {
         </Row>
       </Panel>
 
-      <br />
-
       {auditHook.data?.items && auditHook.data?.items.length > 0 && (
-        <AuditTimeline audit={auditHook.data} />
+        <>
+          <br />
+          <AuditTimeline audit={auditHook.data} />
+        </>
       )}
 
       <br />

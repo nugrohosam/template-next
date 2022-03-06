@@ -7,6 +7,7 @@ import { PathBreadcrumb } from 'components/ui/Breadcrumb';
 import LoadingButton from 'components/ui/Button/LoadingButton';
 import DetailLayout from 'components/ui/DetailLayout';
 import UnbudgetModal from 'components/ui/Modal/Unbudget/UnbudgetModal';
+import { usePaginateParams } from 'components/ui/Table/DataTable';
 import SimpleTable from 'components/ui/Table/SimpleTable';
 import { PeriodeType } from 'constants/period';
 import { useAttachmentHelpers } from 'modules/attachment/helpers';
@@ -15,6 +16,10 @@ import { getValueItemByMonth } from 'modules/budgetPlanItem/helpers';
 import { useDownloadTemplateHelpers } from 'modules/downloadTemplate/helpers';
 import { UnbudgetForm } from 'modules/unbudget/entities';
 import { useUnbudgetHelpers } from 'modules/unbudget/helpers';
+import {
+  useFetchUnbudgetDetail,
+  useFetchUnbudgetItems,
+} from 'modules/unbudget/hook';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -27,26 +32,28 @@ import * as yup from 'yup';
 // TODO: period masih hardcode
 const periodNow = PeriodeType.Mb;
 
-const breadCrumb: PathBreadcrumb[] = [
-  {
-    label: 'Unbudgets',
-    link: `/unbudgets`,
-  },
-  {
-    label: 'Create',
-    active: true,
-  },
-];
-
 const schema = yup.object().shape({
   unbudgetBackground: yup.string().required(),
   unbudgetImpactIfNotRealized: yup.string().required(),
   unbudgetAttachment: yup.string().required(),
 });
 
-const CreateUnbudget: NextPage = () => {
+const EditUnbudget: NextPage = () => {
   const router = useRouter();
+  const idUnbudget = router.query.id as string;
+
   const [selectedRow, setSelectedRow] = useState<Record<string, boolean>>({});
+
+  const breadCrumb: PathBreadcrumb[] = [
+    {
+      label: 'Detail Unbudget',
+      link: `/unbudgets/${idUnbudget}/detail`,
+    },
+    {
+      label: 'Edit',
+      active: true,
+    },
+  ];
 
   const {
     control,
@@ -57,6 +64,8 @@ const CreateUnbudget: NextPage = () => {
     clearErrors,
     setValue,
     getValues,
+    reset,
+    resetField,
   } = useForm<UnbudgetForm>({
     mode: 'onChange',
     resolver: yupResolver(schema),
@@ -70,26 +79,60 @@ const CreateUnbudget: NextPage = () => {
     control,
     name: 'budgetPlanItems',
   });
-  const { isBuilding: watchIsBuilding, budgetPlanItems: watchBudgetPlanItems } =
-    watch();
+  const {
+    isBuilding: watchIsBuilding,
+    budgetPlanItems: watchBudgetPlanItems,
+    unbudgetAttachmentFile: watchUnbudgetAttachmentFile,
+    outstandingPlanPaymentAttachmentFile:
+      watchOutstandingPlanPaymentAttachmentFile,
+    outstandingRetentionAttachmentFile: watchOutstandingRetentionAttachmentFile,
+  } = watch();
 
   useEffect(() => {
     replace([]);
-  }, [replace, watchIsBuilding]);
+    resetField('outstandingPlanPaymentAttachment');
+    resetField('outstandingPlanPaymentAttachmentFile');
+    resetField('outstandingRetentionAttachment');
+    resetField('outstandingRetentionAttachmentFile');
+  }, [replace, resetField, watchIsBuilding]);
 
-  const { mutationCreateUnbudget, handleSubmitCreateUnbudget } =
+  const dataHookUnbudgetDetail = useFetchUnbudgetDetail(idUnbudget);
+  const dataHookUnbudgetItems = useFetchUnbudgetItems(idUnbudget, {});
+  useEffect(() => {
+    if (dataHookUnbudgetDetail.data) {
+      reset({
+        isBuilding: dataHookUnbudgetDetail.data.isBuilding,
+        unbudgetBackground: dataHookUnbudgetDetail.data.unbudgetBackground,
+        unbudgetImpactIfNotRealized:
+          dataHookUnbudgetDetail.data.unbudgetImpactIfNotRealized,
+        unbudgetAttachment: dataHookUnbudgetDetail.data.unbudgetAttachment,
+        outstandingPlanPaymentAttachment:
+          dataHookUnbudgetDetail.data.outstandingPlanPaymentAttachment,
+        outstandingRetentionAttachment:
+          dataHookUnbudgetDetail.data.outstandingRetentionAttachment,
+      });
+      replace(dataHookUnbudgetItems.data?.items || []);
+    }
+  }, [
+    dataHookUnbudgetDetail.data,
+    dataHookUnbudgetItems.data?.items,
+    replace,
+    reset,
+  ]);
+
+  const { mutationUpdateUnbudget, handleUpdateCreateUnbudget } =
     useUnbudgetHelpers();
   const submitCreateUnbudget = (data: UnbudgetForm) => {
     delete data.unbudgetAttachmentFile;
     delete data.outstandingPlanPaymentAttachmentFile;
     delete data.outstandingRetentionAttachmentFile;
 
-    handleSubmitCreateUnbudget(data)
-      .then(() => router.push(`/unbudgets`))
+    handleUpdateCreateUnbudget(idUnbudget, data)
+      .then(() => router.push(`/unbudgets/${idUnbudget}/detail`))
       .catch((error) => setValidationError(error, setError));
   };
-  const { handleDownloadTemplate } = useDownloadTemplateHelpers();
 
+  const { handleDownloadTemplate } = useDownloadTemplateHelpers();
   const { handleUploadAttachment } = useAttachmentHelpers();
   const uploadAttachment = (attachment: keyof UnbudgetForm) => {
     const file = getValues(`${attachment}File` as keyof UnbudgetForm);
@@ -306,7 +349,7 @@ const CreateUnbudget: NextPage = () => {
     <DetailLayout
       paths={breadCrumb}
       backButtonClick={router.back}
-      title="Create Unbudget"
+      title="Edit Unbudget"
     >
       <Panel>
         <Form onSubmit={handleSubmit(submitCreateUnbudget)}>
@@ -374,12 +417,13 @@ const CreateUnbudget: NextPage = () => {
                 <FileInput
                   name="unbudgetAttachmentFile"
                   control={control}
-                  placeholder="Upload Excel File"
+                  placeholder="Upload New File"
                   error={(errors.unbudgetAttachment as FieldError)?.message}
                 />
                 <Button
                   variant="link"
                   className="mt-2 p-0 font-xs"
+                  disabled={!!!watchUnbudgetAttachmentFile}
                   onClick={() => {
                     clearErrors('unbudgetAttachment');
                     uploadAttachment('unbudgetAttachment');
@@ -442,7 +486,7 @@ const CreateUnbudget: NextPage = () => {
                     <FileInput
                       name="outstandingPlanPaymentAttachmentFile"
                       control={control}
-                      placeholder="Upload Excel File"
+                      placeholder="Upload New Excel File"
                       error={
                         (errors.outstandingPlanPaymentAttachment as FieldError)
                           ?.message
@@ -451,6 +495,7 @@ const CreateUnbudget: NextPage = () => {
                     <Button
                       variant="link"
                       className="mt-2 p-0 font-xs"
+                      disabled={!!!watchOutstandingPlanPaymentAttachmentFile}
                       onClick={() => {
                         clearErrors('outstandingPlanPaymentAttachment');
                         uploadAttachment('outstandingPlanPaymentAttachment');
@@ -477,7 +522,7 @@ const CreateUnbudget: NextPage = () => {
                     <FileInput
                       name="outstandingRetentionAttachmentFile"
                       control={control}
-                      placeholder="Upload Excel File"
+                      placeholder="Upload New Excel File"
                       error={
                         (errors.outstandingRetentionAttachment as FieldError)
                           ?.message
@@ -486,6 +531,7 @@ const CreateUnbudget: NextPage = () => {
                     <Button
                       variant="link"
                       className="mt-2 p-0 font-xs"
+                      disabled={!!!watchOutstandingRetentionAttachmentFile}
                       onClick={() => {
                         clearErrors('outstandingRetentionAttachment');
                         uploadAttachment('outstandingRetentionAttachment');
@@ -516,12 +562,12 @@ const CreateUnbudget: NextPage = () => {
               variant="primary"
               type="submit"
               disabled={
-                mutationCreateUnbudget.isLoading ||
+                mutationUpdateUnbudget.isLoading ||
                 watchBudgetPlanItems?.length === 0
               }
-              isLoading={mutationCreateUnbudget.isLoading}
+              isLoading={mutationUpdateUnbudget.isLoading}
             >
-              Create
+              Update
             </LoadingButton>
           </Col>
         </Form>
@@ -530,4 +576,4 @@ const CreateUnbudget: NextPage = () => {
   );
 };
 
-export default CreateUnbudget;
+export default EditUnbudget;

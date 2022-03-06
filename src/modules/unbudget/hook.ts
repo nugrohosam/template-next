@@ -42,8 +42,10 @@ export const useFetchUnbudgetItems = (
   idUnbudget: string,
   params: PaginateParams
 ): UseQueryResult<Paginate<UnbudgetItem>, ResponseError> => {
-  return useQuery(['unbudget-items', params], () =>
-    fetchUnbudgetItems(idUnbudget, params)
+  return useQuery(
+    ['unbudget-items', params],
+    () => fetchUnbudgetItems(idUnbudget, params),
+    { enabled: !!idUnbudget }
   );
 };
 
@@ -59,7 +61,7 @@ export interface UpdateUnbudgetParams {
   idUnbudget: string;
   data: UnbudgetForm;
 }
-export const useUpdateBudgetPlanItems = (): UseMutationResult<
+export const useUpdateUnbudget = (): UseMutationResult<
   UnbudgetDetail,
   ResponseError,
   UpdateUnbudgetParams

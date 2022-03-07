@@ -7,7 +7,7 @@ import LoadingButton from 'components/ui/Button/LoadingButton';
 import DetailLayout from 'components/ui/DetailLayout';
 import { Currency, currencyOptions } from 'constants/currency';
 import { CatalogForm } from 'modules/catalog/entities';
-import { useCreateCatalog } from 'modules/catalog/hook';
+import { useCatalogHelpers } from 'modules/catalog/helpers';
 import { useAssetGroupOptions } from 'modules/custom/useAssetGroupOptions';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
@@ -21,8 +21,7 @@ import {
   Row,
 } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
-import { toast } from 'react-toastify';
-import { setValidationError, showErrorMessage } from 'utils/helpers';
+import { setValidationError } from 'utils/helpers';
 import * as yup from 'yup';
 
 const breadCrumb: PathBreadcrumb[] = [
@@ -61,20 +60,11 @@ const CreateCatalog: NextPage = () => {
   });
   const watchForm = watch();
 
-  const mutation = useCreateCatalog();
+  const { mutationCreateCatalog, handleCreateCatalog } = useCatalogHelpers();
   const handleSubmitForm = (data: CatalogForm) => {
-    mutation.mutate(data, {
-      onSuccess: () => {
-        router.push(`/master-capex/catalogs`);
-        toast('Data Created!');
-      },
-      onError: (error) => {
-        console.log('Failed to create data', error);
-        setValidationError(error, setError);
-        toast(error.message, { autoClose: false });
-        showErrorMessage(error);
-      },
-    });
+    handleCreateCatalog(data)
+      .then(() => router.push(`/master-capex/catalogs`))
+      .catch((error) => setValidationError(error, setError));
   };
 
   const currencyRate = 14500; // TODO: get from API
@@ -193,8 +183,8 @@ const CreateCatalog: NextPage = () => {
             <LoadingButton
               variant="primary"
               type="submit"
-              disabled={!isValid || mutation.isLoading}
-              isLoading={mutation.isLoading}
+              disabled={!isValid || mutationCreateCatalog.isLoading}
+              isLoading={mutationCreateCatalog.isLoading}
             >
               Create
             </LoadingButton>

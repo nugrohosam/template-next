@@ -7,11 +7,12 @@ import LoadingButton from 'components/ui/Button/LoadingButton';
 import DetailLayout from 'components/ui/DetailLayout';
 import { Currency, currencyOptions } from 'constants/currency';
 import { CatalogForm } from 'modules/catalog/entities';
+import { useCatalogHelpers } from 'modules/catalog/helpers';
 import { useFetchCatalogDetail, useUpdateCatalog } from 'modules/catalog/hook';
 import { useAssetGroupOptions } from 'modules/custom/useAssetGroupOptions';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import {
   Col,
   Form,
@@ -21,8 +22,7 @@ import {
   Row,
 } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
-import { toast } from 'react-toastify';
-import { setValidationError, showErrorMessage } from 'utils/helpers';
+import { setValidationError } from 'utils/helpers';
 import * as yup from 'yup';
 
 const breadCrumb: PathBreadcrumb[] = [
@@ -75,26 +75,14 @@ const EditCatalog: NextPage = () => {
       priceInIdr: dataHook?.priceInIdr,
       priceInUsd: dataHook?.priceInUsd,
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dataHook, reset]);
 
+  const { mutationUpdateCatalog, handleUpdateUnbudget } = useCatalogHelpers();
   const mutation = useUpdateCatalog();
   const handleSubmitForm = (data: CatalogForm) => {
-    mutation.mutate(
-      { idCatalog: id, data },
-      {
-        onSuccess: () => {
-          router.push(`/master-capex/catalogs`);
-          toast('Data Updated!');
-        },
-        onError: (error) => {
-          console.log('Failed to update data', error);
-          setValidationError(error, setError);
-          toast(error.message, { autoClose: false });
-          showErrorMessage(error);
-        },
-      }
-    );
+    handleUpdateUnbudget(id, data)
+      .then(() => router.push(`/master-capex/catalogs`))
+      .catch((error) => setValidationError(error, setError));
   };
   const currencyRate = 14500; // TODO: get from API
 
@@ -203,8 +191,8 @@ const EditCatalog: NextPage = () => {
             <LoadingButton
               variant="primary"
               type="submit"
-              disabled={mutation.isLoading}
-              isLoading={mutation.isLoading}
+              disabled={mutationUpdateCatalog.isLoading}
+              isLoading={mutationUpdateCatalog.isLoading}
             >
               Update
             </LoadingButton>

@@ -25,3 +25,14 @@ export type OverBudgetDetail = OverBudget & {
   quantity: number;
   workflowApprovalId: number;
 };
+
+export interface OverBudgetForm {
+  idBudgetReference: string;
+  currentBalance: number;
+  additionalBudgetPerUnit: number;
+  overbudget: number;
+  background: string;
+  impactIfNotRealized: string;
+  attachment: string | Array<File> | null;
+  status: OverBudgetStatus;
+}

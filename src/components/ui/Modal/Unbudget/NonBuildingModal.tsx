@@ -1,4 +1,3 @@
-// TODO: Next time harus refactor menggunakan https://react-hook-form.com/api/usefieldarray/
 import { yupResolver } from '@hookform/resolvers/yup';
 import Input from 'components/form/Input';
 import SingleSelect from 'components/form/SingleSelect';

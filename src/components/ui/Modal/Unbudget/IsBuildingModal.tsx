@@ -1,11 +1,9 @@
-// TODO: Next time harus refactor menggunakan https://react-hook-form.com/api/usefieldarray/
 import { yupResolver } from '@hookform/resolvers/yup';
 import Input from 'components/form/Input';
 import SingleSelect from 'components/form/SingleSelect';
 import { Currency, currencyOptions } from 'constants/currency';
 import { PeriodeType } from 'constants/period';
 import { useAssetGroupOptions } from 'modules/assetGroup/helpers';
-import { useCatalogOptions } from 'modules/catalog/helpers';
 import { useKurs } from 'modules/custom/useKurs';
 import {
   BudgetPlanItemOfUnbudgetForm,
@@ -55,8 +53,6 @@ const IsBuildingUnbudgetModal: React.FC<UnbudgetModalProps> = ({
     control,
     formState: { errors },
     watch,
-    resetField,
-    setValue,
     reset,
   } = useForm<BudgetPlanItemOfUnbudgetForm>({
     mode: 'onChange',
@@ -68,11 +64,7 @@ const IsBuildingUnbudgetModal: React.FC<UnbudgetModalProps> = ({
     control,
     name: 'items',
   });
-  const {
-    currency: watchCurrency,
-    idAssetGroup: watchIdAssetGroup,
-    items: watchItems,
-  } = watch();
+  const { currency: watchCurrency, items: watchItems } = watch();
 
   const handleSubmitForm = (data: BudgetPlanItemOfUnbudgetForm) => {
     data.items = watchItems
@@ -92,7 +84,6 @@ const IsBuildingUnbudgetModal: React.FC<UnbudgetModalProps> = ({
 
   const { kurs } = useKurs();
   const assetGroupOptions = useAssetGroupOptions();
-  const catalogOptions = useCatalogOptions(watchIdAssetGroup);
 
   const totalAmount = (currency: Currency) => {
     if (!watchCurrency) return 0;

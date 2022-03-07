@@ -57,6 +57,7 @@ const CreateUnbudget: NextPage = () => {
     clearErrors,
     setValue,
     getValues,
+    resetField,
   } = useForm<UnbudgetForm>({
     mode: 'onChange',
     resolver: yupResolver(schema),
@@ -75,7 +76,11 @@ const CreateUnbudget: NextPage = () => {
 
   useEffect(() => {
     replace([]);
-  }, [replace, watchIsBuilding]);
+    resetField('outstandingPlanPaymentAttachment');
+    resetField('outstandingPlanPaymentAttachmentFile');
+    resetField('outstandingRetentionAttachment');
+    resetField('outstandingRetentionAttachmentFile');
+  }, [replace, resetField, watchIsBuilding]);
 
   const { mutationCreateUnbudget, handleSubmitCreateUnbudget } =
     useUnbudgetHelpers();

@@ -49,6 +49,7 @@ const NonBuildingUnbudgetModal: React.FC<UnbudgetModalProps> = ({
   classButton,
   buttonTitle,
   period,
+  inPageUpdate,
 }) => {
   /**
    * Handle form
@@ -157,6 +158,21 @@ const NonBuildingUnbudgetModal: React.FC<UnbudgetModalProps> = ({
     return true;
   };
 
+  const onModalOpened = () => {
+    if (inPageUpdate) {
+      /**
+       * special condition when create item in update page,
+       * field idAssetGroup and currency will disable.
+       * Because the value will get from index 0 budget plan items
+       */
+      reset({
+        ...initDefaultValues(),
+        idAssetGroup: inPageUpdate.idAssetGroup,
+        currency: inPageUpdate.currency,
+      });
+    }
+  };
+
   const columns = useMemo<Column<ItemOfUnbudgetItem>[]>(
     () => [
       {
@@ -218,6 +234,7 @@ const NonBuildingUnbudgetModal: React.FC<UnbudgetModalProps> = ({
       wordingSubmit="Save"
       dialogClassName="modal-90w"
       onSend={handleSubmit(handleSubmitForm)}
+      onClikModal={onModalOpened}
     >
       <Row>
         <Col lg={6}>
@@ -239,6 +256,7 @@ const NonBuildingUnbudgetModal: React.FC<UnbudgetModalProps> = ({
               placeholder="Asset Group"
               options={assetGroupOptions}
               error={errors.idAssetGroup?.message}
+              isDisabled={!!inPageUpdate}
               onChange={() => {
                 resetField('idCapexCatalog');
                 resetField('currency');
@@ -273,6 +291,7 @@ const NonBuildingUnbudgetModal: React.FC<UnbudgetModalProps> = ({
               placeholder="Currency"
               options={currencyOptions}
               error={errors.currency?.message}
+              isDisabled={!!inPageUpdate}
               onChange={(val) => changeCurrency(val.value as Currency)}
             />
           </FormGroup>

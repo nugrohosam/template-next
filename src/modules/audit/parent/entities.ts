@@ -18,6 +18,7 @@ export enum ResourceType {
   ProportionalCose = 'proportional_cost',
   BudgetPlanItemGroup = 'budget_plan_item_group',
   Unbudget = 'unbudget',
+  Overbudget = 'overbudget',
 }
 
 export interface AuditPaginateParams extends PaginateParams {

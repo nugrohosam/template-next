@@ -87,11 +87,13 @@ const NonBuildingUnbudgetModal: React.FC<UnbudgetModalProps> = ({
   });
 
   const handleSubmitForm = (data: BudgetPlanItemOfUnbudgetForm) => {
-    data.items = controlledFields.map((item) => ({
-      month: item.month,
-      quantity: +item.quantity || 0,
-      amount: item.amount || 0,
-    }));
+    data.items = controlledFields
+      .filter((item) => item.quantity)
+      .map((item) => ({
+        month: item.month,
+        quantity: +item.quantity || 0,
+        amount: item.amount || 0,
+      }));
     data.totalAmount = totalAmount(Currency.IDR);
     data.totalAmountUsd = totalAmount(Currency.USD);
     data.catalog = catalogOptions.find(

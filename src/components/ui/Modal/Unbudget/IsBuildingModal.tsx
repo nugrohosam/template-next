@@ -71,21 +71,20 @@ const IsBuildingUnbudgetModal: React.FC<UnbudgetModalProps> = ({
   const {
     currency: watchCurrency,
     idAssetGroup: watchIdAssetGroup,
-    pricePerUnit: watchPricePerUnit,
-    idCapexCatalog: watchIdCapexCatalog,
     items: watchItems,
   } = watch();
 
   const handleSubmitForm = (data: BudgetPlanItemOfUnbudgetForm) => {
-    data.items = watchItems.map((item) => ({
-      month: item.month,
-      quantity: item.quantity,
-      amount: +item.amount || 0,
-    }));
+    data.items = watchItems
+      .filter((item) => item.amount)
+      .map((item) => ({
+        month: item.month,
+        quantity: item.quantity,
+        amount: +item.amount || 0,
+      }));
     data.totalAmount = totalAmount(Currency.IDR);
     data.totalAmountUsd = totalAmount(Currency.USD);
 
-    console.log(data);
     onSend(data);
     reset(initDefaultValues());
   };

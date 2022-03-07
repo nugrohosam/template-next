@@ -99,7 +99,7 @@ const BudgetPlanGroupItemList: NextPage = () => {
 
   const auditHook = useFetchAudits({
     resourceId: budgetPlanGroupId,
-    resourceType: ResourceType.BUDGET_PLAN_ITEM_GROUP,
+    resourceType: ResourceType.BudgetPlanItemGroup,
     orderBy: 'asc',
     order: 'created_at',
     pageNumber: 1,
@@ -338,10 +338,6 @@ const BudgetPlanGroupItemList: NextPage = () => {
       backButtonClick={router.back}
       title="Detail Budget Plan Item Group"
     >
-      {auditHook.data?.items && auditHook.data?.items.length > 0 && (
-        <AuditTimeline audit={auditHook.data} />
-      )}
-
       <Panel>
         {dataHookBudgetPlanItemGroup.isLoading && <Loader size="sm" />}
 
@@ -381,6 +377,12 @@ const BudgetPlanGroupItemList: NextPage = () => {
             </h3>
           </Col>
         </Row>
+
+        <br />
+
+        {auditHook.data?.items && auditHook.data?.items.length > 0 && (
+          <AuditTimeline audit={auditHook.data} />
+        )}
 
         <br />
 

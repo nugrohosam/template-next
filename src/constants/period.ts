@@ -1,8 +1,12 @@
 import { SelectOption } from 'components/form/SingleSelect';
 
+export enum PeriodeType {
+  Mb = 'MB',
+  S2 = 'S2',
+}
 export const periodeTypeOptions: SelectOption[] = [
-  { label: 'MB', value: 'MB' },
-  { label: 'S2', value: 'S2' },
+  { label: 'MB', value: PeriodeType.Mb },
+  { label: 'S2', value: PeriodeType.S2 },
 ];
 
 export const periodeStatusOptions: SelectOption[] = [

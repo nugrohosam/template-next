@@ -6,7 +6,7 @@ import LoadingButton from 'components/ui/Button/LoadingButton';
 import DetailLayout from 'components/ui/DetailLayout';
 import BudgetPlanItemModal from 'components/ui/Modal/BudgetPlanItem/BudgetPlanItemModal';
 import SimpleTable from 'components/ui/Table/SimpleTable';
-import { useDownloadAttachmentHelpers } from 'modules/attachment/helpers';
+import { useAttachmentHelpers } from 'modules/attachment/helpers';
 import { useUploadAttachment } from 'modules/attachment/hook';
 import {
   BudgetPlanItemForm,
@@ -45,7 +45,7 @@ const UpdateBudgetPlanItems: NextPage = () => {
     },
   ];
 
-  const { handleDownloadAttachment } = useDownloadAttachmentHelpers();
+  const { handleDownloadAttachment } = useAttachmentHelpers();
   const dataHookBudgetPlanItemGroup =
     useFetchBudgetPlanItemGroupDetail(budgetPlanGroupId);
   const dataHookBudgetPlanItemGroupItems =

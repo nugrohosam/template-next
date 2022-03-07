@@ -1,28 +1,28 @@
 import { Currency } from 'constants/currency';
-import { ItemOfBudgetPlanItemForm } from 'modules/budgetPlanItem/entities';
+import { BudgetPlanItemOfBudgetPlanItemForm } from 'modules/budgetPlanItem/entities';
 import React from 'react';
 
 import IsBuildingModal from './IsBuildingModal';
 import NonBuildingModal from './NonBuildingModal';
 
-interface BudgetPlanItemModalProps {
-  onSend: (data: ItemOfBudgetPlanItemForm) => void;
+export interface BudgetPlanItemModalProps {
+  onSend: (data: BudgetPlanItemOfBudgetPlanItemForm) => void;
   classButton?: string;
   isEdit?: boolean;
   inPageUpdate?: { idAssetGroup: string; currency: Currency | null };
   isBuilding?: boolean;
-  myItem?: ItemOfBudgetPlanItemForm;
+  myItem?: BudgetPlanItemOfBudgetPlanItemForm;
   buttonTitle?: string;
 }
 
-const IsBuildingBudgetPlanItemModal: React.FC<BudgetPlanItemModalProps> = ({
+const BudgetPlanItemModal: React.FC<BudgetPlanItemModalProps> = ({
   onSend,
   classButton,
   isEdit = false,
   inPageUpdate,
   isBuilding = false,
   myItem,
-  buttonTitle,
+  buttonTitle = '+ Add Item',
 }) => {
   const props = {
     onSend,
@@ -46,4 +46,4 @@ const IsBuildingBudgetPlanItemModal: React.FC<BudgetPlanItemModalProps> = ({
   );
 };
 
-export default IsBuildingBudgetPlanItemModal;
+export default BudgetPlanItemModal;

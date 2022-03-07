@@ -21,13 +21,17 @@ export type ItemOfBudgetPlanItem = {
 
 export interface BudgetPlanItemForm {
   idCapexBudgetPlan: string;
-  outstandingPlanPaymentAttachment?: string | Array<File> | null;
-  outstandingRetentionAttachment?: string | Array<File> | null;
+  outstandingPlanPaymentAttachment?: string | null;
+  outstandingRetentionAttachment?: string | null;
   isBuilding: boolean;
-  budgetPlanItems: ItemOfBudgetPlanItemForm[];
+  budgetPlanItems: BudgetPlanItemOfBudgetPlanItemForm[];
+
+  // Save File
+  outstandingRetentionAttachmentFile?: File[] | null;
+  outstandingPlanPaymentAttachmentFile?: File[] | null;
 }
 
-export interface ItemOfBudgetPlanItemForm {
+export interface BudgetPlanItemOfBudgetPlanItemForm {
   idAssetGroup: string;
   idCapexCatalog: string | null;
   pricePerUnit: number | null;
@@ -39,9 +43,4 @@ export interface ItemOfBudgetPlanItemForm {
   detail: string | null;
   id?: string;
   catalog?: Catalog;
-}
-
-export interface UploadExcelBudgetPlanItem {
-  idBudgetPlan: string;
-  file: Array<File>;
 }

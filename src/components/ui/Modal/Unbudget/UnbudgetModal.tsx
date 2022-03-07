@@ -1,18 +1,18 @@
 import { Currency } from 'constants/currency';
 import { PeriodeType } from 'constants/period';
-import { ItemOfBudgetPlanItemForm } from 'modules/budgetPlanItem/entities';
+import { BudgetPlanItemOfUnbudgetForm } from 'modules/unbudget/entities';
 import React from 'react';
 
 import IsBuildingModal from './IsBuildingModal';
 import NonBuildingModal from './NonBuildingModal';
 
 export interface UnbudgetModalProps {
-  onSend: (data: ItemOfBudgetPlanItemForm) => void;
+  onSend: (data: BudgetPlanItemOfUnbudgetForm) => void;
   classButton?: string;
   isEdit?: boolean;
   inPageUpdate?: { idAssetGroup: string; currency: Currency | null };
   isBuilding?: boolean;
-  myItem?: ItemOfBudgetPlanItemForm;
+  myItem?: BudgetPlanItemOfUnbudgetForm;
   buttonTitle?: string;
   period: PeriodeType;
 }

@@ -1,42 +1,38 @@
-/**
- * Harus refactor selanjutnya, pakai https://react-hook-form.com/api/usefieldarray/
- * TODO: untuk sekarang upload attachment masih menggunakan button upload manual
- */
 import Checkbox from 'components/form/Checkbox';
 import FileInput from 'components/form/FileInput';
 import Panel from 'components/form/Panel';
 import { PathBreadcrumb } from 'components/ui/Breadcrumb';
 import LoadingButton from 'components/ui/Button/LoadingButton';
 import DetailLayout from 'components/ui/DetailLayout';
-import IsBuildingBudgetPlanItemModal from 'components/ui/Modal/BudgetPlanItem/IsBuildingModal';
-import NonBuildingBudgetPlanItemModal from 'components/ui/Modal/BudgetPlanItem/NonBuildingModal';
+import BudgetPlanItemModal from 'components/ui/Modal/BudgetPlanItem/BudgetPlanItemModal';
 import SimpleTable from 'components/ui/Table/SimpleTable';
-import { useUploadAttachment } from 'modules/attachment/hook';
+import { useAttachmentHelpers } from 'modules/attachment/helpers';
 import {
   BudgetPlanItemForm,
-  ItemOfBudgetPlanItemForm,
+  BudgetPlanItemOfBudgetPlanItemForm,
 } from 'modules/budgetPlanItem/entities';
-import { getValueItemByMonth } from 'modules/budgetPlanItem/helpers';
-import { useCreateBudgetPlanItems } from 'modules/budgetPlanItem/hook';
-import { useDownloadTemplateExcel } from 'modules/downloadTemplate/hook';
+import {
+  getValueItemByMonth,
+  useBudgetPlanItemHelpers,
+} from 'modules/budgetPlanItem/helpers';
+import { useDownloadTemplateHelpers } from 'modules/downloadTemplate/helpers';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { Button, Col, Form, FormGroup, FormLabel, Row } from 'react-bootstrap';
-import { FieldError, useForm } from 'react-hook-form';
+import { useFieldArray, useForm } from 'react-hook-form';
 import { CellProps, Column } from 'react-table';
-import { toast } from 'react-toastify';
-import { setValidationError, showErrorMessage } from 'utils/helpers';
+import { setValidationError } from 'utils/helpers';
 
-const CreatePeriodActual: NextPage = () => {
+const CreateBudgetPlanItem: NextPage = () => {
   const router = useRouter();
-  const id = router.query.id as string;
+  const idBudgetPlan = router.query.id as string;
   const [selectedRow, setSelectedRow] = useState<Record<string, boolean>>({});
 
   const breadCrumb: PathBreadcrumb[] = [
     {
       label: 'Detail',
-      link: `/budget-plans/${id}/detail`,
+      link: `/budget-plans/${idBudgetPlan}/detail`,
     },
     {
       label: 'Create Items',
@@ -44,117 +40,96 @@ const CreatePeriodActual: NextPage = () => {
     },
   ];
 
-  const [myBudgetPlanItem, setMyBudgetPlanItem] = useState<
-    ItemOfBudgetPlanItemForm[]
-  >([]);
-
-  const handleDeleteMultipleMyBudgetPlanItem = () => {
-    setMyBudgetPlanItem((prev) =>
-      prev.filter(
-        (item, i) =>
-          !Object.keys(selectedRow)
-            .map((key) => +key)
-            .includes(i)
-      )
-    );
-  };
-
   const {
     control,
     watch,
     setError,
     formState: { errors, isValid },
     handleSubmit,
-    resetField,
-    getValues,
-    setValue,
     clearErrors,
-  } = useForm<BudgetPlanItemForm>();
-  const watchIsBuilding = watch('isBuilding');
+    setValue,
+    getValues,
+    resetField,
+  } = useForm<BudgetPlanItemForm>({
+    mode: 'onChange',
+    delayError: 500,
+    defaultValues: {
+      outstandingPlanPaymentAttachment: null,
+      outstandingRetentionAttachment: null,
+    },
+  });
+  const { fields, remove, append, replace, update } = useFieldArray({
+    control,
+    name: 'budgetPlanItems',
+  });
+  const {
+    isBuilding: watchIsBuilding,
+    budgetPlanItems: watchBudgetPlanItems,
+    outstandingPlanPaymentAttachmentFile:
+      watchOutstandingPlanPaymentAttachmentFile,
+    outstandingRetentionAttachmentFile: watchOutstandingRetentionAttachmentFile,
+  } = watch();
+
   useEffect(() => {
-    setMyBudgetPlanItem([]);
+    replace([]);
     resetField('outstandingPlanPaymentAttachment');
+    resetField('outstandingPlanPaymentAttachmentFile');
     resetField('outstandingRetentionAttachment');
-  }, [resetField, watchIsBuilding]);
+    resetField('outstandingRetentionAttachmentFile');
+  }, [replace, resetField, watchIsBuilding]);
 
-  const mutationCreateBudgetPlanItems = useCreateBudgetPlanItems();
-  const mutationUploadAttachment = useUploadAttachment();
-  const submitCreateBudgetPlanItems = (data: BudgetPlanItemForm) => {
-    mutationCreateBudgetPlanItems.mutate(
-      {
-        idCapexBudgetPlan: id,
-        isBuilding: data.isBuilding,
-        outstandingPlanPaymentAttachment: data.outstandingPlanPaymentAttachment,
-        outstandingRetentionAttachment: data.outstandingRetentionAttachment,
-        budgetPlanItems: myBudgetPlanItem,
-      },
-      {
-        onSuccess: () => {
-          router.push(`/budget-plans/${id}/detail`);
-          toast('Data created!');
-        },
-        onError: (error) => {
-          console.error('Failed to create data', error);
-          setValidationError(error, setError);
-          toast(error.message, { autoClose: false });
-          showErrorMessage(error);
-        },
-      }
-    );
-  };
-
-  const handleUploadAttachment = (name: keyof BudgetPlanItemForm) => {
-    const file = getValues(name);
-    const formData = new FormData();
-    formData.append('module', 'budget plan');
-    if (file) {
-      formData.append('attachment', (file as Array<File>)[0]);
-    }
-
-    mutationUploadAttachment.mutate(formData, {
-      onSuccess: (data) => {
-        toast('Data uploaded!');
-        setValue(name, data.name);
-      },
-      onError: (error) => {
-        setValidationError(error, setError);
-        toast(error.message, { autoClose: false });
-      },
+  const { mutationCreateBudgetPlanItem, handleCreateBudgetPlanItem } =
+    useBudgetPlanItemHelpers();
+  const submitCreateBudgetPlanItem = (data: BudgetPlanItemForm) => {
+    delete data.outstandingPlanPaymentAttachmentFile;
+    delete data.outstandingRetentionAttachmentFile;
+    data.idCapexBudgetPlan = idBudgetPlan;
+    data.budgetPlanItems.map((item) => {
+      delete item.catalog;
+      return item;
     });
+
+    handleCreateBudgetPlanItem(data)
+      .then(() => router.push(`/budget-plans/${idBudgetPlan}/detail`))
+      .catch((error) => setValidationError(error, setError));
   };
 
-  const downloadTemplateExcelMutation = useDownloadTemplateExcel();
-  const handleDownloadTemplate = (feature: string) => {
-    downloadTemplateExcelMutation.mutate(
-      { feature },
-      {
-        onSuccess: () => {
-          toast('Excel Template file downloaded successfully!');
-        },
-        onError: (error) => {
-          toast(error.message, { autoClose: false });
-          showErrorMessage(error);
-        },
-      }
-    );
+  const { handleDownloadTemplate } = useDownloadTemplateHelpers();
+  const { handleUploadAttachment } = useAttachmentHelpers();
+  const uploadAttachment = (attachment: keyof BudgetPlanItemForm) => {
+    const file = getValues(`${attachment}File` as keyof BudgetPlanItemForm);
+    handleUploadAttachment(file as File[], 'budget plan')
+      .then((result) => setValue(attachment, result.name))
+      .catch((error) => setValidationError(error, setError));
   };
 
-  const columns: Column<ItemOfBudgetPlanItemForm>[] = [
+  const columns: Column<BudgetPlanItemOfBudgetPlanItemForm>[] = [
     { Header: 'Catalog', accessor: 'catalog' },
-    { Header: 'Item', accessor: 'items' },
-    { Header: 'ID Asset Group', accessor: 'idAssetGroup' },
+    { Header: 'Items', accessor: 'items' },
     { Header: 'ID Capex Catalog', accessor: 'idCapexCatalog' },
+    { Header: 'ID Assey Group', accessor: 'idAssetGroup' },
     { Header: 'Currency Rate', accessor: 'currencyRate' },
-    { Header: 'id', accessor: 'id' },
+    {
+      Header: 'Actions',
+      Cell: ({ row }: CellProps<BudgetPlanItemOfBudgetPlanItemForm>) => (
+        <div style={{ minWidth: 100 }}>
+          <BudgetPlanItemModal
+            onSend={(data) => update(row.index, data)}
+            isEdit={true}
+            buttonTitle="Edit"
+            myItem={row.values as BudgetPlanItemOfBudgetPlanItemForm}
+            isBuilding={watchIsBuilding}
+          ></BudgetPlanItemModal>
+        </div>
+      ),
+    },
     {
       Header: 'Detail',
       accessor: 'detail',
       minWidth: 300,
-      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) => (
-        <div style={{ minWidth: 300 }}>
-          {watchIsBuilding ? row.values.detail : row.values.catalog?.detail}
-        </div>
-      ),
+      Cell: ({ row }: CellProps<BudgetPlanItemOfBudgetPlanItemForm>) =>
+        (watchIsBuilding ? row.values.detail : row.values.catalog?.detail) ||
+        '-',
     },
     {
       Header: 'Currency',
@@ -164,28 +139,25 @@ const CreatePeriodActual: NextPage = () => {
     {
       Header: 'Price/Unit',
       accessor: 'pricePerUnit',
-      minWidth: 200,
-      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) =>
+      Cell: ({ row }: CellProps<BudgetPlanItemOfBudgetPlanItemForm>) =>
         row.values.pricePerUnit?.toLocaleString('id-Id') || '-',
     },
     {
       Header: 'Total USD',
       accessor: 'totalAmountUsd',
-      minWidth: 200,
-      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) =>
+      Cell: ({ row }: CellProps<BudgetPlanItemOfBudgetPlanItemForm>) =>
         row.values.totalAmountUsd?.toLocaleString('en-EN') || '-',
     },
     {
       Header: 'Total IDR',
       accessor: 'totalAmount',
-      minWidth: 200,
-      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) =>
+      Cell: ({ row }: CellProps<BudgetPlanItemOfBudgetPlanItemForm>) =>
         row.values.totalAmount?.toLocaleString('id-Id') || '-',
     },
     {
       Header: 'Jan',
       minWidth: 100,
-      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) => (
+      Cell: ({ row }: CellProps<BudgetPlanItemOfBudgetPlanItemForm>) => (
         <div style={{ minWidth: 100 }}>
           {getValueItemByMonth(
             row.values.items,
@@ -199,7 +171,7 @@ const CreatePeriodActual: NextPage = () => {
     {
       Header: 'Feb',
       minWidth: 100,
-      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) => (
+      Cell: ({ row }: CellProps<BudgetPlanItemOfBudgetPlanItemForm>) => (
         <div style={{ minWidth: 100 }}>
           {getValueItemByMonth(
             row.values.items,
@@ -213,7 +185,7 @@ const CreatePeriodActual: NextPage = () => {
     {
       Header: 'Mar',
       minWidth: 100,
-      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) => (
+      Cell: ({ row }: CellProps<BudgetPlanItemOfBudgetPlanItemForm>) => (
         <div style={{ minWidth: 100 }}>
           {getValueItemByMonth(
             row.values.items,
@@ -227,7 +199,7 @@ const CreatePeriodActual: NextPage = () => {
     {
       Header: 'Apr',
       minWidth: 100,
-      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) => (
+      Cell: ({ row }: CellProps<BudgetPlanItemOfBudgetPlanItemForm>) => (
         <div style={{ minWidth: 100 }}>
           {getValueItemByMonth(
             row.values.items,
@@ -241,7 +213,7 @@ const CreatePeriodActual: NextPage = () => {
     {
       Header: 'Mei',
       minWidth: 100,
-      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) => (
+      Cell: ({ row }: CellProps<BudgetPlanItemOfBudgetPlanItemForm>) => (
         <div style={{ minWidth: 100 }}>
           {getValueItemByMonth(
             row.values.items,
@@ -255,7 +227,7 @@ const CreatePeriodActual: NextPage = () => {
     {
       Header: 'Jun',
       minWidth: 100,
-      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) => (
+      Cell: ({ row }: CellProps<BudgetPlanItemOfBudgetPlanItemForm>) => (
         <div style={{ minWidth: 100 }}>
           {getValueItemByMonth(
             row.values.items,
@@ -269,7 +241,7 @@ const CreatePeriodActual: NextPage = () => {
     {
       Header: 'Jul',
       minWidth: 100,
-      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) => (
+      Cell: ({ row }: CellProps<BudgetPlanItemOfBudgetPlanItemForm>) => (
         <div style={{ minWidth: 100 }}>
           {getValueItemByMonth(
             row.values.items,
@@ -283,7 +255,7 @@ const CreatePeriodActual: NextPage = () => {
     {
       Header: 'Aug',
       minWidth: 100,
-      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) => (
+      Cell: ({ row }: CellProps<BudgetPlanItemOfBudgetPlanItemForm>) => (
         <div style={{ minWidth: 100 }}>
           {getValueItemByMonth(
             row.values.items,
@@ -297,7 +269,7 @@ const CreatePeriodActual: NextPage = () => {
     {
       Header: 'Sep',
       minWidth: 100,
-      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) => (
+      Cell: ({ row }: CellProps<BudgetPlanItemOfBudgetPlanItemForm>) => (
         <div style={{ minWidth: 100 }}>
           {getValueItemByMonth(
             row.values.items,
@@ -311,7 +283,7 @@ const CreatePeriodActual: NextPage = () => {
     {
       Header: 'Oct',
       minWidth: 100,
-      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) => (
+      Cell: ({ row }: CellProps<BudgetPlanItemOfBudgetPlanItemForm>) => (
         <div style={{ minWidth: 100 }}>
           {getValueItemByMonth(
             row.values.items,
@@ -325,7 +297,7 @@ const CreatePeriodActual: NextPage = () => {
     {
       Header: 'Nov',
       minWidth: 100,
-      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) => (
+      Cell: ({ row }: CellProps<BudgetPlanItemOfBudgetPlanItemForm>) => (
         <div style={{ minWidth: 100 }}>
           {getValueItemByMonth(
             row.values.items,
@@ -339,7 +311,7 @@ const CreatePeriodActual: NextPage = () => {
     {
       Header: 'Dec',
       minWidth: 100,
-      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) => (
+      Cell: ({ row }: CellProps<BudgetPlanItemOfBudgetPlanItemForm>) => (
         <div style={{ minWidth: 100 }}>
           {getValueItemByMonth(
             row.values.items,
@@ -356,48 +328,38 @@ const CreatePeriodActual: NextPage = () => {
     <DetailLayout
       paths={breadCrumb}
       backButtonClick={router.back}
-      title="Budget Plan Items Create"
+      title="Create Budget Plan Items"
     >
       <Panel>
-        <Form onSubmit={handleSubmit(submitCreateBudgetPlanItems)}>
+        <Form onSubmit={handleSubmit(submitCreateBudgetPlanItem)}>
           <Row>
             <SimpleTable
               classTable="table-admin table-inherit"
               columns={columns}
-              items={myBudgetPlanItem}
+              items={fields}
               selectedRows={selectedRow}
               hiddenColumns={[
-                'items',
                 'catalog',
-                'idAssetGroup',
+                'items',
                 'idCapexCatalog',
+                'idAssetGroup',
                 'currencyRate',
-                'id',
               ]}
               onSelectedRowsChanged={(rows) => setSelectedRow(rows)}
               addOns={
                 <div className="d-flex align-items-center">
                   <div className="mr-2">
                     <Checkbox
-                      label="Is Building"
+                      label="Asset Building"
                       name="isBuilding"
                       control={control}
                       defaultValue={false}
                     ></Checkbox>
                   </div>
-                  {watchIsBuilding ? (
-                    <IsBuildingBudgetPlanItemModal
-                      onSend={(data) =>
-                        setMyBudgetPlanItem((prev) => [...prev, data])
-                      }
-                    ></IsBuildingBudgetPlanItemModal>
-                  ) : (
-                    <NonBuildingBudgetPlanItemModal
-                      onSend={(data) =>
-                        setMyBudgetPlanItem((prev) => [...prev, data])
-                      }
-                    ></NonBuildingBudgetPlanItemModal>
-                  )}
+                  <BudgetPlanItemModal
+                    isBuilding={watchIsBuilding}
+                    onSend={append}
+                  />
                 </div>
               }
               actions={
@@ -406,7 +368,7 @@ const CreatePeriodActual: NextPage = () => {
                     variant="red"
                     size="sm"
                     className="mr-2"
-                    onClick={handleDeleteMultipleMyBudgetPlanItem}
+                    onClick={() => remove(+Object.keys(selectedRow))}
                   >
                     Delete
                   </Button>
@@ -418,32 +380,28 @@ const CreatePeriodActual: NextPage = () => {
           {watchIsBuilding && (
             <>
               <br />
-
               <Row>
                 <Col lg={6}>
                   <FormGroup>
                     <FormLabel>Oustanding Plan Payment</FormLabel>
                     <FileInput
-                      name="outstandingPlanPaymentAttachment"
+                      name="outstandingPlanPaymentAttachmentFile"
                       control={control}
                       placeholder="Upload Excel File"
-                      error={
-                        (errors.outstandingPlanPaymentAttachment as FieldError)
-                          ?.message
-                      }
+                      error={errors.outstandingPlanPaymentAttachment?.message}
                     />
                     <Button
                       variant="link"
                       className="mt-2 p-0 font-xs"
+                      disabled={!!!watchOutstandingPlanPaymentAttachmentFile}
                       onClick={() => {
                         clearErrors('outstandingPlanPaymentAttachment');
-                        handleUploadAttachment(
-                          'outstandingPlanPaymentAttachment'
-                        );
+                        uploadAttachment('outstandingPlanPaymentAttachment');
                       }}
                     >
-                      <p>Upload</p>
+                      <p className="mb-0">Upload</p>
                     </Button>
+                    <br />
                     <Button
                       variant="link"
                       className="mt-2 p-0 font-xs"
@@ -460,26 +418,23 @@ const CreatePeriodActual: NextPage = () => {
                   <FormGroup>
                     <FormLabel>Oustanding Retention</FormLabel>
                     <FileInput
-                      name="outstandingRetentionAttachment"
+                      name="outstandingRetentionAttachmentFile"
                       control={control}
                       placeholder="Upload Excel File"
-                      error={
-                        (errors.outstandingRetentionAttachment as FieldError)
-                          ?.message
-                      }
+                      error={errors.outstandingRetentionAttachment?.message}
                     />
                     <Button
                       variant="link"
                       className="mt-2 p-0 font-xs"
+                      disabled={!!!watchOutstandingRetentionAttachmentFile}
                       onClick={() => {
                         clearErrors('outstandingRetentionAttachment');
-                        handleUploadAttachment(
-                          'outstandingRetentionAttachment'
-                        );
+                        uploadAttachment('outstandingRetentionAttachment');
                       }}
                     >
-                      <p>Upload</p>
+                      <p className="mb-0">Upload</p>
                     </Button>
+                    <br />
                     <Button
                       variant="link"
                       className="mt-2 p-0 font-xs"
@@ -502,10 +457,10 @@ const CreatePeriodActual: NextPage = () => {
               variant="primary"
               type="submit"
               disabled={
-                mutationCreateBudgetPlanItems.isLoading ||
-                myBudgetPlanItem.length === 0
+                mutationCreateBudgetPlanItem.isLoading ||
+                watchBudgetPlanItems?.length === 0
               }
-              isLoading={mutationCreateBudgetPlanItems.isLoading}
+              isLoading={mutationCreateBudgetPlanItem.isLoading}
             >
               Create
             </LoadingButton>
@@ -516,4 +471,4 @@ const CreatePeriodActual: NextPage = () => {
   );
 };
 
-export default CreatePeriodActual;
+export default CreateBudgetPlanItem;

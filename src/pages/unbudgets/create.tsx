@@ -10,16 +10,18 @@ import UnbudgetModal from 'components/ui/Modal/Unbudget/UnbudgetModal';
 import SimpleTable from 'components/ui/Table/SimpleTable';
 import { PeriodeType } from 'constants/period';
 import { useAttachmentHelpers } from 'modules/attachment/helpers';
-import { ItemOfBudgetPlanItemForm } from 'modules/budgetPlanItem/entities';
 import { getValueItemByMonth } from 'modules/budgetPlanItem/helpers';
 import { useDownloadTemplateHelpers } from 'modules/downloadTemplate/helpers';
-import { UnbudgetForm } from 'modules/unbudget/entities';
+import {
+  BudgetPlanItemOfUnbudgetForm,
+  UnbudgetForm,
+} from 'modules/unbudget/entities';
 import { useUnbudgetHelpers } from 'modules/unbudget/helpers';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { Button, Col, Form, FormGroup, FormLabel, Row } from 'react-bootstrap';
-import { FieldError, useFieldArray, useForm } from 'react-hook-form';
+import { useFieldArray, useForm } from 'react-hook-form';
 import { CellProps, Column } from 'react-table';
 import { setValidationError } from 'utils/helpers';
 import * as yup from 'yup';
@@ -57,6 +59,7 @@ const CreateUnbudget: NextPage = () => {
     clearErrors,
     setValue,
     getValues,
+    resetField,
   } = useForm<UnbudgetForm>({
     mode: 'onChange',
     resolver: yupResolver(schema),
@@ -70,26 +73,34 @@ const CreateUnbudget: NextPage = () => {
     control,
     name: 'budgetPlanItems',
   });
-  const { isBuilding: watchIsBuilding, budgetPlanItems: watchBudgetPlanItems } =
-    watch();
+  const {
+    isBuilding: watchIsBuilding,
+    budgetPlanItems: watchBudgetPlanItems,
+    outstandingPlanPaymentAttachmentFile:
+      watchOutstandingPlanPaymentAttachmentFile,
+    outstandingRetentionAttachmentFile: watchOutstandingRetentionAttachmentFile,
+  } = watch();
 
   useEffect(() => {
     replace([]);
-  }, [replace, watchIsBuilding]);
+    resetField('outstandingPlanPaymentAttachment');
+    resetField('outstandingPlanPaymentAttachmentFile');
+    resetField('outstandingRetentionAttachment');
+    resetField('outstandingRetentionAttachmentFile');
+  }, [replace, resetField, watchIsBuilding]);
 
-  const { mutationCreateUnbudget, handleSubmitCreateUnbudget } =
-    useUnbudgetHelpers();
+  const { mutationCreateUnbudget, handleCreateUnbudget } = useUnbudgetHelpers();
   const submitCreateUnbudget = (data: UnbudgetForm) => {
     delete data.unbudgetAttachmentFile;
     delete data.outstandingPlanPaymentAttachmentFile;
     delete data.outstandingRetentionAttachmentFile;
 
-    handleSubmitCreateUnbudget(data)
+    handleCreateUnbudget(data)
       .then(() => router.push(`/unbudgets`))
       .catch((error) => setValidationError(error, setError));
   };
-  const { handleDownloadTemplate } = useDownloadTemplateHelpers();
 
+  const { handleDownloadTemplate } = useDownloadTemplateHelpers();
   const { handleUploadAttachment } = useAttachmentHelpers();
   const uploadAttachment = (attachment: keyof UnbudgetForm) => {
     const file = getValues(`${attachment}File` as keyof UnbudgetForm);
@@ -98,14 +109,14 @@ const CreateUnbudget: NextPage = () => {
       .catch((error) => setValidationError(error, setError));
   };
 
-  const columns: Column<ItemOfBudgetPlanItemForm>[] = [
+  const columns: Column<BudgetPlanItemOfUnbudgetForm>[] = [
     { Header: 'Catalog', accessor: 'catalog' },
     { Header: 'Items', accessor: 'items' },
     {
       Header: 'Detail',
       accessor: 'detail',
       minWidth: 300,
-      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) =>
+      Cell: ({ row }: CellProps<BudgetPlanItemOfUnbudgetForm>) =>
         (watchIsBuilding ? row.values.detail : row.values.catalog?.detail) ||
         '-',
     },
@@ -117,25 +128,25 @@ const CreateUnbudget: NextPage = () => {
     {
       Header: 'Price/Unit',
       accessor: 'pricePerUnit',
-      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) =>
+      Cell: ({ row }: CellProps<BudgetPlanItemOfUnbudgetForm>) =>
         row.values.pricePerUnit?.toLocaleString('id-Id') || '-',
     },
     {
       Header: 'Total USD',
       accessor: 'totalAmountUsd',
-      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) =>
+      Cell: ({ row }: CellProps<BudgetPlanItemOfUnbudgetForm>) =>
         row.values.totalAmountUsd?.toLocaleString('en-EN') || '-',
     },
     {
       Header: 'Total IDR',
       accessor: 'totalAmount',
-      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) =>
+      Cell: ({ row }: CellProps<BudgetPlanItemOfUnbudgetForm>) =>
         row.values.totalAmount?.toLocaleString('id-Id') || '-',
     },
     {
       Header: 'Jan',
       minWidth: 100,
-      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) => (
+      Cell: ({ row }: CellProps<BudgetPlanItemOfUnbudgetForm>) => (
         <div style={{ minWidth: 100 }}>
           {getValueItemByMonth(
             row.values.items,
@@ -149,7 +160,7 @@ const CreateUnbudget: NextPage = () => {
     {
       Header: 'Feb',
       minWidth: 100,
-      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) => (
+      Cell: ({ row }: CellProps<BudgetPlanItemOfUnbudgetForm>) => (
         <div style={{ minWidth: 100 }}>
           {getValueItemByMonth(
             row.values.items,
@@ -163,7 +174,7 @@ const CreateUnbudget: NextPage = () => {
     {
       Header: 'Mar',
       minWidth: 100,
-      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) => (
+      Cell: ({ row }: CellProps<BudgetPlanItemOfUnbudgetForm>) => (
         <div style={{ minWidth: 100 }}>
           {getValueItemByMonth(
             row.values.items,
@@ -177,7 +188,7 @@ const CreateUnbudget: NextPage = () => {
     {
       Header: 'Apr',
       minWidth: 100,
-      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) => (
+      Cell: ({ row }: CellProps<BudgetPlanItemOfUnbudgetForm>) => (
         <div style={{ minWidth: 100 }}>
           {getValueItemByMonth(
             row.values.items,
@@ -191,7 +202,7 @@ const CreateUnbudget: NextPage = () => {
     {
       Header: 'Mei',
       minWidth: 100,
-      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) => (
+      Cell: ({ row }: CellProps<BudgetPlanItemOfUnbudgetForm>) => (
         <div style={{ minWidth: 100 }}>
           {getValueItemByMonth(
             row.values.items,
@@ -205,7 +216,7 @@ const CreateUnbudget: NextPage = () => {
     {
       Header: 'Jun',
       minWidth: 100,
-      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) => (
+      Cell: ({ row }: CellProps<BudgetPlanItemOfUnbudgetForm>) => (
         <div style={{ minWidth: 100 }}>
           {getValueItemByMonth(
             row.values.items,
@@ -219,7 +230,7 @@ const CreateUnbudget: NextPage = () => {
     {
       Header: 'Jul',
       minWidth: 100,
-      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) => (
+      Cell: ({ row }: CellProps<BudgetPlanItemOfUnbudgetForm>) => (
         <div style={{ minWidth: 100 }}>
           {getValueItemByMonth(
             row.values.items,
@@ -233,7 +244,7 @@ const CreateUnbudget: NextPage = () => {
     {
       Header: 'Aug',
       minWidth: 100,
-      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) => (
+      Cell: ({ row }: CellProps<BudgetPlanItemOfUnbudgetForm>) => (
         <div style={{ minWidth: 100 }}>
           {getValueItemByMonth(
             row.values.items,
@@ -247,7 +258,7 @@ const CreateUnbudget: NextPage = () => {
     {
       Header: 'Sep',
       minWidth: 100,
-      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) => (
+      Cell: ({ row }: CellProps<BudgetPlanItemOfUnbudgetForm>) => (
         <div style={{ minWidth: 100 }}>
           {getValueItemByMonth(
             row.values.items,
@@ -261,7 +272,7 @@ const CreateUnbudget: NextPage = () => {
     {
       Header: 'Oct',
       minWidth: 100,
-      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) => (
+      Cell: ({ row }: CellProps<BudgetPlanItemOfUnbudgetForm>) => (
         <div style={{ minWidth: 100 }}>
           {getValueItemByMonth(
             row.values.items,
@@ -275,7 +286,7 @@ const CreateUnbudget: NextPage = () => {
     {
       Header: 'Nov',
       minWidth: 100,
-      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) => (
+      Cell: ({ row }: CellProps<BudgetPlanItemOfUnbudgetForm>) => (
         <div style={{ minWidth: 100 }}>
           {getValueItemByMonth(
             row.values.items,
@@ -289,7 +300,7 @@ const CreateUnbudget: NextPage = () => {
     {
       Header: 'Dec',
       minWidth: 100,
-      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) => (
+      Cell: ({ row }: CellProps<BudgetPlanItemOfUnbudgetForm>) => (
         <div style={{ minWidth: 100 }}>
           {getValueItemByMonth(
             row.values.items,
@@ -375,7 +386,7 @@ const CreateUnbudget: NextPage = () => {
                   name="unbudgetAttachmentFile"
                   control={control}
                   placeholder="Upload Excel File"
-                  error={(errors.unbudgetAttachment as FieldError)?.message}
+                  error={errors.unbudgetAttachment?.message}
                 />
                 <Button
                   variant="link"
@@ -443,14 +454,12 @@ const CreateUnbudget: NextPage = () => {
                       name="outstandingPlanPaymentAttachmentFile"
                       control={control}
                       placeholder="Upload Excel File"
-                      error={
-                        (errors.outstandingPlanPaymentAttachment as FieldError)
-                          ?.message
-                      }
+                      error={errors.outstandingPlanPaymentAttachment?.message}
                     />
                     <Button
                       variant="link"
                       className="mt-2 p-0 font-xs"
+                      disabled={!!!watchOutstandingPlanPaymentAttachmentFile}
                       onClick={() => {
                         clearErrors('outstandingPlanPaymentAttachment');
                         uploadAttachment('outstandingPlanPaymentAttachment');
@@ -478,14 +487,12 @@ const CreateUnbudget: NextPage = () => {
                       name="outstandingRetentionAttachmentFile"
                       control={control}
                       placeholder="Upload Excel File"
-                      error={
-                        (errors.outstandingRetentionAttachment as FieldError)
-                          ?.message
-                      }
+                      error={errors.outstandingRetentionAttachment?.message}
                     />
                     <Button
                       variant="link"
                       className="mt-2 p-0 font-xs"
+                      disabled={!!!watchOutstandingRetentionAttachmentFile}
                       onClick={() => {
                         clearErrors('outstandingRetentionAttachment');
                         uploadAttachment('outstandingRetentionAttachment');

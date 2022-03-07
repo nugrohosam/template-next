@@ -9,9 +9,10 @@ import {
 import {
   deleteOverBudget,
   DeleteOverBudgetParams,
+  fetchOverBudgetDetail,
   fetchOverBudgets,
 } from './api';
-import { OverBudget } from './entities';
+import { OverBudget, OverBudgetDetail } from './entities';
 
 export const useFetchOverBudgets = (
   params: PaginateParams
@@ -26,5 +27,15 @@ export const useDeleteOverBudgets = (): UseMutationResult<
 > => {
   return useMutation(({ idOverbudgets, action }) =>
     deleteOverBudget({ idOverbudgets, action })
+  );
+};
+
+export const useFetchOverBudgetDetail = (
+  idOverBudget: string
+): UseQueryResult<OverBudgetDetail> => {
+  return useQuery(
+    ['overbudget-detail', idOverBudget],
+    () => fetchOverBudgetDetail(idOverBudget),
+    { enabled: !!idOverBudget }
   );
 };

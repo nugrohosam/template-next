@@ -1,4 +1,5 @@
 import { OverBudgetStatus } from 'constants/status';
+import { BudgetReference } from 'modules/budgetReference/entities';
 
 export type OverBudget = {
   id: string;
@@ -15,4 +16,12 @@ export type OverBudget = {
   workflowApprovalPosition: Array<string>;
   workflowApprovalName: Array<string>;
   createdAt: string;
+};
+
+export type OverBudgetDetail = OverBudget & {
+  budgetReference: BudgetReference;
+  attachment: string;
+  description: string;
+  quantity: number;
+  workflowApprovalId: number;
 };

@@ -4,19 +4,23 @@ import LoadingButton from 'components/ui/Button/LoadingButton';
 import ContentLayout from 'components/ui/ContentLayout';
 import ApproveModal from 'components/ui/Modal/ApproveModal';
 import DataTable, { usePaginateParams } from 'components/ui/Table/DataTable';
-import { overBudgetStatusOptions } from 'constants/status';
+import { OverBudgetStatus, overBudgetStatusOptions } from 'constants/status';
 import { UserType } from 'constants/user';
+import { ApprovalField } from 'modules/approval/entities';
 import { useDecodeToken } from 'modules/custom/useDecodeToken';
-import { OverBudget } from 'modules/overbudget/entities';
+import { OverBudget, SubmitOverbudgets } from 'modules/overbudget/entities';
 import {
+  useApprovalOverbudgets,
   useDeleteOverBudgets,
   useFetchOverBudgets,
+  useSubmitOverbudgets,
 } from 'modules/overbudget/hook';
 import moment from 'moment';
 import { NextPage } from 'next';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { Button, Col, Row } from 'react-bootstrap';
+import { BsFillEyeFill, BsPencilSquare, BsTrash2Fill } from 'react-icons/bs';
 import Select from 'react-select';
 import { CellProps, Column, SortingRule } from 'react-table';
 import { toast } from 'react-toastify';
@@ -63,6 +67,65 @@ const OverBudgetIndex: NextPage = () => {
     }
   };
 
+  const approvalOverbudgetsMutation = useApprovalOverbudgets();
+  const approvalOverbudgets = (
+    data: ApprovalField & { idOverbudgets: Array<string> }
+  ) => {
+    approvalOverbudgetsMutation.mutate(
+      {
+        idOverbudgets: data.idOverbudgets,
+        status: data.status,
+        remark: data.notes,
+      },
+      {
+        onSuccess: () => {
+          dataHook.refetch();
+          toast('Data approved!');
+        },
+        onError: (error) => {
+          console.log('Failed to approve data', error);
+          toast(error.message, { autoClose: false });
+          showErrorMessage(error);
+        },
+      }
+    );
+  };
+
+  const handleMultipleApprovalOverbudgets = (data: ApprovalField) => {
+    const ids = getAllIds(selectedRow, dataHook.data) as string[];
+    if (ids) {
+      approvalOverbudgets({
+        idOverbudgets: ids,
+        status: data.status,
+      });
+    }
+  };
+
+  const submitOverbudgetsMutation = useSubmitOverbudgets();
+  const submitOverbudgets = (idOverbudgets: Array<string>) => {
+    submitOverbudgetsMutation.mutate(
+      { idOverbudgets },
+      {
+        onSuccess: () => {
+          dataHook.refetch();
+          toast('Data submited!');
+        },
+        onError: (error) => {
+          console.log('Failed to approve data', error);
+          toast(error.message, { autoClose: false });
+          showErrorMessage(error);
+        },
+      }
+    );
+  };
+
+  const handleMultipleSubmitOverbudgets = () => {
+    const ids = getAllIds(selectedRow, dataHook.data) as string[];
+    if (confirm('Submit selected data?') && ids) {
+      submitOverbudgets(ids);
+    }
+  };
+
   const columns = useMemo<Column<OverBudget>[]>(
     () => [
       {
@@ -103,14 +166,38 @@ const OverBudgetIndex: NextPage = () => {
         Cell: ({ cell }: CellProps<OverBudget>) => {
           return (
             <>
-              <ButtonActions
-                hrefDetail={`/overbudgets/${cell.row.values.id}/detail`}
-                hrefEdit={`/overbudgets/${cell.row.values.id}/edit`}
-                onDelete={() => {
-                  if (confirm('Delete data?'))
-                    deleteOverBudget([cell.row.values.id]);
-                }}
-              />
+              <div className="d-flex">
+                <Link
+                  href={`/overbudgets/${cell.row.values.id}/detail`}
+                  passHref
+                >
+                  <Button className="d-flex mr-2">
+                    <BsFillEyeFill className="align-self-center" />
+                  </Button>
+                </Link>
+                {profile?.type !== UserType.ApprovalBudgetPlanCapex &&
+                  (cell.row.values.status === OverBudgetStatus.DRAFT ||
+                    cell.row.values.status === OverBudgetStatus.REVISE) && (
+                    <Link
+                      href={`/overbudgets/${cell.row.values.id}/edit`}
+                      passHref
+                    >
+                      <Button className="mr-2 d-flex" variant="info">
+                        <BsPencilSquare className="align-self-center" />
+                      </Button>
+                    </Link>
+                  )}
+                <Button
+                  className="d-flex"
+                  variant="red"
+                  onClick={() => {
+                    if (confirm('Delete data?'))
+                      deleteOverBudget([cell.row.values.id]);
+                  }}
+                >
+                  <BsTrash2Fill className="align-self-center" />
+                </Button>
+              </div>
             </>
           );
         },
@@ -154,8 +241,8 @@ const OverBudgetIndex: NextPage = () => {
                       variant="primary"
                       size="sm"
                       className="mr-2"
-                      // disabled={mutation.isLoading}
-                      // onClick={handleDeleteMultipleBudgetPeriod}
+                      disabled={submitOverbudgetsMutation.isLoading}
+                      onClick={handleMultipleSubmitOverbudgets}
                       isLoading={false}
                     >
                       Submit
@@ -165,10 +252,7 @@ const OverBudgetIndex: NextPage = () => {
                 {profile?.type === UserType.ApprovalBudgetPlanCapex && (
                   <>
                     <ApproveModal
-                      // onSend={(data) =>
-                      //   handleApprovaltMultipleBudgetPlanItemsGroups(data)
-                      // }
-                      onSend={(data) => console.log(data)}
+                      onSend={(data) => handleMultipleApprovalOverbudgets(data)}
                       classButton="mr-2"
                     />
                   </>

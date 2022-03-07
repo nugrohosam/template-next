@@ -7,14 +7,22 @@ import {
 } from 'react-query';
 
 import {
+  approvalOverbudgets,
   createOverBudget,
   deleteOverBudget,
   DeleteOverBudgetParams,
   fetchOverBudgetDetail,
   fetchOverBudgets,
+  submitOverbudgets,
   updateOverBudget,
 } from './api';
-import { OverBudget, OverBudgetDetail, OverBudgetForm } from './entities';
+import {
+  ApprovalOverbudgets,
+  OverBudget,
+  OverBudgetDetail,
+  OverBudgetForm,
+  SubmitOverbudgets,
+} from './entities';
 
 export const useFetchOverBudgets = (
   params: PaginateParams
@@ -63,4 +71,20 @@ export const useUpdateOverbudget = (): UseMutationResult<
   return useMutation(({ idOverbudget, data }) =>
     updateOverBudget(idOverbudget, data)
   );
+};
+
+export const useApprovalOverbudgets = (): UseMutationResult<
+  null,
+  ResponseError,
+  ApprovalOverbudgets
+> => {
+  return useMutation((data) => approvalOverbudgets(data));
+};
+
+export const useSubmitOverbudgets = (): UseMutationResult<
+  null,
+  ResponseError,
+  SubmitOverbudgets
+> => {
+  return useMutation((data) => submitOverbudgets(data));
 };

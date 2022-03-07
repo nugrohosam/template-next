@@ -12,7 +12,7 @@ import {
 
 export const useUnbudgetHelpers = () => {
   const mutationCreateUnbudget = useCreateUnbudget();
-  const handleSubmitCreateUnbudget = (data: UnbudgetForm) => {
+  const handleCreateUnbudget = (data: UnbudgetForm) => {
     return new Promise((resolve, reject) => {
       mutationCreateUnbudget.mutate(data, {
         onSuccess: (result) => {
@@ -30,10 +30,7 @@ export const useUnbudgetHelpers = () => {
   };
 
   const mutationUpdateUnbudget = useUpdateUnbudget();
-  const handleUpdateCreateUnbudget = (
-    idUnbudget: string,
-    data: UnbudgetForm
-  ) => {
+  const handleUpdateUnbudget = (idUnbudget: string, data: UnbudgetForm) => {
     return new Promise((resolve, reject) => {
       mutationUpdateUnbudget.mutate(
         { idUnbudget, data },
@@ -109,9 +106,9 @@ export const useUnbudgetHelpers = () => {
 
   return {
     mutationCreateUnbudget,
-    handleSubmitCreateUnbudget,
+    handleCreateUnbudget,
     mutationUpdateUnbudget,
-    handleUpdateCreateUnbudget,
+    handleUpdateUnbudget,
     deleteUnbudgetsMutation,
     handleDeleteUnbudgets,
     submitUnbudgetsMutation,

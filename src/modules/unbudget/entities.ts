@@ -79,4 +79,5 @@ export interface BudgetPlanItemOfUnbudgetForm {
   detail: string | null;
   items: ItemOfUnbudgetItem[];
   catalog?: Catalog;
+  id?: string;
 }

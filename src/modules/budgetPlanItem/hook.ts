@@ -1,32 +1,27 @@
-import { Paginate, PaginateParams, ResponseError } from 'modules/common/types';
-import {
-  useMutation,
-  UseMutationResult,
-  useQuery,
-  UseQueryResult,
-} from 'react-query';
+import { ResponseError } from 'modules/common/types';
+import { useMutation, UseMutationResult } from 'react-query';
 
 import {
-  createBudgetPlanItems,
+  createBudgetPlanItem,
   deleteBudgetPlanItems,
-  updateBudgetPlanItems,
+  updateBudgetPlanItem,
 } from './api';
 import { BudgetPlanItem, BudgetPlanItemForm } from './entities';
 
-export const useCreateBudgetPlanItems = (): UseMutationResult<
+export const useCreateBudgetPlanItem = (): UseMutationResult<
   BudgetPlanItem,
   ResponseError,
   BudgetPlanItemForm
 > => {
-  return useMutation(createBudgetPlanItems);
+  return useMutation(createBudgetPlanItem);
 };
 
-export const useUpdateBudgetPlanItems = (): UseMutationResult<
+export const useUpdateBudgetPlanItem = (): UseMutationResult<
   BudgetPlanItem,
   ResponseError,
   BudgetPlanItemForm
 > => {
-  return useMutation(updateBudgetPlanItems);
+  return useMutation(updateBudgetPlanItem);
 };
 
 export const useDeleteBudgetPlanitems = (): UseMutationResult<

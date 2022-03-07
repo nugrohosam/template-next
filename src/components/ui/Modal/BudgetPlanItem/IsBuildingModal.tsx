@@ -1,11 +1,11 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import Input from 'components/form/Input';
-import SingleSelect, { SelectOption } from 'components/form/SingleSelect';
+import SingleSelect from 'components/form/SingleSelect';
 import { Currency, currencyOptions } from 'constants/currency';
-import { useFetchAssetGroups } from 'modules/assetGroup/hook';
+import { useAssetGroupOptions } from 'modules/assetGroup/helpers';
 import {
+  BudgetPlanItemOfBudgetPlanItemForm,
   ItemOfBudgetPlanItem,
-  ItemOfBudgetPlanItemForm,
 } from 'modules/budgetPlanItem/entities';
 import { useKurs } from 'modules/custom/useKurs';
 import moment from 'moment';
@@ -17,57 +17,46 @@ import * as yup from 'yup';
 
 import SimpleTable from '../../Table/SimpleTable';
 import ModalBox from '..';
+import { BudgetPlanItemModalProps } from './BudgetPlanItemModal';
 
-interface IsBuildingBudgetPlanItemModalProps {
-  onSend: (data: ItemOfBudgetPlanItemForm) => void;
-  classButton?: string;
-  isEdit?: boolean;
-  inPageUpdate?: { idAssetGroup: string; currency: Currency | null };
-  buttonTitle?: string;
-  myItem?: ItemOfBudgetPlanItemForm;
-}
-
+const initItems = () =>
+  [...Array(12).keys()].map((item) => ({
+    month: item + 1,
+    quantity: 0,
+  }));
 const initDefaultValues = () => ({
   idAssetGroup: '',
   currency: null,
   detail: '',
   pricePerUnit: 0,
   idCapexCatalog: null,
-  // TODO: currenctRate masih dummy
-  currencyRate: 10000,
-  items: [...Array(12).keys()].map((item) => ({
-    month: item + 1,
-    quantity: 0,
-  })),
+  currencyRate: 10000, // TODO: currenctRate masih dummy
+  items: initItems(),
 });
 
-const IsBuildingBudgetPlanItemModal: React.FC<
-  IsBuildingBudgetPlanItemModalProps
-> = ({
+const schema = yup.object().shape({
+  idAssetGroup: yup.string().required(),
+  currency: yup.string().required().nullable(),
+  detail: yup.string().required().nullable(),
+});
+
+const IsBuildingBudgetPlanItemModal: React.FC<BudgetPlanItemModalProps> = ({
   onSend,
   classButton,
-  isEdit = false,
-  inPageUpdate,
-  buttonTitle = '+ Add Item',
+  buttonTitle,
+  isEdit,
   myItem,
 }) => {
-  const { kurs } = useKurs();
-
-  const schema = yup.object().shape({
-    idAssetGroup: yup.string().required(),
-    currency: yup.string().required(),
-    detail: yup.string().required().nullable(),
-  });
-
+  /**
+   * Handle form
+   */
   const {
     handleSubmit,
     control,
     formState: { errors },
     watch,
-    resetField,
     reset,
-  } = useForm<ItemOfBudgetPlanItemForm>({
-    shouldUnregister: false,
+  } = useForm<BudgetPlanItemOfBudgetPlanItemForm>({
     mode: 'onChange',
     resolver: yupResolver(schema),
     delayError: 500,
@@ -77,27 +66,44 @@ const IsBuildingBudgetPlanItemModal: React.FC<
     control,
     name: 'items',
   });
-  const watchCurrency = watch('currency');
-  const watchItems = watch('items');
+  const { currency: watchCurrency, items: watchItems } = watch();
 
-  const handleSubmitForm = (data: ItemOfBudgetPlanItemForm) => {
-    data.totalAmount = +totalAmount();
-    data.totalAmountUsd = +totalAmountUsd();
+  const handleSubmitForm = (data: BudgetPlanItemOfBudgetPlanItemForm) => {
+    data.items = watchItems
+      .filter((item) => item.amount)
+      .map((item) => ({
+        month: item.month,
+        quantity: item.quantity,
+        amount: +item.amount || 0,
+      }));
+    data.totalAmount = totalAmount(Currency.IDR);
+    data.totalAmountUsd = totalAmount(Currency.USD);
 
-    data.items = data.items.map((item) => ({ ...item, amount: +item.amount }));
     onSend(data);
     reset(initDefaultValues());
   };
+  // --------------- //
 
-  // asset group options
-  const dataHookAssetGroups = useFetchAssetGroups({ pageSize: 50 });
-  const assetGroupOptions: SelectOption[] =
-    dataHookAssetGroups.data?.items
-      .filter((item) => item.assetGroupCode === 'BG')
-      .map((item) => ({
-        value: item.id,
-        label: item.assetGroup,
-      })) || [];
+  const { kurs } = useKurs();
+  const assetGroupOptions = useAssetGroupOptions().filter(
+    (item) => item.label === 'Building'
+  );
+
+  const totalAmount = (currency: Currency) => {
+    if (!watchCurrency) return 0;
+    const total = watchItems
+      .filter((item) => item.amount)
+      .map((item) => +item.amount)
+      .reduce((previousValue, currentValue) => previousValue + currentValue, 0);
+
+    if (currency === Currency.USD) {
+      return watchCurrency === Currency.IDR ? total / kurs : total;
+    } else if (currency === Currency.IDR) {
+      return watchCurrency === Currency.USD ? total * kurs : total;
+    }
+
+    return 0;
+  };
 
   const columns = useMemo<Column<ItemOfBudgetPlanItem>[]>(
     () => [
@@ -128,50 +134,32 @@ const IsBuildingBudgetPlanItemModal: React.FC<
         ),
       },
     ],
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [control, errors.items, watchItems]
+    [control, errors.items]
   );
-
-  const totalAmount = () => {
-    if (!watchCurrency) return 0;
-    const total = watchItems
-      .map((item) => +item.amount)
-      .reduce((previousValue, currentValue) => previousValue + currentValue, 0);
-
-    return watchCurrency === Currency.USD ? total * kurs : total;
-  };
-
-  const totalAmountUsd = () => {
-    if (!watchCurrency) return 0;
-    const total = watchItems
-      .map((item) => +item.amount)
-      .reduce((previousValue, currentValue) => previousValue + currentValue, 0);
-
-    return watchCurrency === Currency.IDR ? total / kurs : total;
-  };
 
   const onModalOpened = () => {
     if (isEdit) {
       reset({
         idAssetGroup: myItem?.idAssetGroup,
-        idCapexCatalog: myItem?.idCapexCatalog,
         pricePerUnit: myItem?.pricePerUnit,
         currency: myItem?.currency,
         currencyRate: myItem?.currencyRate,
         id: myItem?.id,
-        items: myItem?.items.map((prev) => {
-          const foundMonth = myItem?.items.find(
-            (item) => item.month === prev.month
-          );
-          return foundMonth || prev;
-        }),
+        detail: myItem?.detail,
+        items:
+          initItems().map((prev) => {
+            const foundMonth = myItem?.items.find(
+              (item) => item.month === prev.month
+            );
+            return foundMonth || prev;
+          }) || [],
       });
     }
   };
 
   return (
     <ModalBox
-      buttonTitle={buttonTitle}
+      buttonTitle={buttonTitle || ''}
       buttonVariant="primary"
       submitButtonVariant="primary"
       classButton={classButton}
@@ -197,10 +185,10 @@ const IsBuildingBudgetPlanItemModal: React.FC<
             <SingleSelect
               name="idAssetGroup"
               control={control}
+              defaultValue=""
               placeholder="Asset Group"
               options={assetGroupOptions}
               error={errors.idAssetGroup?.message}
-              onChange={() => resetField('currency')}
             />
           </FormGroup>
         </Col>
@@ -234,7 +222,7 @@ const IsBuildingBudgetPlanItemModal: React.FC<
             <FormLabel>Total IDR</FormLabel>
             <FormControl
               type="text"
-              value={totalAmount().toLocaleString('id-Id')}
+              value={totalAmount(Currency.IDR).toLocaleString('id-Id')}
               disabled
             />
           </FormGroup>
@@ -244,7 +232,7 @@ const IsBuildingBudgetPlanItemModal: React.FC<
             <FormLabel>Total USD</FormLabel>
             <FormControl
               type="text"
-              value={totalAmountUsd().toLocaleString('en-En')}
+              value={totalAmount(Currency.USD).toLocaleString('en-EN')}
               disabled
             />
           </FormGroup>

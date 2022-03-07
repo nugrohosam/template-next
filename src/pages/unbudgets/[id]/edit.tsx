@@ -10,10 +10,12 @@ import UnbudgetModal from 'components/ui/Modal/Unbudget/UnbudgetModal';
 import SimpleTable from 'components/ui/Table/SimpleTable';
 import { PeriodeType } from 'constants/period';
 import { useAttachmentHelpers } from 'modules/attachment/helpers';
-import { ItemOfBudgetPlanItemForm } from 'modules/budgetPlanItem/entities';
 import { getValueItemByMonth } from 'modules/budgetPlanItem/helpers';
 import { useDownloadTemplateHelpers } from 'modules/downloadTemplate/helpers';
-import { UnbudgetForm } from 'modules/unbudget/entities';
+import {
+  BudgetPlanItemOfUnbudgetForm,
+  UnbudgetForm,
+} from 'modules/unbudget/entities';
 import { useUnbudgetHelpers } from 'modules/unbudget/helpers';
 import {
   useFetchUnbudgetDetail,
@@ -86,6 +88,9 @@ const EditUnbudget: NextPage = () => {
       watchOutstandingPlanPaymentAttachmentFile,
     outstandingRetentionAttachmentFile: watchOutstandingRetentionAttachmentFile,
   } = watch();
+  const controlledFields = fields.map(
+    (field, index) => watchBudgetPlanItems[index]
+  );
 
   useEffect(() => {
     replace([]);
@@ -119,14 +124,13 @@ const EditUnbudget: NextPage = () => {
     reset,
   ]);
 
-  const { mutationUpdateUnbudget, handleUpdateCreateUnbudget } =
-    useUnbudgetHelpers();
+  const { mutationUpdateUnbudget, handleUpdateUnbudget } = useUnbudgetHelpers();
   const submitCreateUnbudget = (data: UnbudgetForm) => {
     delete data.unbudgetAttachmentFile;
     delete data.outstandingPlanPaymentAttachmentFile;
     delete data.outstandingRetentionAttachmentFile;
 
-    handleUpdateCreateUnbudget(idUnbudget, data)
+    handleUpdateUnbudget(idUnbudget, data)
       .then(() => router.push(`/unbudgets/${idUnbudget}/detail`))
       .catch((error) => setValidationError(error, setError));
   };
@@ -140,14 +144,17 @@ const EditUnbudget: NextPage = () => {
       .catch((error) => setValidationError(error, setError));
   };
 
-  const columns: Column<ItemOfBudgetPlanItemForm>[] = [
+  const columns: Column<BudgetPlanItemOfUnbudgetForm>[] = [
     { Header: 'Catalog', accessor: 'catalog' },
-    { Header: 'Items', accessor: 'items' },
+    { Header: 'Item', accessor: 'items' },
+    { Header: 'ID Asset Group', accessor: 'idAssetGroup' },
+    { Header: 'Currency Rate', accessor: 'currencyRate' },
+    { Header: 'ID', accessor: 'id' },
     {
       Header: 'Detail',
       accessor: 'detail',
       minWidth: 300,
-      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) =>
+      Cell: ({ row }: CellProps<BudgetPlanItemOfUnbudgetForm>) =>
         (watchIsBuilding ? row.values.detail : row.values.catalog?.detail) ||
         '-',
     },
@@ -159,25 +166,25 @@ const EditUnbudget: NextPage = () => {
     {
       Header: 'Price/Unit',
       accessor: 'pricePerUnit',
-      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) =>
+      Cell: ({ row }: CellProps<BudgetPlanItemOfUnbudgetForm>) =>
         row.values.pricePerUnit?.toLocaleString('id-Id') || '-',
     },
     {
       Header: 'Total USD',
       accessor: 'totalAmountUsd',
-      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) =>
+      Cell: ({ row }: CellProps<BudgetPlanItemOfUnbudgetForm>) =>
         row.values.totalAmountUsd?.toLocaleString('en-EN') || '-',
     },
     {
       Header: 'Total IDR',
       accessor: 'totalAmount',
-      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) =>
+      Cell: ({ row }: CellProps<BudgetPlanItemOfUnbudgetForm>) =>
         row.values.totalAmount?.toLocaleString('id-Id') || '-',
     },
     {
       Header: 'Jan',
       minWidth: 100,
-      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) => (
+      Cell: ({ row }: CellProps<BudgetPlanItemOfUnbudgetForm>) => (
         <div style={{ minWidth: 100 }}>
           {getValueItemByMonth(
             row.values.items,
@@ -191,7 +198,7 @@ const EditUnbudget: NextPage = () => {
     {
       Header: 'Feb',
       minWidth: 100,
-      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) => (
+      Cell: ({ row }: CellProps<BudgetPlanItemOfUnbudgetForm>) => (
         <div style={{ minWidth: 100 }}>
           {getValueItemByMonth(
             row.values.items,
@@ -205,7 +212,7 @@ const EditUnbudget: NextPage = () => {
     {
       Header: 'Mar',
       minWidth: 100,
-      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) => (
+      Cell: ({ row }: CellProps<BudgetPlanItemOfUnbudgetForm>) => (
         <div style={{ minWidth: 100 }}>
           {getValueItemByMonth(
             row.values.items,
@@ -219,7 +226,7 @@ const EditUnbudget: NextPage = () => {
     {
       Header: 'Apr',
       minWidth: 100,
-      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) => (
+      Cell: ({ row }: CellProps<BudgetPlanItemOfUnbudgetForm>) => (
         <div style={{ minWidth: 100 }}>
           {getValueItemByMonth(
             row.values.items,
@@ -233,7 +240,7 @@ const EditUnbudget: NextPage = () => {
     {
       Header: 'Mei',
       minWidth: 100,
-      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) => (
+      Cell: ({ row }: CellProps<BudgetPlanItemOfUnbudgetForm>) => (
         <div style={{ minWidth: 100 }}>
           {getValueItemByMonth(
             row.values.items,
@@ -247,7 +254,7 @@ const EditUnbudget: NextPage = () => {
     {
       Header: 'Jun',
       minWidth: 100,
-      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) => (
+      Cell: ({ row }: CellProps<BudgetPlanItemOfUnbudgetForm>) => (
         <div style={{ minWidth: 100 }}>
           {getValueItemByMonth(
             row.values.items,
@@ -261,7 +268,7 @@ const EditUnbudget: NextPage = () => {
     {
       Header: 'Jul',
       minWidth: 100,
-      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) => (
+      Cell: ({ row }: CellProps<BudgetPlanItemOfUnbudgetForm>) => (
         <div style={{ minWidth: 100 }}>
           {getValueItemByMonth(
             row.values.items,
@@ -275,7 +282,7 @@ const EditUnbudget: NextPage = () => {
     {
       Header: 'Aug',
       minWidth: 100,
-      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) => (
+      Cell: ({ row }: CellProps<BudgetPlanItemOfUnbudgetForm>) => (
         <div style={{ minWidth: 100 }}>
           {getValueItemByMonth(
             row.values.items,
@@ -289,7 +296,7 @@ const EditUnbudget: NextPage = () => {
     {
       Header: 'Sep',
       minWidth: 100,
-      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) => (
+      Cell: ({ row }: CellProps<BudgetPlanItemOfUnbudgetForm>) => (
         <div style={{ minWidth: 100 }}>
           {getValueItemByMonth(
             row.values.items,
@@ -303,7 +310,7 @@ const EditUnbudget: NextPage = () => {
     {
       Header: 'Oct',
       minWidth: 100,
-      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) => (
+      Cell: ({ row }: CellProps<BudgetPlanItemOfUnbudgetForm>) => (
         <div style={{ minWidth: 100 }}>
           {getValueItemByMonth(
             row.values.items,
@@ -317,7 +324,7 @@ const EditUnbudget: NextPage = () => {
     {
       Header: 'Nov',
       minWidth: 100,
-      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) => (
+      Cell: ({ row }: CellProps<BudgetPlanItemOfUnbudgetForm>) => (
         <div style={{ minWidth: 100 }}>
           {getValueItemByMonth(
             row.values.items,
@@ -331,7 +338,7 @@ const EditUnbudget: NextPage = () => {
     {
       Header: 'Dec',
       minWidth: 100,
-      Cell: ({ row }: CellProps<ItemOfBudgetPlanItemForm>) => (
+      Cell: ({ row }: CellProps<BudgetPlanItemOfUnbudgetForm>) => (
         <div style={{ minWidth: 100 }}>
           {getValueItemByMonth(
             row.values.items,
@@ -440,9 +447,16 @@ const EditUnbudget: NextPage = () => {
             <SimpleTable
               classTable="table-admin table-inherit"
               columns={columns}
-              items={fields}
+              items={controlledFields}
               selectedRows={selectedRow}
-              hiddenColumns={['catalog', 'items']}
+              hiddenColumns={[
+                'items',
+                'catalog',
+                'idAssetGroup',
+                'idCapexCatalog',
+                'currencyRate',
+                'id',
+              ]}
               onSelectedRowsChanged={(rows) => setSelectedRow(rows)}
               addOns={
                 <div className="d-flex align-items-center">

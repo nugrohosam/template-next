@@ -1,4 +1,5 @@
 import { Currency } from 'constants/currency';
+import { AssetGroup } from 'modules/assetGroup/entities';
 import { BudgetPlanItem } from 'modules/budgetPlanItem/entities';
 
 export enum BudgetPlanItemGroupStatus {
@@ -31,7 +32,7 @@ export type BudgetPlanItemGroup = {
 export type BudgetPlanItemGroupItem = BudgetPlanItem & {
   detail: string;
   budgetCode: string;
-  assetGroup: string;
+  assetGroup: AssetGroup;
 };
 
 export interface ApprovalBudgetPlanItemGroup {

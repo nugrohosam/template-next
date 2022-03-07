@@ -1,4 +1,4 @@
-import { Form } from 'react-bootstrap';
+import { Form, FormControl } from 'react-bootstrap';
 import {
   Control,
   Controller,
@@ -8,7 +8,7 @@ import {
   UseControllerProps,
 } from 'react-hook-form';
 
-interface PropsInput<T> extends UseControllerProps<T, FieldPath<T>> {
+interface PropsCheckbox<T> extends UseControllerProps<T, FieldPath<T>> {
   name: FieldPath<T>;
   control: Control<T, object>;
   type?: string;
@@ -19,7 +19,7 @@ interface PropsInput<T> extends UseControllerProps<T, FieldPath<T>> {
   label?: string;
 }
 
-function Input<T>({
+function Checkbox<T>({
   name,
   control,
   placeholder,
@@ -27,7 +27,7 @@ function Input<T>({
   error,
   disabled,
   label,
-}: PropsInput<T>) {
+}: PropsCheckbox<T>) {
   return (
     <>
       <Controller
@@ -43,6 +43,7 @@ function Input<T>({
               placeholder={placeholder}
               disabled={disabled}
               {...rest}
+              checked={value as boolean}
             />
             <label className="custom-control-label" htmlFor={name}>
               {label}
@@ -60,4 +61,4 @@ function Input<T>({
   );
 }
 
-export default Input;
+export default Checkbox;

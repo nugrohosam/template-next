@@ -63,6 +63,7 @@ const EditCatalog: NextPage = () => {
     mode: 'onChange',
     resolver: yupResolver(schema),
   });
+  const watchForm = watch();
 
   const { data: dataHook } = useFetchCatalogDetail(id);
 
@@ -97,33 +98,23 @@ const EditCatalog: NextPage = () => {
   };
   const currencyRate = 14500; // TODO: get from API
 
-  const data = watch();
-  const [idrDisabled, setIdrDisabled] = useState(false);
-  const [usdDisabled, setUsdDisabled] = useState(true);
-
-  const handleCurrencyChange = (value: string | number | boolean) => {
-    if (value == Currency.USD) {
-      // TODO: reset value IDR
-      setUsdDisabled(false);
-      setIdrDisabled(true);
-    } else {
-      // TODO: reset value USD
-      setUsdDisabled(true);
-      setIdrDisabled(false);
-    }
-    return currencyOptions;
-  };
-
   useEffect(() => {
-    if (data.primaryCurrency === Currency.IDR) {
+    if (watchForm.primaryCurrency === Currency.Idr) {
       setValue(
         'priceInUsd',
-        Number((data.priceInIdr / currencyRate).toFixed(2))
+        +(watchForm.priceInIdr / currencyRate).toLocaleString('en-En', {
+          maximumFractionDigits: 2,
+        })
       );
-    } else if (data.primaryCurrency === Currency.USD) {
-      setValue('priceInIdr', data.priceInUsd * currencyRate);
+    } else if (watchForm.primaryCurrency === Currency.Usd) {
+      setValue('priceInIdr', watchForm.priceInUsd * currencyRate);
     }
-  }, [data.primaryCurrency, data.priceInIdr, data.priceInUsd, setValue]);
+  }, [
+    setValue,
+    watchForm.priceInIdr,
+    watchForm.priceInUsd,
+    watchForm.primaryCurrency,
+  ]);
 
   return (
     <DetailLayout
@@ -169,7 +160,6 @@ const EditCatalog: NextPage = () => {
                   defaultValue=""
                   options={currencyOptions}
                   placeholder="Primary Currency"
-                  onChange={(e) => handleCurrencyChange(e.value)}
                 />
               </FormGroup>
             </Col>
@@ -193,7 +183,7 @@ const EditCatalog: NextPage = () => {
                 type="number"
                 placeholder="Price (IDR)"
                 error={errors.priceInIdr?.message}
-                disabled={idrDisabled}
+                disabled={watchForm.primaryCurrency === Currency.Usd}
               />
             </Col>
             <Col lg={6}>
@@ -205,7 +195,7 @@ const EditCatalog: NextPage = () => {
                 type="number"
                 placeholder="Price (USD)"
                 error={errors.priceInUsd?.message}
-                disabled={usdDisabled}
+                disabled={watchForm.primaryCurrency === Currency.Idr}
               />
             </Col>
           </Row>

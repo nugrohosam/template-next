@@ -95,8 +95,8 @@ const NonBuildingBudgetPlanItemModal: React.FC<BudgetPlanItemModalProps> = ({
         quantity: +item.quantity || 0,
         amount: item.amount || 0,
       }));
-    data.totalAmount = totalAmount(Currency.IDR);
-    data.totalAmountUsd = totalAmount(Currency.USD);
+    data.totalAmount = totalAmount(Currency.Idr);
+    data.totalAmountUsd = totalAmount(Currency.Usd);
     data.catalog = catalogOptions.find(
       (item) => item.id === data.idCapexCatalog
     );
@@ -117,7 +117,7 @@ const NonBuildingBudgetPlanItemModal: React.FC<BudgetPlanItemModalProps> = ({
     if (watchCurrency && found) {
       setValue(
         'pricePerUnit',
-        watchCurrency === Currency.IDR ? found?.priceInIdr : found?.priceInUsd
+        watchCurrency === Currency.Idr ? found?.priceInIdr : found?.priceInUsd
       );
     }
   };
@@ -129,7 +129,7 @@ const NonBuildingBudgetPlanItemModal: React.FC<BudgetPlanItemModalProps> = ({
     if (watchIdCapexCatalog && found) {
       setValue(
         'pricePerUnit',
-        currency === Currency.IDR ? found?.priceInIdr : found?.priceInUsd
+        currency === Currency.Idr ? found?.priceInIdr : found?.priceInUsd
       );
     }
   };
@@ -141,10 +141,10 @@ const NonBuildingBudgetPlanItemModal: React.FC<BudgetPlanItemModalProps> = ({
       .map((item) => item.amount)
       .reduce((previousValue, currentValue) => previousValue + currentValue, 0);
 
-    if (currency === Currency.USD) {
-      return watchCurrency === Currency.IDR ? total / kurs : total;
-    } else if (currency === Currency.IDR) {
-      return watchCurrency === Currency.USD ? total * kurs : total;
+    if (currency === Currency.Usd) {
+      return watchCurrency === Currency.Idr ? total / kurs : total;
+    } else if (currency === Currency.Idr) {
+      return watchCurrency === Currency.Usd ? total * kurs : total;
     }
 
     return 0;
@@ -218,7 +218,7 @@ const NonBuildingBudgetPlanItemModal: React.FC<BudgetPlanItemModalProps> = ({
             value={
               row.values.amount
                 ? row.values.amount.toLocaleString(
-                    watchCurrency === Currency.USD ? 'en-En' : 'id-Id'
+                    watchCurrency === Currency.Usd ? 'en-En' : 'id-Id'
                   )
                 : 0
             }
@@ -318,7 +318,7 @@ const NonBuildingBudgetPlanItemModal: React.FC<BudgetPlanItemModalProps> = ({
             <FormLabel>Total IDR</FormLabel>
             <FormControl
               type="text"
-              value={totalAmount(Currency.IDR).toLocaleString('id-Id')}
+              value={totalAmount(Currency.Idr).toLocaleString('id-Id')}
               disabled
             />
           </FormGroup>
@@ -328,7 +328,7 @@ const NonBuildingBudgetPlanItemModal: React.FC<BudgetPlanItemModalProps> = ({
             <FormLabel>Total USD</FormLabel>
             <FormControl
               type="text"
-              value={totalAmount(Currency.USD).toLocaleString('en-EN')}
+              value={totalAmount(Currency.Usd).toLocaleString('en-EN')}
               disabled
             />
           </FormGroup>

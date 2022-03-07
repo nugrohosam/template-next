@@ -74,8 +74,8 @@ const IsBuildingUnbudgetModal: React.FC<UnbudgetModalProps> = ({
         quantity: item.quantity,
         amount: +item.amount || 0,
       }));
-    data.totalAmount = totalAmount(Currency.IDR);
-    data.totalAmountUsd = totalAmount(Currency.USD);
+    data.totalAmount = totalAmount(Currency.Idr);
+    data.totalAmountUsd = totalAmount(Currency.Usd);
 
     onSend(data);
     reset(initDefaultValues());
@@ -92,10 +92,10 @@ const IsBuildingUnbudgetModal: React.FC<UnbudgetModalProps> = ({
       .map((item) => +item.amount)
       .reduce((previousValue, currentValue) => previousValue + currentValue, 0);
 
-    if (currency === Currency.USD) {
-      return watchCurrency === Currency.IDR ? total / kurs : total;
-    } else if (currency === Currency.IDR) {
-      return watchCurrency === Currency.USD ? total * kurs : total;
+    if (currency === Currency.Usd) {
+      return watchCurrency === Currency.Idr ? total / kurs : total;
+    } else if (currency === Currency.Idr) {
+      return watchCurrency === Currency.Usd ? total * kurs : total;
     }
 
     return 0;
@@ -210,7 +210,7 @@ const IsBuildingUnbudgetModal: React.FC<UnbudgetModalProps> = ({
             <FormLabel>Total IDR</FormLabel>
             <FormControl
               type="text"
-              value={totalAmount(Currency.IDR).toLocaleString('id-Id')}
+              value={totalAmount(Currency.Idr).toLocaleString('id-Id')}
               disabled
             />
           </FormGroup>
@@ -220,7 +220,7 @@ const IsBuildingUnbudgetModal: React.FC<UnbudgetModalProps> = ({
             <FormLabel>Total USD</FormLabel>
             <FormControl
               type="text"
-              value={totalAmount(Currency.USD).toLocaleString('en-EN')}
+              value={totalAmount(Currency.Usd).toLocaleString('en-EN')}
               disabled
             />
           </FormGroup>

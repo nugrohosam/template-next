@@ -9,7 +9,6 @@ import {
   useDownloadCatalogExcel,
   useFetchCatalogs,
 } from 'modules/catalog/hook';
-import { ResponseError } from 'modules/common/types';
 import { useAssetGroupOptions } from 'modules/custom/useAssetGroupOptions';
 import { NextPage } from 'next';
 import Link from 'next/link';

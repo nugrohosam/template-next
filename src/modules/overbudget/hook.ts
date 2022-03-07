@@ -7,12 +7,13 @@ import {
 } from 'react-query';
 
 import {
+  createOverBudget,
   deleteOverBudget,
   DeleteOverBudgetParams,
   fetchOverBudgetDetail,
   fetchOverBudgets,
 } from './api';
-import { OverBudget, OverBudgetDetail } from './entities';
+import { OverBudget, OverBudgetDetail, OverBudgetForm } from './entities';
 
 export const useFetchOverBudgets = (
   params: PaginateParams
@@ -38,4 +39,12 @@ export const useFetchOverBudgetDetail = (
     () => fetchOverBudgetDetail(idOverBudget),
     { enabled: !!idOverBudget }
   );
+};
+
+export const useCreateOverBudget = (): UseMutationResult<
+  OverBudget,
+  ResponseError,
+  OverBudgetForm
+> => {
+  return useMutation(createOverBudget);
 };

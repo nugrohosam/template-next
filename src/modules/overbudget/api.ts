@@ -1,7 +1,7 @@
 import { Paginate, PaginateParams, ResponseData } from 'modules/common/types';
 import axios from 'utils/axios';
 
-import { OverBudget, OverBudgetDetail } from './entities';
+import { OverBudget, OverBudgetDetail, OverBudgetForm } from './entities';
 
 export const fetchOverBudgets = async (
   params: PaginateParams
@@ -33,6 +33,16 @@ export const fetchOverBudgetDetail = async (
 ): Promise<OverBudgetDetail> => {
   const result = await axios.get<ResponseData<OverBudgetDetail>>(
     `v1/overbudgets/${idOverBudget}`
+  );
+  return result.data.data;
+};
+
+export const createOverBudget = async (
+  data: OverBudgetForm
+): Promise<OverBudget> => {
+  const result = await axios.post<ResponseData<OverBudget>>(
+    'v1/overbudgets',
+    data
   );
   return result.data.data;
 };

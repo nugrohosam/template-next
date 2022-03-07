@@ -1,4 +1,5 @@
 import { customStyles } from 'components/form/SingleSelect';
+import ButtonActions from 'components/ui/Button/ButtonActions';
 import LoadingButton from 'components/ui/Button/LoadingButton';
 import ContentLayout from 'components/ui/ContentLayout';
 import ApproveModal from 'components/ui/Modal/ApproveModal';
@@ -102,31 +103,14 @@ const OverBudgetIndex: NextPage = () => {
         Cell: ({ cell }: CellProps<OverBudget>) => {
           return (
             <>
-              <div className="d-flex">
-                <Link
-                  href={`/overbudgets/${cell.row.values.id}/detail`}
-                  passHref
-                >
-                  <Button className="d-flex mr-2">
-                    <i className="bi-eye align-self-center"></i>
-                  </Button>
-                </Link>
-                <Link href={`/overbudgets/${cell.row.values.id}/edit`} passHref>
-                  <Button className="mr-2 d-flex" variant="info">
-                    <i className="bi-pencil-square align-self-center"></i>
-                  </Button>
-                </Link>
-                <Button
-                  className="d-flex"
-                  variant="red"
-                  onClick={() => {
-                    if (confirm('Delete data?'))
-                      deleteOverBudget([cell.row.values.id]);
-                  }}
-                >
-                  <i className="bi-trash align-self-center"></i>
-                </Button>
-              </div>
+              <ButtonActions
+                hrefDetail={`/overbudgets/${cell.row.values.id}/detail`}
+                hrefEdit={`/overbudgets/${cell.row.values.id}/edit`}
+                onDelete={() => {
+                  if (confirm('Delete data?'))
+                    deleteOverBudget([cell.row.values.id]);
+                }}
+              />
             </>
           );
         },

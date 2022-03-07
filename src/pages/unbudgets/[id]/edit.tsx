@@ -7,7 +7,6 @@ import { PathBreadcrumb } from 'components/ui/Breadcrumb';
 import LoadingButton from 'components/ui/Button/LoadingButton';
 import DetailLayout from 'components/ui/DetailLayout';
 import UnbudgetModal from 'components/ui/Modal/Unbudget/UnbudgetModal';
-import { usePaginateParams } from 'components/ui/Table/DataTable';
 import SimpleTable from 'components/ui/Table/SimpleTable';
 import { PeriodeType } from 'constants/period';
 import { useAttachmentHelpers } from 'modules/attachment/helpers';
@@ -458,6 +457,14 @@ const EditUnbudget: NextPage = () => {
                   <UnbudgetModal
                     isBuilding={watchIsBuilding}
                     period={periodNow}
+                    {...(watchBudgetPlanItems?.length > 0 && {
+                      inPageUpdate: {
+                        idAssetGroup:
+                          watchBudgetPlanItems[0]?.catalog?.assetGroup?.id ||
+                          '',
+                        currency: watchBudgetPlanItems[0]?.currency,
+                      },
+                    })}
                     onSend={append}
                   ></UnbudgetModal>
                 </div>

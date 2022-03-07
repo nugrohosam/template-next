@@ -1,4 +1,3 @@
-// TODO: Next time harus refactor menggunakan https://react-hook-form.com/api/usefieldarray/
 import { yupResolver } from '@hookform/resolvers/yup';
 import Input from 'components/form/Input';
 import SingleSelect from 'components/form/SingleSelect';
@@ -50,6 +49,7 @@ const NonBuildingUnbudgetModal: React.FC<UnbudgetModalProps> = ({
   classButton,
   buttonTitle,
   period,
+  inPageUpdate,
 }) => {
   /**
    * Handle form
@@ -87,11 +87,13 @@ const NonBuildingUnbudgetModal: React.FC<UnbudgetModalProps> = ({
   });
 
   const handleSubmitForm = (data: BudgetPlanItemOfUnbudgetForm) => {
-    data.items = controlledFields.map((item) => ({
-      month: item.month,
-      quantity: +item.quantity || 0,
-      amount: item.amount || 0,
-    }));
+    data.items = controlledFields
+      .filter((item) => item.quantity)
+      .map((item) => ({
+        month: item.month,
+        quantity: +item.quantity || 0,
+        amount: item.amount || 0,
+      }));
     data.totalAmount = totalAmount(Currency.IDR);
     data.totalAmountUsd = totalAmount(Currency.USD);
     data.catalog = catalogOptions.find(
@@ -156,6 +158,21 @@ const NonBuildingUnbudgetModal: React.FC<UnbudgetModalProps> = ({
     return true;
   };
 
+  const onModalOpened = () => {
+    if (inPageUpdate) {
+      /**
+       * special condition when create item in update page,
+       * field idAssetGroup and currency will disable.
+       * Because the value will get from index 0 budget plan items
+       */
+      reset({
+        ...initDefaultValues(),
+        idAssetGroup: inPageUpdate.idAssetGroup,
+        currency: inPageUpdate.currency,
+      });
+    }
+  };
+
   const columns = useMemo<Column<ItemOfUnbudgetItem>[]>(
     () => [
       {
@@ -217,6 +234,7 @@ const NonBuildingUnbudgetModal: React.FC<UnbudgetModalProps> = ({
       wordingSubmit="Save"
       dialogClassName="modal-90w"
       onSend={handleSubmit(handleSubmitForm)}
+      onClikModal={onModalOpened}
     >
       <Row>
         <Col lg={6}>
@@ -238,6 +256,7 @@ const NonBuildingUnbudgetModal: React.FC<UnbudgetModalProps> = ({
               placeholder="Asset Group"
               options={assetGroupOptions}
               error={errors.idAssetGroup?.message}
+              isDisabled={!!inPageUpdate}
               onChange={() => {
                 resetField('idCapexCatalog');
                 resetField('currency');
@@ -272,6 +291,7 @@ const NonBuildingUnbudgetModal: React.FC<UnbudgetModalProps> = ({
               placeholder="Currency"
               options={currencyOptions}
               error={errors.currency?.message}
+              isDisabled={!!inPageUpdate}
               onChange={(val) => changeCurrency(val.value as Currency)}
             />
           </FormGroup>

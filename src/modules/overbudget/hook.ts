@@ -12,6 +12,7 @@ import {
   DeleteOverBudgetParams,
   fetchOverBudgetDetail,
   fetchOverBudgets,
+  updateOverBudget,
 } from './api';
 import { OverBudget, OverBudgetDetail, OverBudgetForm } from './entities';
 
@@ -47,4 +48,19 @@ export const useCreateOverBudget = (): UseMutationResult<
   OverBudgetForm
 > => {
   return useMutation(createOverBudget);
+};
+
+interface UpdateOverbudgetparams {
+  idOverbudget: string;
+  data: OverBudgetForm;
+}
+
+export const useUpdateOverbudget = (): UseMutationResult<
+  OverBudget,
+  ResponseError,
+  UpdateOverbudgetparams
+> => {
+  return useMutation(({ idOverbudget, data }) =>
+    updateOverBudget(idOverbudget, data)
+  );
 };

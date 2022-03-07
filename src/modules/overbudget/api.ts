@@ -46,3 +46,14 @@ export const createOverBudget = async (
   );
   return result.data.data;
 };
+
+export const updateOverBudget = async (
+  idOverbudget: string,
+  data: OverBudgetForm
+): Promise<OverBudget> => {
+  const result = await axios.put<ResponseData<OverBudget>>(
+    `v1/overbudgets/${idOverbudget}`,
+    data
+  );
+  return result.data.data;
+};

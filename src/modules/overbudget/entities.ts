@@ -36,3 +36,11 @@ export interface OverBudgetForm {
   attachment: string | Array<File> | null;
   status: OverBudgetStatus;
 }
+
+export type ApprovalOverbudgets = {
+  idOverbudgets: string[];
+  status: string;
+  remark?: string;
+};
+
+export type SubmitOverbudgets = Pick<ApprovalOverbudgets, 'idOverbudgets'>;

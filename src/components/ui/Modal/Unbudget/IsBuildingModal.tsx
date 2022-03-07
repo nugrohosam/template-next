@@ -4,13 +4,13 @@ import SingleSelect from 'components/form/SingleSelect';
 import { Currency, currencyOptions } from 'constants/currency';
 import { PeriodeType } from 'constants/period';
 import { useAssetGroupOptions } from 'modules/assetGroup/helpers';
-import { useKurs } from 'modules/custom/useKurs';
+import { useCurrencyRate } from 'modules/custom/useCurrencyRate';
 import {
   BudgetPlanItemOfUnbudgetForm,
   ItemOfUnbudgetItem,
 } from 'modules/unbudget/entities';
 import moment from 'moment';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Col, FormControl, FormGroup, FormLabel, Row } from 'react-bootstrap';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { CellProps, Column } from 'react-table';
@@ -54,6 +54,7 @@ const IsBuildingUnbudgetModal: React.FC<UnbudgetModalProps> = ({
     formState: { errors },
     watch,
     reset,
+    setValue,
   } = useForm<BudgetPlanItemOfUnbudgetForm>({
     mode: 'onChange',
     resolver: yupResolver(schema),
@@ -64,7 +65,11 @@ const IsBuildingUnbudgetModal: React.FC<UnbudgetModalProps> = ({
     control,
     name: 'items',
   });
-  const { currency: watchCurrency, items: watchItems } = watch();
+  const {
+    currency: watchCurrency,
+    items: watchItems,
+    currencyRate: watchCurrencyRate,
+  } = watch();
 
   const handleSubmitForm = (data: BudgetPlanItemOfUnbudgetForm) => {
     data.items = watchItems
@@ -82,7 +87,11 @@ const IsBuildingUnbudgetModal: React.FC<UnbudgetModalProps> = ({
   };
   // --------------- //
 
-  const { kurs } = useKurs();
+  const { currencyRate } = useCurrencyRate();
+  useEffect(() => {
+    setValue('currencyRate', currencyRate);
+  }, [currencyRate, setValue]);
+
   const assetGroupOptions = useAssetGroupOptions();
 
   const totalAmount = (currency: Currency) => {
@@ -93,9 +102,9 @@ const IsBuildingUnbudgetModal: React.FC<UnbudgetModalProps> = ({
       .reduce((previousValue, currentValue) => previousValue + currentValue, 0);
 
     if (currency === Currency.Usd) {
-      return watchCurrency === Currency.Idr ? total / kurs : total;
+      return watchCurrency === Currency.Idr ? total / watchCurrencyRate : total;
     } else if (currency === Currency.Idr) {
-      return watchCurrency === Currency.Usd ? total * kurs : total;
+      return watchCurrency === Currency.Usd ? total * watchCurrencyRate : total;
     }
 
     return 0;
@@ -161,7 +170,7 @@ const IsBuildingUnbudgetModal: React.FC<UnbudgetModalProps> = ({
         <Col lg={6}>
           <FormGroup>
             <FormLabel>Kurs</FormLabel>
-            <FormControl type="text" value={kurs} disabled />
+            <FormControl type="text" value={watchCurrencyRate} disabled />
           </FormGroup>
         </Col>
       </Row>

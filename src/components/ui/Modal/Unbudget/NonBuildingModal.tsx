@@ -5,13 +5,13 @@ import { Currency, currencyOptions } from 'constants/currency';
 import { PeriodeType } from 'constants/period';
 import { useAssetGroupOptions } from 'modules/assetGroup/helpers';
 import { useCatalogOptions } from 'modules/catalog/helpers';
-import { useKurs } from 'modules/custom/useKurs';
+import { useCurrencyRate } from 'modules/custom/useCurrencyRate';
 import {
   BudgetPlanItemOfUnbudgetForm,
   ItemOfUnbudgetItem,
 } from 'modules/unbudget/entities';
 import moment from 'moment';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Col, FormControl, FormGroup, FormLabel, Row } from 'react-bootstrap';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { CellProps, Column } from 'react-table';
@@ -78,6 +78,7 @@ const NonBuildingUnbudgetModal: React.FC<UnbudgetModalProps> = ({
     pricePerUnit: watchPricePerUnit,
     idCapexCatalog: watchIdCapexCatalog,
     items: watchItems,
+    currencyRate: watchCurrencyRate,
   } = watch();
   const controlledFields = fields.map((field, index) => {
     return {
@@ -105,7 +106,11 @@ const NonBuildingUnbudgetModal: React.FC<UnbudgetModalProps> = ({
   };
   // --------------- //
 
-  const { kurs } = useKurs();
+  const { currencyRate } = useCurrencyRate();
+  useEffect(() => {
+    setValue('currencyRate', currencyRate);
+  }, [currencyRate, setValue]);
+
   const assetGroupOptions = useAssetGroupOptions();
   const catalogOptions = useCatalogOptions(watchIdAssetGroup);
 
@@ -139,9 +144,9 @@ const NonBuildingUnbudgetModal: React.FC<UnbudgetModalProps> = ({
       .reduce((previousValue, currentValue) => previousValue + currentValue, 0);
 
     if (currency === Currency.Usd) {
-      return watchCurrency === Currency.Idr ? total / kurs : total;
+      return watchCurrency === Currency.Idr ? total / watchCurrencyRate : total;
     } else if (currency === Currency.Idr) {
-      return watchCurrency === Currency.Usd ? total * kurs : total;
+      return watchCurrency === Currency.Usd ? total * watchCurrencyRate : total;
     }
 
     return 0;
@@ -240,7 +245,7 @@ const NonBuildingUnbudgetModal: React.FC<UnbudgetModalProps> = ({
         <Col lg={6}>
           <FormGroup>
             <FormLabel>Kurs</FormLabel>
-            <FormControl type="text" value={kurs} disabled />
+            <FormControl type="text" value={watchCurrencyRate} disabled />
           </FormGroup>
         </Col>
       </Row>

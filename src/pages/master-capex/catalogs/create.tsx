@@ -9,6 +9,7 @@ import { Currency, currencyOptions } from 'constants/currency';
 import { CatalogForm } from 'modules/catalog/entities';
 import { useCatalogHelpers } from 'modules/catalog/helpers';
 import { useAssetGroupOptions } from 'modules/custom/useAssetGroupOptions';
+import { useCurrencyRate } from 'modules/custom/useCurrencyRate';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
@@ -45,6 +46,7 @@ const schema = yup.object().shape({
 
 const CreateCatalog: NextPage = () => {
   const [assetGroupOtions] = useAssetGroupOptions();
+  const { currencyRate } = useCurrencyRate();
 
   const router = useRouter();
   const {
@@ -67,8 +69,6 @@ const CreateCatalog: NextPage = () => {
       .catch((error) => setValidationError(error, setError));
   };
 
-  const currencyRate = 14500; // TODO: get from API
-
   useEffect(() => {
     if (watchForm.primaryCurrency === Currency.Idr) {
       setValue(
@@ -81,6 +81,7 @@ const CreateCatalog: NextPage = () => {
       setValue('priceInIdr', watchForm.priceInUsd * currencyRate);
     }
   }, [
+    currencyRate,
     setValue,
     watchForm.priceInIdr,
     watchForm.priceInUsd,
@@ -139,7 +140,6 @@ const CreateCatalog: NextPage = () => {
             <Col lg={6}>
               <FormGroup>
                 <FormLabel>Currency Rate</FormLabel>
-                {/* TODO: get from API */}
                 <FormControl
                   type="text"
                   value={currencyRate.toLocaleString('id-Id')}

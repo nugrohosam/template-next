@@ -8,9 +8,9 @@ import {
   ItemOfBudgetPlanItem,
 } from 'modules/budgetPlanItem/entities';
 import { useCatalogOptions } from 'modules/catalog/helpers';
-import { useKurs } from 'modules/custom/useKurs';
+import { useCurrencyRate } from 'modules/custom/useCurrencyRate';
 import moment from 'moment';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Col, FormControl, FormGroup, FormLabel, Row } from 'react-bootstrap';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { CellProps, Column } from 'react-table';
@@ -33,7 +33,7 @@ const initDefaultValues = () => ({
   detail: null,
   totalAmount: 0,
   totalAmountUsd: 0,
-  currencyRate: 10000, // TODO: currenctRate masih dummy
+  currencyRate: 0,
   items: initItems(),
 });
 
@@ -79,6 +79,7 @@ const NonBuildingBudgetPlanItemModal: React.FC<BudgetPlanItemModalProps> = ({
     pricePerUnit: watchPricePerUnit,
     idCapexCatalog: watchIdCapexCatalog,
     items: watchItems,
+    currencyRate: watchCurrencyRate,
   } = watch();
   const controlledFields = fields.map((field, index) => {
     return {
@@ -106,7 +107,11 @@ const NonBuildingBudgetPlanItemModal: React.FC<BudgetPlanItemModalProps> = ({
   };
   // --------------- //
 
-  const { kurs } = useKurs();
+  const { currencyRate } = useCurrencyRate();
+  useEffect(() => {
+    setValue('currencyRate', currencyRate);
+  }, [currencyRate, setValue]);
+
   const assetGroupOptions = useAssetGroupOptions().filter(
     (item) => item.label !== 'Building'
   );
@@ -142,9 +147,9 @@ const NonBuildingBudgetPlanItemModal: React.FC<BudgetPlanItemModalProps> = ({
       .reduce((previousValue, currentValue) => previousValue + currentValue, 0);
 
     if (currency === Currency.Usd) {
-      return watchCurrency === Currency.Idr ? total / kurs : total;
+      return watchCurrency === Currency.Idr ? total / watchCurrencyRate : total;
     } else if (currency === Currency.Idr) {
-      return watchCurrency === Currency.Usd ? total * kurs : total;
+      return watchCurrency === Currency.Usd ? total * watchCurrencyRate : total;
     }
 
     return 0;
@@ -246,7 +251,7 @@ const NonBuildingBudgetPlanItemModal: React.FC<BudgetPlanItemModalProps> = ({
         <Col lg={6}>
           <FormGroup>
             <FormLabel>Kurs</FormLabel>
-            <FormControl type="text" value={kurs} disabled />
+            <FormControl type="text" value={watchCurrencyRate} disabled />
           </FormGroup>
         </Col>
       </Row>

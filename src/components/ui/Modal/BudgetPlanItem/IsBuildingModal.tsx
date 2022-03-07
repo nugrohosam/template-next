@@ -7,9 +7,9 @@ import {
   BudgetPlanItemOfBudgetPlanItemForm,
   ItemOfBudgetPlanItem,
 } from 'modules/budgetPlanItem/entities';
-import { useKurs } from 'modules/custom/useKurs';
+import { useCurrencyRate } from 'modules/custom/useCurrencyRate';
 import moment from 'moment';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Col, FormControl, FormGroup, FormLabel, Row } from 'react-bootstrap';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { CellProps, Column } from 'react-table';
@@ -30,7 +30,7 @@ const initDefaultValues = () => ({
   detail: '',
   pricePerUnit: 0,
   idCapexCatalog: null,
-  currencyRate: 10000, // TODO: currenctRate masih dummy
+  currencyRate: 0,
   items: initItems(),
 });
 
@@ -56,6 +56,7 @@ const IsBuildingBudgetPlanItemModal: React.FC<BudgetPlanItemModalProps> = ({
     formState: { errors },
     watch,
     reset,
+    setValue,
   } = useForm<BudgetPlanItemOfBudgetPlanItemForm>({
     mode: 'onChange',
     resolver: yupResolver(schema),
@@ -66,7 +67,11 @@ const IsBuildingBudgetPlanItemModal: React.FC<BudgetPlanItemModalProps> = ({
     control,
     name: 'items',
   });
-  const { currency: watchCurrency, items: watchItems } = watch();
+  const {
+    currency: watchCurrency,
+    items: watchItems,
+    currencyRate: watchCurrencyRate,
+  } = watch();
 
   const handleSubmitForm = (data: BudgetPlanItemOfBudgetPlanItemForm) => {
     data.items = watchItems
@@ -84,7 +89,12 @@ const IsBuildingBudgetPlanItemModal: React.FC<BudgetPlanItemModalProps> = ({
   };
   // --------------- //
 
-  const { kurs } = useKurs();
+  // set currency rate
+  const { currencyRate } = useCurrencyRate();
+  useEffect(() => {
+    setValue('currencyRate', currencyRate);
+  }, [currencyRate, setValue]);
+
   const assetGroupOptions = useAssetGroupOptions().filter(
     (item) => item.label === 'Building'
   );
@@ -97,9 +107,9 @@ const IsBuildingBudgetPlanItemModal: React.FC<BudgetPlanItemModalProps> = ({
       .reduce((previousValue, currentValue) => previousValue + currentValue, 0);
 
     if (currency === Currency.Usd) {
-      return watchCurrency === Currency.Idr ? total / kurs : total;
+      return watchCurrency === Currency.Idr ? total / watchCurrencyRate : total;
     } else if (currency === Currency.Idr) {
-      return watchCurrency === Currency.Usd ? total * kurs : total;
+      return watchCurrency === Currency.Usd ? total * watchCurrencyRate : total;
     }
 
     return 0;
@@ -173,7 +183,7 @@ const IsBuildingBudgetPlanItemModal: React.FC<BudgetPlanItemModalProps> = ({
         <Col lg={6}>
           <FormGroup>
             <FormLabel>Kurs</FormLabel>
-            <FormControl type="text" value={kurs} disabled />
+            <FormControl type="text" value={watchCurrencyRate} disabled />
           </FormGroup>
         </Col>
       </Row>

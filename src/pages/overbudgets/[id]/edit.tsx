@@ -54,7 +54,6 @@ const schema = yup.object().shape({
   impactIfNotRealized: yup
     .string()
     .required(`Impact If Not Realized can't be empty`),
-  // attachment: yup.string().required(`Attachment File can't be empty`),	TODO: make sure attachment required or not
 });
 
 const EditOverBudget: NextPage = () => {
@@ -75,6 +74,7 @@ const EditOverBudget: NextPage = () => {
     currency: '',
     pricePerUnit: '',
   });
+  const [isAttachmentUploaded, setIsAttachmentUploaded] = useState(false);
 
   const {
     handleSubmit,
@@ -93,21 +93,25 @@ const EditOverBudget: NextPage = () => {
 
   const mutation = useUpdateOverbudget();
   const handleSubmitForm = (data: OverBudgetForm) => {
-    mutation.mutate(
-      { idOverbudget: id, data },
-      {
-        onSuccess: () => {
-          router.push('/overbudgets');
-          toast('Data updated!');
-        },
-        onError: (error) => {
-          console.log('Failed to update data', error);
-          setValidationError(error, setError);
-          toast(error.message, { autoClose: false });
-          showErrorMessage(error);
-        },
-      }
-    );
+    if (watch('attachment') !== dataHook?.attachment && !isAttachmentUploaded) {
+      toast('Upload the attachment file!', { type: 'error', autoClose: false });
+    } else {
+      mutation.mutate(
+        { idOverbudget: id, data },
+        {
+          onSuccess: () => {
+            router.push('/overbudgets');
+            toast('Data updated!');
+          },
+          onError: (error) => {
+            console.log('Failed to update data', error);
+            setValidationError(error, setError);
+            toast(error.message, { autoClose: false });
+            showErrorMessage(error);
+          },
+        }
+      );
+    }
   };
 
   useEffect(() => {
@@ -143,8 +147,10 @@ const EditOverBudget: NextPage = () => {
       onSuccess: (data) => {
         toast('Data uploaded!');
         setValue('attachment', data.name);
+        setIsAttachmentUploaded(true);
       },
       onError: (error) => {
+        setIsAttachmentUploaded(true); // TODO: set to false, masih set true karena module upload overbudget belum ready
         setValue('attachment', 'attachment_overbudget.pdf'); // TODO: hapus baris ini, sekarang API upload belum ready, buar bisa submit data
         setValidationError(error, setError);
         toast(error.message, { autoClose: false });
@@ -313,7 +319,7 @@ const EditOverBudget: NextPage = () => {
           <Row>
             <Col lg={6}>
               <FormGroup>
-                <FormLabel className="required">Attachment File</FormLabel>
+                <FormLabel>Attachment File</FormLabel>
                 <FileInput
                   name="attachment"
                   control={control}

@@ -1,5 +1,4 @@
 import { customStyles } from 'components/form/SingleSelect';
-import ButtonActions from 'components/ui/Button/ButtonActions';
 import LoadingButton from 'components/ui/Button/LoadingButton';
 import ContentLayout from 'components/ui/ContentLayout';
 import ApproveModal from 'components/ui/Modal/ApproveModal';
@@ -8,7 +7,7 @@ import { OverBudgetStatus, overBudgetStatusOptions } from 'constants/status';
 import { UserType } from 'constants/user';
 import { ApprovalField } from 'modules/approval/entities';
 import { useDecodeToken } from 'modules/custom/useDecodeToken';
-import { OverBudget, SubmitOverbudgets } from 'modules/overbudget/entities';
+import { OverBudget } from 'modules/overbudget/entities';
 import {
   useApprovalOverbudgets,
   useDeleteOverBudgets,
@@ -40,19 +39,25 @@ const OverBudgetIndex: NextPage = () => {
 
   const dataHook = useFetchOverBudgets(params);
   const [profile] = useDecodeToken();
+  const dataEditable = (status: string) => {
+    return (
+      status === OverBudgetStatus.DRAFT || status === OverBudgetStatus.REVISE
+    );
+  };
 
   const deleteOverBudgetMutation = useDeleteOverBudgets();
-  const deleteOverBudget = (ids: Array<string>) => {
+  const deleteOverBudget = (ids: Array<string>, action: string) => {
+    const actionMessage = action === 'DELETE' ? 'Deleted' : 'Canceled';
     deleteOverBudgetMutation.mutate(
-      { idOverbudgets: ids, action: 'DELETE' },
+      { idOverbudgets: ids, action },
       {
         onSuccess: () => {
           setSelectedRow({});
           dataHook.refetch();
-          toast('Data Deleted!');
+          toast(`Data ${actionMessage}!`);
         },
         onError: (error) => {
-          console.log('Failed to delete data', error);
+          console.log('Failed to process data', error);
           toast(error.message, { autoClose: false });
           showErrorMessage(error);
         },
@@ -60,10 +65,10 @@ const OverBudgetIndex: NextPage = () => {
     );
   };
 
-  const handleDeleteMultipleOverBudgets = () => {
+  const handleDeleteMultipleOverBudgets = (action: string) => {
     const ids = getAllIds(selectedRow, dataHook.data) as string[];
-    if (confirm('Delete selected data?') && ids) {
-      deleteOverBudget(ids);
+    if (confirm(`${action} selected data?`) && ids) {
+      deleteOverBudget(ids, action.toUpperCase());
     }
   };
 
@@ -111,7 +116,7 @@ const OverBudgetIndex: NextPage = () => {
           toast('Data submited!');
         },
         onError: (error) => {
-          console.log('Failed to approve data', error);
+          console.log('Failed to submit data', error);
           toast(error.message, { autoClose: false });
           showErrorMessage(error);
         },
@@ -175,28 +180,33 @@ const OverBudgetIndex: NextPage = () => {
                     <BsFillEyeFill className="align-self-center" />
                   </Button>
                 </Link>
-                {profile?.type !== UserType.ApprovalBudgetPlanCapex &&
-                  (cell.row.values.status === OverBudgetStatus.DRAFT ||
-                    cell.row.values.status === OverBudgetStatus.REVISE) && (
-                    <Link
-                      href={`/overbudgets/${cell.row.values.id}/edit`}
-                      passHref
-                    >
-                      <Button className="mr-2 d-flex" variant="info">
-                        <BsPencilSquare className="align-self-center" />
+                {profile?.type !== UserType.ApprovalBudgetPlanCapex && (
+                  <>
+                    {dataEditable(cell.row.values.status) && (
+                      <Link
+                        href={`/overbudgets/${cell.row.values.id}/edit`}
+                        passHref
+                      >
+                        <Button className="mr-2 d-flex" variant="info">
+                          <BsPencilSquare className="align-self-center" />
+                        </Button>
+                      </Link>
+                    )}
+                    {(dataEditable(cell.row.values.status) ||
+                      cell.row.values.status === OverBudgetStatus.CANCEL) && (
+                      <Button
+                        className="d-flex"
+                        variant="red"
+                        onClick={() => {
+                          if (confirm('Delete data?'))
+                            deleteOverBudget([cell.row.values.id], 'DELETE');
+                        }}
+                      >
+                        <BsTrash2Fill className="align-self-center" />
                       </Button>
-                    </Link>
-                  )}
-                <Button
-                  className="d-flex"
-                  variant="red"
-                  onClick={() => {
-                    if (confirm('Delete data?'))
-                      deleteOverBudget([cell.row.values.id]);
-                  }}
-                >
-                  <BsTrash2Fill className="align-self-center" />
-                </Button>
+                    )}
+                  </>
+                )}
               </div>
             </>
           );
@@ -232,10 +242,26 @@ const OverBudgetIndex: NextPage = () => {
                       size="sm"
                       className="mr-2"
                       disabled={deleteOverBudgetMutation.isLoading}
-                      onClick={handleDeleteMultipleOverBudgets}
+                      onClick={() => handleDeleteMultipleOverBudgets('Delete')}
                       isLoading={false}
                     >
                       Delete
+                    </LoadingButton>
+                    <LoadingButton
+                      variant="warning"
+                      size="sm"
+                      className="mr-2"
+                      disabled={deleteOverBudgetMutation.isLoading}
+                      onClick={() => handleDeleteMultipleOverBudgets('Cancel')}
+                      isLoading={false}
+                      style={{
+                        fontWeight: 'bold',
+                        fontSize: '12px',
+                        letterSpacing: '1.5px',
+                        lineHeight: '16px',
+                      }}
+                    >
+                      Cancel
                     </LoadingButton>
                     <LoadingButton
                       variant="primary"

@@ -22,7 +22,7 @@ export enum OverBudgetStatus {
 
 export const overBudgetStatusOptions: SelectOption[] = [
   { label: 'DRAFT', value: OverBudgetStatus.DRAFT },
-  { label: 'WAITING APPROVAL', value: 'WAITING_APPROVAL' },
+  { label: 'WAITING APPROVAL', value: 'WAITING APPROVAL' },
   { label: 'REVISE', value: OverBudgetStatus.REVISE },
   { label: 'REJECT', value: OverBudgetStatus.REJECT },
   { label: 'DONE', value: OverBudgetStatus.DONE },

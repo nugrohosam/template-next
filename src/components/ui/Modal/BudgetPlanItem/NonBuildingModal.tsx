@@ -45,13 +45,16 @@ const schema = yup.object().shape({
   currencyRate: yup.number().required(),
 });
 
-const NonBuildingBudgetPlanItemModal: React.FC<BudgetPlanItemModalProps> = ({
+const NonBuildingBudgetPlanItemModal: React.FC<
+  BudgetPlanItemModalProps & { title: string }
+> = ({
   onSend,
   classButton,
   buttonTitle,
   inPageUpdate,
   isEdit,
   myItem,
+  title,
 }) => {
   /**
    * Handle form
@@ -236,9 +239,10 @@ const NonBuildingBudgetPlanItemModal: React.FC<BudgetPlanItemModalProps> = ({
       buttonVariant="primary"
       submitButtonVariant="primary"
       classButton={classButton}
-      title="Add Budget Plan Item"
+      title={title}
       wordingSubmit="Save"
       dialogClassName="modal-90w"
+      isError={errors}
       onSend={handleSubmit(handleSubmitForm)}
       onClikModal={onModalOpened}
     >

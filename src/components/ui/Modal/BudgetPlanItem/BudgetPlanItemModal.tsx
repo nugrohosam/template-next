@@ -32,6 +32,7 @@ const BudgetPlanItemModal: React.FC<BudgetPlanItemModalProps> = ({
     myItem,
     isBuilding,
     buttonTitle,
+    title: `${isEdit ? 'Edit ' : 'Add'} Budget Plan Item`,
   };
 
   return (

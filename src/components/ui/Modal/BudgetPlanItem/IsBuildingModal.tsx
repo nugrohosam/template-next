@@ -40,13 +40,9 @@ const schema = yup.object().shape({
   detail: yup.string().required().nullable(),
 });
 
-const IsBuildingBudgetPlanItemModal: React.FC<BudgetPlanItemModalProps> = ({
-  onSend,
-  classButton,
-  buttonTitle,
-  isEdit,
-  myItem,
-}) => {
+const IsBuildingBudgetPlanItemModal: React.FC<
+  BudgetPlanItemModalProps & { title: string }
+> = ({ onSend, classButton, buttonTitle, isEdit, myItem, title }) => {
   /**
    * Handle form
    */
@@ -163,7 +159,7 @@ const IsBuildingBudgetPlanItemModal: React.FC<BudgetPlanItemModalProps> = ({
       buttonVariant="primary"
       submitButtonVariant="primary"
       classButton={classButton}
-      title="Add Budget Plan Item"
+      title={title}
       wordingSubmit="Save"
       dialogClassName="modal-90w"
       onSend={handleSubmit(handleSubmitForm)}

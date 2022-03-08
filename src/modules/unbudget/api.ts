@@ -2,6 +2,7 @@ import { Paginate, PaginateParams, ResponseData } from 'modules/common/types';
 import axios from 'utils/axios';
 
 import {
+  ApprovalUnbudgetForm,
   Unbudget,
   UnbudgetDetail,
   UnbudgetForm,
@@ -77,5 +78,15 @@ export const cancelUnbudgets = async (idUnbudgets: string[]): Promise<null> => {
   const result = await axios.patch<ResponseData<null>>('v1/unbudgets/cancel', {
     idUnbudgets,
   });
+  return result.data.data;
+};
+
+export const approvalUnbudgets = async (
+  data: ApprovalUnbudgetForm
+): Promise<null> => {
+  const result = await axios.patch<ResponseData<null>>(
+    'v1/unbudgets/approval',
+    { data }
+  );
   return result.data.data;
 };

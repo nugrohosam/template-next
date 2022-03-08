@@ -44,7 +44,7 @@ const ApproveModal: React.FC<ApproveModalProps> = ({ onSend, classButton }) => {
             <Input
               name="status"
               control={control}
-              defaultValue={ApprovalStatus.APPROVE}
+              defaultValue={ApprovalStatus.Approve}
               disabled
               type="hidden"
               error={errors.status?.message}

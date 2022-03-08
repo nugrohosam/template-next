@@ -40,8 +40,9 @@ const RejectModal: React.FC<RejectModalProps> = ({ onSend, classButton }) => {
       classButton={classButton}
       title="Are you sure to processed this data ?"
       onSend={handleSubmit(onSend)}
+      isError={errors}
     >
-      <p className="text-center">Enter a remark</p>
+      <p className="text-center required">Enter a remark</p>
       <Form>
         <Row>
           <Col lg={12}>

@@ -62,12 +62,14 @@ const BudgetPlanGroupItemList: NextPage = () => {
 
   const dataHookOutstandingPlanPayment = useFetchBuildingAttachments(
     budgetPlanGroupId,
-    { ...params, type: BuildingAttachmentType.OutstandingPlanPayment }
+    { ...params, type: BuildingAttachmentType.OutstandingPlanPayment },
+    dataHookBudgetPlanItemGroup?.data?.isBuilding || false
   );
 
   const dataHookOutstandingRetention = useFetchBuildingAttachments(
     budgetPlanGroupId,
-    { ...params, type: BuildingAttachmentType.OutstandingRetention }
+    { ...params, type: BuildingAttachmentType.OutstandingRetention },
+    dataHookBudgetPlanItemGroup?.data?.isBuilding || false
   );
 
   // handle delete
@@ -106,10 +108,28 @@ const BudgetPlanGroupItemList: NextPage = () => {
     pageSize: 10,
   });
 
-  const userCanDelete =
-    profile?.type !== UserType.ApprovalBudgetPlanCapex &&
-    dataHookBudgetPlanItemGroup?.data?.status ===
-      BudgetPlanItemGroupStatus.Draft;
+  // permission
+  const isUserApprovalBudgetPlanCapex =
+    profile?.type === UserType.ApprovalBudgetPlanCapex;
+  const isUserAdminCapex = profile?.type === UserType.AdminCapex;
+  const canEdit = () => {
+    if (!isUserAdminCapex) return false;
+    const statusAccess = [
+      BudgetPlanItemGroupStatus.Draft,
+      BudgetPlanItemGroupStatus.Reject,
+      BudgetPlanItemGroupStatus.Revise,
+    ];
+    return statusAccess.includes(
+      dataHookBudgetPlanItemGroup?.data?.status as BudgetPlanItemGroupStatus
+    );
+  };
+  const canDelete = () => {
+    if (!isUserAdminCapex) return false;
+    const statusAccess = [BudgetPlanItemGroupStatus.Draft];
+    return statusAccess.includes(
+      dataHookBudgetPlanItemGroup?.data?.status as BudgetPlanItemGroupStatus
+    );
+  };
 
   const columns: Column<BudgetPlanItemGroupItem>[] = [
     { Header: 'ID', accessor: 'id' },
@@ -392,7 +412,7 @@ const BudgetPlanGroupItemList: NextPage = () => {
               columns={columns}
               data={dataHookBudgetPlanItemGroupItems.data}
               actions={
-                userCanDelete && (
+                canDelete() && (
                   <LoadingButton
                     variant="red"
                     size="sm"
@@ -406,8 +426,7 @@ const BudgetPlanGroupItemList: NextPage = () => {
                 )
               }
               addOns={
-                dataHookBudgetPlanItemGroup?.data?.status ===
-                  BudgetPlanItemGroupStatus.Draft && (
+                canEdit() && (
                   <Link
                     href={`/budget-plans/${budgetPlanId}/${budgetPlanGroupId}/edit`}
                     passHref
@@ -421,7 +440,7 @@ const BudgetPlanGroupItemList: NextPage = () => {
               selectedRows={selectedRow}
               hiddenColumns={['id', 'catalog', 'items']}
               paginateParams={params}
-              {...(userCanDelete && {
+              {...(canDelete() && {
                 onSelectedRowsChanged: (rows) => setSelectedRow(rows),
               })}
               onSelectedSortChanged={(sort) => {

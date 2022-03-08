@@ -7,11 +7,13 @@ import LoadingButton from 'components/ui/Button/LoadingButton';
 import DetailLayout from 'components/ui/DetailLayout';
 import { Currency, currencyOptions } from 'constants/currency';
 import { CatalogForm } from 'modules/catalog/entities';
+import { useCatalogHelpers } from 'modules/catalog/helpers';
 import { useFetchCatalogDetail, useUpdateCatalog } from 'modules/catalog/hook';
 import { useAssetGroupOptions } from 'modules/custom/useAssetGroupOptions';
+import { useCurrencyRate } from 'modules/custom/useCurrencyRate';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import {
   Col,
   Form,
@@ -21,8 +23,7 @@ import {
   Row,
 } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
-import { toast } from 'react-toastify';
-import { setValidationError, showErrorMessage } from 'utils/helpers';
+import { setValidationError } from 'utils/helpers';
 import * as yup from 'yup';
 
 const breadCrumb: PathBreadcrumb[] = [
@@ -47,6 +48,7 @@ const schema = yup.object().shape({
 
 const EditCatalog: NextPage = () => {
   const [assetGroupOptions] = useAssetGroupOptions();
+  const { currencyRate } = useCurrencyRate();
 
   const router = useRouter();
   const id = router.query.id as string;
@@ -63,6 +65,7 @@ const EditCatalog: NextPage = () => {
     mode: 'onChange',
     resolver: yupResolver(schema),
   });
+  const watchForm = watch();
 
   const { data: dataHook } = useFetchCatalogDetail(id);
 
@@ -74,56 +77,34 @@ const EditCatalog: NextPage = () => {
       priceInIdr: dataHook?.priceInIdr,
       priceInUsd: dataHook?.priceInUsd,
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dataHook, reset]);
 
+  const { mutationUpdateCatalog, handleUpdateUnbudget } = useCatalogHelpers();
   const mutation = useUpdateCatalog();
   const handleSubmitForm = (data: CatalogForm) => {
-    mutation.mutate(
-      { idCatalog: id, data },
-      {
-        onSuccess: () => {
-          router.push(`/master-capex/catalogs`);
-          toast('Data Updated!');
-        },
-        onError: (error) => {
-          console.log('Failed to update data', error);
-          setValidationError(error, setError);
-          toast(error.message, { autoClose: false });
-          showErrorMessage(error);
-        },
-      }
-    );
-  };
-  const currencyRate = 14500; // TODO: get from API
-
-  const data = watch();
-  const [idrDisabled, setIdrDisabled] = useState(false);
-  const [usdDisabled, setUsdDisabled] = useState(true);
-
-  const handleCurrencyChange = (value: string | number | boolean) => {
-    if (value == Currency.USD) {
-      // TODO: reset value IDR
-      setUsdDisabled(false);
-      setIdrDisabled(true);
-    } else {
-      // TODO: reset value USD
-      setUsdDisabled(true);
-      setIdrDisabled(false);
-    }
-    return currencyOptions;
+    handleUpdateUnbudget(id, data)
+      .then(() => router.push(`/master-capex/catalogs`))
+      .catch((error) => setValidationError(error, setError));
   };
 
   useEffect(() => {
-    if (data.primaryCurrency === Currency.IDR) {
+    if (watchForm.primaryCurrency === Currency.Idr) {
       setValue(
         'priceInUsd',
-        Number((data.priceInIdr / currencyRate).toFixed(2))
+        +(watchForm.priceInIdr / currencyRate).toLocaleString('en-En', {
+          maximumFractionDigits: 2,
+        })
       );
-    } else if (data.primaryCurrency === Currency.USD) {
-      setValue('priceInIdr', data.priceInUsd * currencyRate);
+    } else if (watchForm.primaryCurrency === Currency.Usd) {
+      setValue('priceInIdr', watchForm.priceInUsd * currencyRate);
     }
-  }, [data.primaryCurrency, data.priceInIdr, data.priceInUsd, setValue]);
+  }, [
+    currencyRate,
+    setValue,
+    watchForm.priceInIdr,
+    watchForm.priceInUsd,
+    watchForm.primaryCurrency,
+  ]);
 
   return (
     <DetailLayout
@@ -169,14 +150,12 @@ const EditCatalog: NextPage = () => {
                   defaultValue=""
                   options={currencyOptions}
                   placeholder="Primary Currency"
-                  onChange={(e) => handleCurrencyChange(e.value)}
                 />
               </FormGroup>
             </Col>
             <Col lg={6}>
               <FormGroup>
                 <FormLabel>Currency Rate</FormLabel>
-                {/* TODO: get from API */}
                 <FormControl
                   type="text"
                   value={currencyRate.toLocaleString('id-Id')}
@@ -193,7 +172,7 @@ const EditCatalog: NextPage = () => {
                 type="number"
                 placeholder="Price (IDR)"
                 error={errors.priceInIdr?.message}
-                disabled={idrDisabled}
+                disabled={watchForm.primaryCurrency === Currency.Usd}
               />
             </Col>
             <Col lg={6}>
@@ -205,7 +184,7 @@ const EditCatalog: NextPage = () => {
                 type="number"
                 placeholder="Price (USD)"
                 error={errors.priceInUsd?.message}
-                disabled={usdDisabled}
+                disabled={watchForm.primaryCurrency === Currency.Idr}
               />
             </Col>
           </Row>
@@ -213,8 +192,8 @@ const EditCatalog: NextPage = () => {
             <LoadingButton
               variant="primary"
               type="submit"
-              disabled={mutation.isLoading}
-              isLoading={mutation.isLoading}
+              disabled={mutationUpdateCatalog.isLoading}
+              isLoading={mutationUpdateCatalog.isLoading}
             >
               Update
             </LoadingButton>

@@ -83,13 +83,14 @@ export const useApprovalBudgetPlanItemGroups = (): UseMutationResult<
 
 export const useFetchBuildingAttachments = (
   idBudgetPlanItemGroup: string,
-  params: BuildingAttachmentParams
+  params: BuildingAttachmentParams,
+  isBuilding: boolean
 ): UseQueryResult<Paginate<BuildingAttachment>, ResponseError> => {
   return useQuery(
     ['building-attachments', params],
     () => fetchBuildingAttachments(idBudgetPlanItemGroup, params),
     {
-      enabled: !!idBudgetPlanItemGroup,
+      enabled: isBuilding && !!idBudgetPlanItemGroup,
     }
   );
 };

@@ -1,11 +1,11 @@
 import { SelectOption } from 'components/form/SingleSelect';
 
 export enum Currency {
-  IDR = 'IDR',
-  USD = 'USD',
+  Idr = 'IDR',
+  Usd = 'USD',
 }
 
 export const currencyOptions: SelectOption[] = [
-  { label: 'IDR', value: Currency.IDR },
-  { label: 'USD', value: Currency.USD },
+  { label: 'IDR', value: Currency.Idr },
+  { label: 'USD', value: Currency.Usd },
 ];

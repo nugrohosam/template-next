@@ -4,6 +4,8 @@ import { BudgetPlanItem } from 'modules/budgetPlanItem/entities';
 
 export enum BudgetPlanItemGroupStatus {
   Draft = 'DRAFT',
+  Revise = 'REVISE',
+  Reject = 'REJECT',
 }
 
 export enum BuildingAttachmentType {

@@ -8,12 +8,9 @@ import ReviseModal from 'components/ui/Modal/ReviseModal';
 import DataTable, { usePaginateParams } from 'components/ui/Table/DataTable';
 import Loader from 'components/ui/Table/Loader';
 import { UserType } from 'constants/user';
-import { ApprovalField, ApprovalStatus } from 'modules/approval/entities';
+import { ApprovalField } from 'modules/approval/entities';
 import { useFetchBudgetPlanDetail } from 'modules/budgetPlan/hook';
-import {
-  ApprovalBudgetPlanItemGroup,
-  BudgetPlanItemGroup,
-} from 'modules/budgetPlanItemGroup/entities';
+import { BudgetPlanItemGroup } from 'modules/budgetPlanItemGroup/entities';
 import {
   useApprovalBudgetPlanItemGroups,
   useDeleteBudgetPlanItemGroups,

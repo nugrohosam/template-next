@@ -49,7 +49,7 @@ const IsBuildingBudgetPlanItemModal: React.FC<
   const {
     handleSubmit,
     control,
-    formState: { errors },
+    formState: { errors, isValid },
     watch,
     reset,
     setValue,
@@ -111,6 +111,27 @@ const IsBuildingBudgetPlanItemModal: React.FC<
     return 0;
   };
 
+  const onModalOpened = () => {
+    setValue('currencyRate', currencyRate);
+    if (isEdit) {
+      reset({
+        idAssetGroup: myItem?.idAssetGroup,
+        pricePerUnit: myItem?.pricePerUnit,
+        currency: myItem?.currency,
+        currencyRate: myItem?.currencyRate,
+        id: myItem?.id,
+        detail: myItem?.detail,
+        items:
+          initItems().map((prev) => {
+            const foundMonth = myItem?.items.find(
+              (item) => item.month === prev.month
+            );
+            return foundMonth || prev;
+          }) || [],
+      });
+    }
+  };
+
   const columns = useMemo<Column<ItemOfBudgetPlanItem>[]>(
     () => [
       {
@@ -143,26 +164,6 @@ const IsBuildingBudgetPlanItemModal: React.FC<
     [control, errors.items]
   );
 
-  const onModalOpened = () => {
-    if (isEdit) {
-      reset({
-        idAssetGroup: myItem?.idAssetGroup,
-        pricePerUnit: myItem?.pricePerUnit,
-        currency: myItem?.currency,
-        currencyRate: myItem?.currencyRate,
-        id: myItem?.id,
-        detail: myItem?.detail,
-        items:
-          initItems().map((prev) => {
-            const foundMonth = myItem?.items.find(
-              (item) => item.month === prev.month
-            );
-            return foundMonth || prev;
-          }) || [],
-      });
-    }
-  };
-
   return (
     <ModalBox
       buttonTitle={buttonTitle || ''}
@@ -172,7 +173,7 @@ const IsBuildingBudgetPlanItemModal: React.FC<
       title={title}
       wordingSubmit="Save"
       dialogClassName="modal-90w"
-      isError={errors}
+      isError={!isValid}
       onSend={handleSubmit(handleSubmitForm)}
       onClikModal={onModalOpened}
     >

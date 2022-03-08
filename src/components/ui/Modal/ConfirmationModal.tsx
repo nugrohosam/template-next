@@ -31,7 +31,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
     handleSubmit,
     control,
     setValue,
-    formState: { errors },
+    formState: { errors, isValid },
   } = useForm<OutstandingPrPoConfirmation>({
     mode: 'onChange',
     resolver: yupResolver(schema),
@@ -55,7 +55,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
       buttonTitle="Confirm"
       title="Confirmation"
       onSend={handleSubmit(onSend)}
-      isError={errors}
+      isError={!isValid}
     >
       <Form>
         <Row>

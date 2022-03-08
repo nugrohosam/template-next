@@ -51,7 +51,7 @@ const IsBuildingUnbudgetModal: React.FC<UnbudgetModalProps> = ({
   const {
     handleSubmit,
     control,
-    formState: { errors },
+    formState: { errors, isValid },
     watch,
     reset,
     setValue,
@@ -121,6 +121,10 @@ const IsBuildingUnbudgetModal: React.FC<UnbudgetModalProps> = ({
     return true;
   };
 
+  const onModalOpened = () => {
+    setValue('currencyRate', currencyRate);
+  };
+
   const columns = useMemo<Column<ItemOfUnbudgetItem>[]>(
     () => [
       {
@@ -164,7 +168,9 @@ const IsBuildingUnbudgetModal: React.FC<UnbudgetModalProps> = ({
       title="Add Unbudget Item"
       wordingSubmit="Save"
       dialogClassName="modal-90w"
+      isError={!isValid}
       onSend={handleSubmit(handleSubmitForm)}
+      onClikModal={onModalOpened}
     >
       <Row>
         <Col lg={6}>

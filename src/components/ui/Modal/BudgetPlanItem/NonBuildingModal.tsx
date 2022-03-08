@@ -62,7 +62,7 @@ const NonBuildingBudgetPlanItemModal: React.FC<
   const {
     handleSubmit,
     control,
-    formState: { errors },
+    formState: { errors, isValid },
     watch,
     setValue,
     reset,
@@ -159,6 +159,7 @@ const NonBuildingBudgetPlanItemModal: React.FC<
   };
 
   const onModalOpened = () => {
+    setValue('currencyRate', currencyRate);
     if (isEdit) {
       reset({
         idAssetGroup: myItem?.idAssetGroup,
@@ -247,7 +248,7 @@ const NonBuildingBudgetPlanItemModal: React.FC<
       title={title}
       wordingSubmit="Save"
       dialogClassName="modal-90w"
-      isError={errors}
+      isError={!isValid}
       onSend={handleSubmit(handleSubmitForm)}
       onClikModal={onModalOpened}
     >

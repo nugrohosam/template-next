@@ -242,6 +242,7 @@ const NonBuildingBudgetPlanItemModal: React.FC<
       title={title}
       wordingSubmit="Save"
       dialogClassName="modal-90w"
+      isError={errors}
       onSend={handleSubmit(handleSubmitForm)}
       onClikModal={onModalOpened}
     >

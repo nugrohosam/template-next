@@ -58,11 +58,6 @@ const DetailOverBudget: NextPage = () => {
     data: ApprovalField,
     idOverbudgets: string
   ) => {
-    console.log({
-      idOverbudgets: [idOverbudgets],
-      status: data.status,
-      remark: data.notes,
-    });
     approvalOverbudgetMutation.mutate(
       {
         idOverbudgets: [idOverbudgets],

@@ -111,6 +111,9 @@ const DetailBudgetPlan: NextPage = () => {
   };
 
   // approval budget plan item group
+  const isUserApproval =
+    profile?.type === UserType.ApprovalBudgetPlanCapex ||
+    profile?.type === UserType.DeptPicAssetHoCapex;
   const mutationApprovalBudgetPlanItemGroup = useApprovalBudgetPlanItemGroups();
   const approvalBudgetPlanItemGroups = (
     data: ApprovalField & { idBudgetPlanItemGroups: string[] }
@@ -295,7 +298,7 @@ const DetailBudgetPlan: NextPage = () => {
               data={dataHookBudgetPlanItemGroup.data}
               actions={
                 <>
-                  {profile?.type !== UserType.ApprovalBudgetPlanCapex && (
+                  {!isUserApproval && (
                     <LoadingButton
                       variant="red"
                       size="sm"
@@ -308,7 +311,7 @@ const DetailBudgetPlan: NextPage = () => {
                     </LoadingButton>
                   )}
 
-                  {profile?.type === UserType.ApprovalBudgetPlanCapex ? (
+                  {isUserApproval ? (
                     <>
                       <ApproveModal
                         onSend={(data) =>

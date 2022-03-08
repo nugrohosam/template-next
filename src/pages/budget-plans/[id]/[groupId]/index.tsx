@@ -2,10 +2,14 @@ import Panel from 'components/form/Panel';
 import { PathBreadcrumb } from 'components/ui/Breadcrumb';
 import LoadingButton from 'components/ui/Button/LoadingButton';
 import DetailLayout from 'components/ui/DetailLayout';
+import ApproveModal from 'components/ui/Modal/ApproveModal';
+import RejectModal from 'components/ui/Modal/RejectModal';
+import ReviseModal from 'components/ui/Modal/ReviseModal';
 import DataTable, { usePaginateParams } from 'components/ui/Table/DataTable';
 import Loader from 'components/ui/Table/Loader';
 import AuditTimeline from 'components/ui/Timeline/AuditTimeline';
 import { UserType } from 'constants/user';
+import { ApprovalField } from 'modules/approval/entities';
 import { ResourceType } from 'modules/audit/parent/entities';
 import { useFetchAudits } from 'modules/audit/parent/hook';
 import { getValueItemByMonth } from 'modules/budgetPlanItem/helpers';
@@ -17,6 +21,7 @@ import {
   BuildingAttachmentType,
 } from 'modules/budgetPlanItemGroup/entities';
 import {
+  useApprovalBudgetPlanItemGroups,
   useFetchBudgetPlanItemGroupDetail,
   useFetchBudgetPlanItemGroupItems,
   useFetchBuildingAttachments,
@@ -112,6 +117,7 @@ const BudgetPlanGroupItemList: NextPage = () => {
   const isUserApprovalBudgetPlanCapex =
     profile?.type === UserType.ApprovalBudgetPlanCapex;
   const isUserAdminCapex = profile?.type === UserType.AdminCapex;
+  const isUserDeptPicAssetHo = profile?.type === UserType.DeptPicAssetHoCapex;
   const canEdit = () => {
     if (!isUserAdminCapex) return false;
     const statusAccess = [
@@ -128,6 +134,28 @@ const BudgetPlanGroupItemList: NextPage = () => {
     const statusAccess = [BudgetPlanItemGroupStatus.Draft];
     return statusAccess.includes(
       dataHookBudgetPlanItemGroup?.data?.status as BudgetPlanItemGroupStatus
+    );
+  };
+
+  const approvalBudgetPlanItemGroupMutation = useApprovalBudgetPlanItemGroups();
+  const handleApprovalBudgetPlanItemGroup = (data: ApprovalField) => {
+    approvalBudgetPlanItemGroupMutation.mutate(
+      {
+        idBudgetPlanItemGroups: [budgetPlanGroupId],
+        status: data.status,
+        remark: data.notes,
+      },
+      {
+        onSuccess: () => {
+          router.push(`/budget-plans/${budgetPlanId}/detail`);
+          toast('Data approved!');
+        },
+        onError: (error) => {
+          console.log('Failed to approve data', error);
+          toast(error.message, { autoClose: false });
+          showErrorMessage(error);
+        },
+      }
     );
   };
 
@@ -518,6 +546,27 @@ const BudgetPlanGroupItemList: NextPage = () => {
           </div>
         </>
       )}
+
+      {isUserDeptPicAssetHo &&
+        dataHookBudgetPlanItemGroup?.data?.status ===
+          'WAITING APPROVAL PIC ASSET HO' && (
+          <Panel>
+            <Col lg={12}>
+              <ApproveModal
+                onSend={(data) => handleApprovalBudgetPlanItemGroup(data)}
+                classButton="mr-2"
+              />
+              <ReviseModal
+                onSend={(data) => handleApprovalBudgetPlanItemGroup(data)}
+                classButton="mr-2"
+              />
+              <RejectModal
+                onSend={(data) => handleApprovalBudgetPlanItemGroup(data)}
+                classButton="mr-2"
+              />
+            </Col>
+          </Panel>
+        )}
     </DetailLayout>
   );
 };

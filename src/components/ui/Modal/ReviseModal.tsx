@@ -53,7 +53,7 @@ const ReviseModal: React.FC<ReviseModalProps> = ({ onSend, classButton }) => {
             <Input
               name="status"
               control={control}
-              defaultValue={ApprovalStatus.REVISE}
+              defaultValue={ApprovalStatus.Revise}
               disabled
               type="hidden"
               error={errors.status?.message}

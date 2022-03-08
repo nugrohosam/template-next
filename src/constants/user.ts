@@ -3,5 +3,5 @@ export enum UserType {
   ApprovalEwgp = 'approval ewgp',
   ApprovalBudgetPlanCapex = 'approval budget plan capex',
   AdminCapex = 'admin capex',
-  DeptPicAssetHo = 'dept pic asset ho capex',
+  DeptPicAssetHoCapex = 'dept pic asset HO capex',
 }

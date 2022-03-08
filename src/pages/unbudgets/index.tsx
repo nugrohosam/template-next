@@ -2,7 +2,13 @@ import { customStyles } from 'components/form/SingleSelect';
 import ButtonActions from 'components/ui/Button/ButtonActions';
 import LoadingButton from 'components/ui/Button/LoadingButton';
 import ContentLayout from 'components/ui/ContentLayout';
+import ApproveModal from 'components/ui/Modal/ApproveModal';
+import RejectModal from 'components/ui/Modal/RejectModal';
+import ReviseModal from 'components/ui/Modal/ReviseModal';
 import DataTable, { usePaginateParams } from 'components/ui/Table/DataTable';
+import { UserType } from 'constants/user';
+import { ApprovalField, ApprovalStatus } from 'modules/approval/entities';
+import { useDecodeToken } from 'modules/custom/useDecodeToken';
 import {
   UnbudgetStatus,
   UnbudgetStatusOptions,
@@ -23,9 +29,11 @@ enum ActionUnbudget {
   Submit = 'SUBMIT',
   Delete = 'DELETE',
   Cancel = 'CANCEL',
+  Approval = 'APPROVAL',
 }
 
 const UnbudgetList: NextPage = () => {
+  const [profile] = useDecodeToken();
   const [selectedRow, setSelectedRow] = useState<Record<string, boolean>>({});
   const [selectedSort, setSelectedSort] = useState<SortingRule<any>[]>([]);
   const {
@@ -39,26 +47,48 @@ const UnbudgetList: NextPage = () => {
 
   const dataHookUnbudgets = useFetchUnbudgets(params);
   const {
-    deleteUnbudgetsMutation,
+    mutationDeleteUnbudgets,
     handleDeleteUnbudgets,
-    submitUnbudgetsMutation,
+    mutationSubmitUnbudgets,
     handleSubmitUnbudgets,
-    cancelUnbudgetsMutation,
+    mutationCancelUnbudgets,
     handleCancelUnbudgets,
+    handleApprovalUnbudgets,
   } = useUnbudgetHelpers();
 
-  const handleActionMultipleUnbudget = async (action: ActionUnbudget) => {
+  const handleMultipleActionUnbudget = async (
+    action: ActionUnbudget,
+    data?: ApprovalField
+  ) => {
     const ids = getAllIds(selectedRow, dataHookUnbudgets.data);
     if (ids?.length > 0) {
-      if (action === ActionUnbudget.Submit) await handleSubmitUnbudgets(ids);
-      else if (action === ActionUnbudget.Delete)
+      if (action === ActionUnbudget.Submit) {
+        await handleSubmitUnbudgets(ids);
+      } else if (action === ActionUnbudget.Delete) {
         await handleDeleteUnbudgets(ids);
-      else if (action === ActionUnbudget.Cancel)
+      } else if (action === ActionUnbudget.Cancel) {
         await handleCancelUnbudgets(ids);
+      } else if (action === ActionUnbudget.Approval) {
+        await handleApprovalUnbudgets({
+          idUnbudgets: ids,
+          status: data?.status as ApprovalStatus,
+          remark: data?.notes,
+        });
+      }
 
       setSelectedRow({});
       dataHookUnbudgets.refetch();
     }
+  };
+
+  // permission
+  const isUserAdminCapex = profile?.type === UserType.AdminCapex;
+  const isUserApproval = () => {
+    const type = [
+      UserType.ApprovalBudgetPlanCapex,
+      UserType.DeptPicAssetHoCapex,
+    ];
+    return type.includes(profile?.type as UserType);
   };
 
   const canSubmit = (status: string) =>
@@ -130,10 +160,10 @@ const UnbudgetList: NextPage = () => {
               size="sm"
               className="mt-2 w-100"
               disabled={
-                cancelUnbudgetsMutation.isLoading ||
+                mutationCancelUnbudgets.isLoading ||
                 !canCancel(row.values.status)
               }
-              isLoading={cancelUnbudgetsMutation.isLoading}
+              isLoading={mutationCancelUnbudgets.isLoading}
               onClick={() => handleCancelUnbudgets([row.values.id])}
             >
               Cancel
@@ -160,49 +190,83 @@ const UnbudgetList: NextPage = () => {
             data={dataHookUnbudgets.data}
             actions={
               <>
-                <LoadingButton
-                  variant="red"
-                  size="sm"
-                  className="mr-2"
-                  disabled={
-                    deleteUnbudgetsMutation.isLoading ||
-                    disableMultipleAction(canDelete)
-                  }
-                  isLoading={deleteUnbudgetsMutation.isLoading}
-                  onClick={() =>
-                    handleActionMultipleUnbudget(ActionUnbudget.Delete)
-                  }
-                >
-                  Delete
-                </LoadingButton>
-                <LoadingButton
-                  size="sm"
-                  className="mr-2"
-                  disabled={
-                    submitUnbudgetsMutation.isLoading ||
-                    disableMultipleAction(canSubmit)
-                  }
-                  isLoading={submitUnbudgetsMutation.isLoading}
-                  onClick={() =>
-                    handleActionMultipleUnbudget(ActionUnbudget.Submit)
-                  }
-                >
-                  Submit
-                </LoadingButton>
-                <LoadingButton
-                  size="sm"
-                  className="mr-2"
-                  disabled={
-                    cancelUnbudgetsMutation.isLoading ||
-                    disableMultipleAction(canCancel)
-                  }
-                  isLoading={cancelUnbudgetsMutation.isLoading}
-                  onClick={() =>
-                    handleActionMultipleUnbudget(ActionUnbudget.Cancel)
-                  }
-                >
-                  Cancel
-                </LoadingButton>
+                {isUserAdminCapex && (
+                  <>
+                    <LoadingButton
+                      variant="red"
+                      size="sm"
+                      className="mr-2"
+                      disabled={
+                        mutationDeleteUnbudgets.isLoading ||
+                        disableMultipleAction(canDelete)
+                      }
+                      isLoading={mutationDeleteUnbudgets.isLoading}
+                      onClick={() =>
+                        handleMultipleActionUnbudget(ActionUnbudget.Delete)
+                      }
+                    >
+                      Delete
+                    </LoadingButton>
+                    <LoadingButton
+                      size="sm"
+                      className="mr-2"
+                      disabled={
+                        mutationSubmitUnbudgets.isLoading ||
+                        disableMultipleAction(canSubmit)
+                      }
+                      isLoading={mutationSubmitUnbudgets.isLoading}
+                      onClick={() =>
+                        handleMultipleActionUnbudget(ActionUnbudget.Submit)
+                      }
+                    >
+                      Submit
+                    </LoadingButton>
+                    <LoadingButton
+                      size="sm"
+                      className="mr-2"
+                      disabled={
+                        mutationCancelUnbudgets.isLoading ||
+                        disableMultipleAction(canCancel)
+                      }
+                      isLoading={mutationCancelUnbudgets.isLoading}
+                      onClick={() =>
+                        handleMultipleActionUnbudget(ActionUnbudget.Cancel)
+                      }
+                    >
+                      Cancel
+                    </LoadingButton>
+                  </>
+                )}
+                {isUserApproval() && (
+                  <>
+                    <ApproveModal
+                      onSend={(data) =>
+                        handleMultipleActionUnbudget(
+                          ActionUnbudget.Approval,
+                          data
+                        )
+                      }
+                      classButton="mr-2"
+                    />
+                    <ReviseModal
+                      onSend={(data) =>
+                        handleMultipleActionUnbudget(
+                          ActionUnbudget.Approval,
+                          data
+                        )
+                      }
+                      classButton="mr-2"
+                    />
+                    <RejectModal
+                      onSend={(data) =>
+                        handleMultipleActionUnbudget(
+                          ActionUnbudget.Approval,
+                          data
+                        )
+                      }
+                    />
+                  </>
+                )}
               </>
             }
             filters={

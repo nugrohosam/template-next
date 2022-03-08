@@ -1,4 +1,5 @@
 import { Currency } from 'constants/currency';
+import { ApprovalStatus } from 'modules/approval/entities';
 import { AssetGroup } from 'modules/assetGroup/entities';
 import { Catalog } from 'modules/catalog/entities';
 
@@ -80,4 +81,10 @@ export interface BudgetPlanItemOfUnbudgetForm {
   items: ItemOfUnbudgetItem[];
   catalog?: Catalog;
   id?: string;
+}
+
+export interface ApprovalUnbudgetForm {
+  idUnbudgets: string[];
+  status: ApprovalStatus;
+  remark: string | null | undefined;
 }

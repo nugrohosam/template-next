@@ -1,8 +1,10 @@
+import { ApprovalStatus } from 'modules/approval/entities';
 import { toast } from 'react-toastify';
 import { showErrorMessage } from 'utils/helpers';
 
-import { UnbudgetForm } from './entities';
+import { ApprovalUnbudgetForm, UnbudgetForm } from './entities';
 import {
+  useApprovalUnbudgets,
   useCancelUnbudgets,
   useCreateUnbudget,
   useDeleteUnbudgets,
@@ -50,10 +52,10 @@ export const useUnbudgetHelpers = () => {
     });
   };
 
-  const deleteUnbudgetsMutation = useDeleteUnbudgets();
+  const mutationDeleteUnbudgets = useDeleteUnbudgets();
   const handleDeleteUnbudgets = (ids: string[]) => {
     return new Promise((resolve, reject) => {
-      deleteUnbudgetsMutation.mutate(ids, {
+      mutationDeleteUnbudgets.mutate(ids, {
         onSuccess: (result) => {
           resolve(result);
           toast('Data Deleted!');
@@ -68,10 +70,10 @@ export const useUnbudgetHelpers = () => {
     });
   };
 
-  const submitUnbudgetsMutation = useSubmitUnbudgets();
+  const mutationSubmitUnbudgets = useSubmitUnbudgets();
   const handleSubmitUnbudgets = (ids: string[]) => {
     return new Promise((resolve, reject) => {
-      submitUnbudgetsMutation.mutate(ids, {
+      mutationSubmitUnbudgets.mutate(ids, {
         onSuccess: (result) => {
           resolve(result);
           toast('Data Submited!');
@@ -86,10 +88,10 @@ export const useUnbudgetHelpers = () => {
     });
   };
 
-  const cancelUnbudgetsMutation = useCancelUnbudgets();
+  const mutationCancelUnbudgets = useCancelUnbudgets();
   const handleCancelUnbudgets = (ids: string[]) => {
     return new Promise((resolve, reject) => {
-      cancelUnbudgetsMutation.mutate(ids, {
+      mutationCancelUnbudgets.mutate(ids, {
         onSuccess: (result) => {
           resolve(result);
           toast('Data Canceled!');
@@ -104,16 +106,51 @@ export const useUnbudgetHelpers = () => {
     });
   };
 
+  const mutationApprovalUnbudgets = useApprovalUnbudgets();
+  const handleApprovalUnbudgets = (data: ApprovalUnbudgetForm) => {
+    let message = {
+      onSuccess: '',
+      onError: '',
+    };
+    if (data.status === ApprovalStatus.Approve) {
+      message.onSuccess = `Approved`;
+      message.onError = `approve`;
+    } else if (data.status === ApprovalStatus.Reject) {
+      message.onSuccess = `Rejected`;
+      message.onError = `reject`;
+    } else if (data.status === ApprovalStatus.Revise) {
+      message.onSuccess = `Revised`;
+      message.onError = `revise`;
+    }
+
+    return new Promise((resolve, reject) => {
+      mutationApprovalUnbudgets.mutate(data, {
+        onSuccess: (result) => {
+          resolve(result);
+          toast(`Data ${message.onSuccess}!`);
+        },
+        onError: (error) => {
+          reject(error);
+          console.error(`Failed to ${message.onError} data`, error);
+          toast(error.message, { autoClose: false });
+          showErrorMessage(error);
+        },
+      });
+    });
+  };
+
   return {
     mutationCreateUnbudget,
     handleCreateUnbudget,
     mutationUpdateUnbudget,
     handleUpdateUnbudget,
-    deleteUnbudgetsMutation,
+    mutationDeleteUnbudgets,
     handleDeleteUnbudgets,
-    submitUnbudgetsMutation,
+    mutationSubmitUnbudgets,
     handleSubmitUnbudgets,
-    cancelUnbudgetsMutation,
+    mutationCancelUnbudgets,
     handleCancelUnbudgets,
+    mutationApprovalUnbudgets,
+    handleApprovalUnbudgets,
   };
 };

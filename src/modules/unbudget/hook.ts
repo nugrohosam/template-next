@@ -7,6 +7,7 @@ import {
 } from 'react-query';
 
 import {
+  approvalUnbudgets,
   cancelUnbudgets,
   createUnbudget,
   deleteUnbudgets,
@@ -17,6 +18,7 @@ import {
   updateUnbudget,
 } from './api';
 import {
+  ApprovalUnbudgetForm,
   Unbudget,
   UnbudgetDetail,
   UnbudgetForm,
@@ -94,4 +96,12 @@ export const useCancelUnbudgets = (): UseMutationResult<
   string[]
 > => {
   return useMutation((idUnbudgets) => cancelUnbudgets(idUnbudgets));
+};
+
+export const useApprovalUnbudgets = (): UseMutationResult<
+  null,
+  ResponseError,
+  ApprovalUnbudgetForm
+> => {
+  return useMutation(approvalUnbudgets);
 };

@@ -113,7 +113,7 @@ const DetailBudgetPlan: NextPage = () => {
   // approval budget plan item group
   const isUserApproval =
     profile?.type === UserType.ApprovalBudgetPlanCapex ||
-    profile?.type === UserType.DeptPicAssetHo;
+    profile?.type === UserType.DeptPicAssetHoCapex;
   const mutationApprovalBudgetPlanItemGroup = useApprovalBudgetPlanItemGroups();
   const approvalBudgetPlanItemGroups = (
     data: ApprovalField & { idBudgetPlanItemGroups: string[] }

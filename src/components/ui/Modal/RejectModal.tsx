@@ -57,7 +57,7 @@ const RejectModal: React.FC<RejectModalProps> = ({ onSend, classButton }) => {
             <Input
               name="status"
               control={control}
-              defaultValue={ApprovalStatus.REJECT}
+              defaultValue={ApprovalStatus.Reject}
               disabled
               type="hidden"
               error={errors.status?.message}

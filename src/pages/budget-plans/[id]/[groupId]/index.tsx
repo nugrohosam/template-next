@@ -117,7 +117,8 @@ const BudgetPlanGroupItemList: NextPage = () => {
   const isUserApprovalBudgetPlanCapex =
     profile?.type === UserType.ApprovalBudgetPlanCapex;
   const isUserAdminCapex = profile?.type === UserType.AdminCapex;
-  const isUserDeptPicAssetHo = profile?.type === UserType.DeptPicAssetHo;
+  const isUserDeptPicAssetHoCapex =
+    profile?.type === UserType.DeptPicAssetHoCapex;
   const canEdit = () => {
     if (!isUserAdminCapex) return false;
     const statusAccess = [
@@ -547,7 +548,7 @@ const BudgetPlanGroupItemList: NextPage = () => {
         </>
       )}
 
-      {isUserDeptPicAssetHo &&
+      {isUserDeptPicAssetHoCapex &&
         dataHookBudgetPlanItemGroup?.data?.status ===
           'WAITING APPROVAL PIC ASSET HO' && (
           <Panel>

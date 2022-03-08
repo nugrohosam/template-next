@@ -71,12 +71,7 @@ const CreateCatalog: NextPage = () => {
 
   useEffect(() => {
     if (watchForm.primaryCurrency === Currency.Idr) {
-      setValue(
-        'priceInUsd',
-        +(watchForm.priceInIdr / currencyRate).toLocaleString('en-En', {
-          maximumFractionDigits: 2,
-        })
-      );
+      setValue('priceInUsd', +(watchForm.priceInIdr / currencyRate).toFixed(2));
     } else if (watchForm.primaryCurrency === Currency.Usd) {
       setValue('priceInIdr', watchForm.priceInUsd * currencyRate);
     }

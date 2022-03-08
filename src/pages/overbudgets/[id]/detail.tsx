@@ -1,18 +1,27 @@
 import Panel from 'components/form/Panel';
 import { PathBreadcrumb } from 'components/ui/Breadcrumb';
 import DetailLayout from 'components/ui/DetailLayout';
+import ApproveModal from 'components/ui/Modal/ApproveModal';
+import RejectModal from 'components/ui/Modal/RejectModal';
+import ReviseModal from 'components/ui/Modal/ReviseModal';
 import AuditTimeline from 'components/ui/Timeline/AuditTimeline';
 import { OverBudgetStatus } from 'constants/status';
 import { UserType } from 'constants/user';
+import { ApprovalField } from 'modules/approval/entities';
 import { useAttachmentHelpers } from 'modules/attachment/helpers';
 import { ResourceType } from 'modules/audit/parent/entities';
 import { useFetchAudits } from 'modules/audit/parent/hook';
 import { useDecodeToken } from 'modules/custom/useDecodeToken';
-import { useFetchOverBudgetDetail } from 'modules/overbudget/hook';
+import {
+  useApprovalOverbudgets,
+  useFetchOverBudgetDetail,
+} from 'modules/overbudget/hook';
 import { NextPage } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { Button, Col, Row } from 'react-bootstrap';
+import { toast } from 'react-toastify';
+import { showErrorMessage } from 'utils/helpers';
 
 const DetailOverBudget: NextPage = () => {
   const breadCrumb: PathBreadcrumb[] = [
@@ -31,6 +40,9 @@ const DetailOverBudget: NextPage = () => {
   const [profile] = useDecodeToken();
   const dataHook = useFetchOverBudgetDetail(id);
   const { handleDownloadAttachment } = useAttachmentHelpers();
+  const dataEditable =
+    dataHook?.data?.status === OverBudgetStatus.DRAFT ||
+    dataHook?.data?.status === OverBudgetStatus.REVISE;
 
   const auditHook = useFetchAudits({
     resourceId: id,
@@ -40,6 +52,36 @@ const DetailOverBudget: NextPage = () => {
     pageNumber: 1,
     pageSize: 10,
   });
+
+  const approvalOverbudgetMutation = useApprovalOverbudgets();
+  const handleApprovalOverbudgets = (
+    data: ApprovalField,
+    idOverbudgets: string
+  ) => {
+    console.log({
+      idOverbudgets: [idOverbudgets],
+      status: data.status,
+      remark: data.notes,
+    });
+    approvalOverbudgetMutation.mutate(
+      {
+        idOverbudgets: [idOverbudgets],
+        status: data.status,
+        remark: data.notes,
+      },
+      {
+        onSuccess: () => {
+          dataHook.refetch();
+          toast('Data approved!');
+        },
+        onError: (error) => {
+          console.log('Failed to approve data', error);
+          toast(error.message, { autoClose: false });
+          showErrorMessage(error);
+        },
+      }
+    );
+  };
 
   return (
     <DetailLayout
@@ -148,13 +190,30 @@ const DetailOverBudget: NextPage = () => {
         <br />
         <Row>
           <Col lg={12}>
-            {profile?.type !== UserType.ApprovalBudgetPlanCapex && (
+            {profile?.type !== UserType.ApprovalBudgetPlanCapex &&
+              dataEditable && (
+                <>
+                  <Link href={`/overbudgets/${id}/edit`} passHref>
+                    <Button variant="primary" className="float-right">
+                      Edit
+                    </Button>
+                  </Link>
+                </>
+              )}
+            {profile?.type === UserType.ApprovalBudgetPlanCapex && (
               <>
-                <Link href={`/overbudgets/${id}/edit`} passHref>
-                  <Button variant="primary" className="float-right">
-                    Edit
-                  </Button>
-                </Link>
+                <ApproveModal
+                  onSend={(data) => handleApprovalOverbudgets(data, id)}
+                  classButton="mr-2"
+                />
+                <ReviseModal
+                  onSend={(data) => handleApprovalOverbudgets(data, id)}
+                  classButton="mr-2"
+                />
+                <RejectModal
+                  onSend={(data) => handleApprovalOverbudgets(data, id)}
+                  classButton="mr-2"
+                />
               </>
             )}
           </Col>

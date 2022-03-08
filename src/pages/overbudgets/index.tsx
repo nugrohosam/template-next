@@ -80,7 +80,6 @@ const OverBudgetIndex: NextPage = () => {
       {
         idOverbudgets: data.idOverbudgets,
         status: data.status,
-        remark: data.notes,
       },
       {
         onSuccess: () => {

@@ -18,7 +18,7 @@ import {
 import type { NextPage } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Col, Row } from 'react-bootstrap';
 import { CellProps, Column, SortingRule } from 'react-table';
 
@@ -53,7 +53,7 @@ const UnbudgetDetails: NextPage = () => {
     pageSize: 10,
   });
   const dataHookCurrentBudgetPlan = useFetchCurrentBudgetPlan({
-    departmentCode: profile?.job_group as string,
+    departmentCode: dataHookUnbudgetDetail.data?.idCapexBudgetPlan as string,
     districtCode: profile?.district_code as string,
     divisionCode: profile?.division as string,
   });

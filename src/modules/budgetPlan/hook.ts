@@ -15,7 +15,7 @@ import {
   fetchCurrenntBudgetPlan,
   updateBudgetPlan,
 } from './api';
-import { BudgetPlan, BudgetPlanForm } from './entities';
+import { BudgetPlan, BudgetPlanForm, CurrentBudgetPlan } from './entities';
 
 export const useFetchBudgetPlan = (
   params: PaginateParams
@@ -35,8 +35,8 @@ export const useFetchBudgetPlanDetail = (
 
 export const useFetchCurrentBudgetPlan = (
   params: CurrentBudgetPlanParams
-): UseQueryResult<BudgetPlan> => {
-  return useQuery(['current-budget-plan'], () =>
+): UseQueryResult<CurrentBudgetPlan> => {
+  return useQuery(['current-budget-plan', params], () =>
     fetchCurrenntBudgetPlan(params)
   );
 };

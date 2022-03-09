@@ -104,7 +104,7 @@ const EditUnbudget: NextPage = () => {
   const dataHookUnbudgetDetail = useFetchUnbudgetDetail(idUnbudget);
   const dataHookUnbudgetItems = useFetchUnbudgetItems(idUnbudget, {});
   const dataHookCurrentBudgetPlan = useFetchCurrentBudgetPlan({
-    departmentCode: profile?.job_group as string,
+    departmentCode: dataHookUnbudgetDetail.data?.idCapexBudgetPlan as string,
     districtCode: profile?.district_code as string,
     divisionCode: profile?.division as string,
   });

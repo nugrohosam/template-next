@@ -326,7 +326,6 @@ const CreateUnbudget: NextPage = () => {
       backButtonClick={router.back}
       title="Create Unbudget"
     >
-      {JSON.stringify(profile)}
       <Panel>
         <Form onSubmit={handleSubmit(submitCreateUnbudget)}>
           <Row>

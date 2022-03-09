@@ -11,9 +11,14 @@ import ModalBox from '.';
 interface ReviseModalProps {
   onSend: (data: ApprovalField) => void;
   classButton?: string;
+  disabledToggle?: boolean;
 }
 
-const ReviseModal: React.FC<ReviseModalProps> = ({ onSend, classButton }) => {
+const ReviseModal: React.FC<ReviseModalProps> = ({
+  onSend,
+  classButton,
+  disabledToggle,
+}) => {
   const schema = yup.object().shape({
     notes: yup.string().required('Required field'),
     status: yup.string().required(),
@@ -34,6 +39,7 @@ const ReviseModal: React.FC<ReviseModalProps> = ({ onSend, classButton }) => {
       buttonVariant="orange"
       submitButtonVariant="red"
       classButton={classButton}
+      disabledToggle={disabledToggle}
       title="Are you sure to processed this data ?"
       onSend={handleSubmit(onSend)}
       isError={!isValid}

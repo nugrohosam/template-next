@@ -7,16 +7,15 @@ import RejectModal from 'components/ui/Modal/RejectModal';
 import ReviseModal from 'components/ui/Modal/ReviseModal';
 import DataTable, { usePaginateParams } from 'components/ui/Table/DataTable';
 import Loader from 'components/ui/Table/Loader';
-import { UserType } from 'constants/user';
-import { ApprovalField } from 'modules/approval/entities';
+import { ApprovalField, ApprovalStatus } from 'modules/approval/entities';
 import { useFetchBudgetPlanDetail } from 'modules/budgetPlan/hook';
+import { BudgetPlanItemGroupStatus } from 'modules/budgetPlanItemGroup/constant';
 import { BudgetPlanItemGroup } from 'modules/budgetPlanItemGroup/entities';
 import {
-  useApprovalBudgetPlanItemGroups,
-  useDeleteBudgetPlanItemGroups,
-  useFetchBudgetPlanItemGroups,
-  useSubmitBudgetPlanItemGroups,
-} from 'modules/budgetPlanItemGroup/hook';
+  permissionBudgetPlanItemGroupHelpers,
+  useBudgetPlanItemGroupHelpers,
+} from 'modules/budgetPlanItemGroup/helpers';
+import { useFetchBudgetPlanItemGroups } from 'modules/budgetPlanItemGroup/hook';
 import { useDecodeToken } from 'modules/custom/useDecodeToken';
 import moment from 'moment';
 import { NextPage } from 'next';
@@ -25,8 +24,7 @@ import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import { Badge, Button, Col, Row } from 'react-bootstrap';
 import { CellProps, Column, SortingRule } from 'react-table';
-import { toast } from 'react-toastify';
-import { getAllIds, showErrorMessage } from 'utils/helpers';
+import { getAllIds } from 'utils/helpers';
 
 const breadCrumb: PathBreadcrumb[] = [
   {
@@ -39,146 +37,80 @@ const breadCrumb: PathBreadcrumb[] = [
   },
 ];
 
+enum ActionBudgetPlanItemGroup {
+  Delete = 'DELETE',
+  Submit = 'SUBMIT',
+  Approval = 'APPROVAL',
+}
+
 const DetailBudgetPlan: NextPage = () => {
+  const router = useRouter();
+  const idBudgetPlan = router.query.id as string;
   const [profile] = useDecodeToken();
+
   const [selectedRow, setSelectedRow] = useState<Record<string, boolean>>({});
   const [selectedSort, setSelectedSort] = useState<SortingRule<any>[]>([]);
   const { params, setPageNumber, setPageSize, setSearch, setSortingRules } =
     usePaginateParams();
 
-  const router = useRouter();
-  const id = router.query.id as string;
-
-  const dataHook = useFetchBudgetPlanDetail(id);
+  const dataHook = useFetchBudgetPlanDetail(idBudgetPlan);
   const dataHookBudgetPlanItemGroup = useFetchBudgetPlanItemGroups({
     ...params,
-    idBudgetPlan: id,
+    idBudgetPlan: idBudgetPlan,
   });
 
-  // TODO: next time bisa dimodulin ke satu file, karena halaman lain juga pakai
-  // submit budget plan item group
-  const mutationSubmitBudgetPlanItemGroup = useSubmitBudgetPlanItemGroups();
-  const submitBudgetPlanItemGroups = (ids: Array<string>) => {
-    mutationSubmitBudgetPlanItemGroup.mutate(ids, {
-      onSuccess: () => {
-        setSelectedRow({});
-        dataHook.refetch();
-        dataHookBudgetPlanItemGroup.refetch();
-        toast('Data Submited!');
-      },
-      onError: (error) => {
-        console.error('Failed to submit data', error);
-        toast(error.message, { autoClose: false });
-        showErrorMessage(error);
-      },
-    });
-  };
-  const handleSubmitMultipleBudgetPlanItemsGroups = () => {
-    const ids = getAllIds(
-      selectedRow,
-      dataHookBudgetPlanItemGroup.data
-    ) as string[];
-    if (ids?.length > 0) {
-      submitBudgetPlanItemGroups(ids);
-    }
+  // permission
+  const { userCanHandleData, userCanApproveData, canSubmit, canApprove } =
+    permissionBudgetPlanItemGroupHelpers(profile?.type);
+  const disableMultipleAction = (canAction: (item: string) => void) => {
+    const items =
+      Object.keys(selectedRow).map(
+        (index) =>
+          dataHookBudgetPlanItemGroup.data?.items[parseInt(index)].status
+      ) || [];
+
+    return !items.every((item) => canAction(item || ''));
   };
 
-  // delete budget plan item group
-  const mutationDeleteBudgetPlanItemGroup = useDeleteBudgetPlanItemGroups();
-  const deleteBudgetPlanItemGroups = (ids: Array<string>) => {
-    mutationDeleteBudgetPlanItemGroup.mutate(ids, {
-      onSuccess: () => {
-        setSelectedRow({});
-        dataHook.refetch();
-        dataHookBudgetPlanItemGroup.refetch();
-        toast('Data Deleted!');
-      },
-      onError: (error) => {
-        console.error('Failed to delete data', error);
-        toast(error.message, { autoClose: false });
-        showErrorMessage(error);
-      },
-    });
-  };
-  const handleDeleteMultipleBudgetPlanItemsGroups = () => {
-    const ids = getAllIds(
-      selectedRow,
-      dataHookBudgetPlanItemGroup.data
-    ) as string[];
-    if (ids?.length > 0) {
-      if (confirm('Delete selected data?')) deleteBudgetPlanItemGroups(ids);
-    }
-  };
-
-  // approval budget plan item group
-  const isUserApproval =
-    profile?.type === UserType.ApprovalBudgetPlanCapex ||
-    profile?.type === UserType.DeptPicAssetHoCapex;
-  const mutationApprovalBudgetPlanItemGroup = useApprovalBudgetPlanItemGroups();
-  const approvalBudgetPlanItemGroups = (
-    data: ApprovalField & { idBudgetPlanItemGroups: string[] }
+  // handle actions
+  const {
+    mutationSubmitBudgetPlanItemGroup,
+    handleSubmitBudgetPlanItemGroups,
+    mutationDeleteBudgetPlanItemGroup,
+    handleDeleteBudgetPlanItemGroups,
+    handleApprovalBudgetPlanItemGroup,
+  } = useBudgetPlanItemGroupHelpers();
+  const handleMultipleAction = async (
+    action: ActionBudgetPlanItemGroup,
+    data?: ApprovalField
   ) => {
-    mutationApprovalBudgetPlanItemGroup.mutate(
-      {
-        idBudgetPlanItemGroups: data.idBudgetPlanItemGroups,
-        status: data.status,
-        remark: data.notes,
-      },
-      {
-        onSuccess: () => {
-          router.push(`/budget-plans/${id}/detail`);
-          dataHook.refetch();
-          dataHookBudgetPlanItemGroup.refetch();
-          toast('Data Approved!');
-        },
-        onError: (error) => {
-          console.error('Failed to approve data', error);
-          toast(error.message, { autoClose: false });
-          showErrorMessage(error);
-        },
+    const ids = getAllIds(selectedRow, dataHookBudgetPlanItemGroup.data);
+    if (ids?.length > 0) {
+      if (action === ActionBudgetPlanItemGroup.Submit) {
+        await handleSubmitBudgetPlanItemGroups(ids);
+      } else if (action === ActionBudgetPlanItemGroup.Delete) {
+        await handleDeleteBudgetPlanItemGroups(ids);
+      } else if (action === ActionBudgetPlanItemGroup.Approval) {
+        await handleApprovalBudgetPlanItemGroup({
+          idBudgetPlanItemGroups: ids,
+          status: data?.status as ApprovalStatus,
+          remark: data?.notes,
+        });
       }
-    );
-  };
-  const handleApprovaltMultipleBudgetPlanItemsGroups = (
-    data: ApprovalField
-  ) => {
-    const ids = getAllIds(
-      selectedRow,
-      dataHookBudgetPlanItemGroup.data
-    ) as string[];
-    if (ids?.length > 0) {
-      approvalBudgetPlanItemGroups({
-        idBudgetPlanItemGroups: ids,
-        status: data.status,
-        notes: data.notes,
-      });
+
+      setSelectedRow({});
+      dataHookBudgetPlanItemGroup.refetch();
     }
   };
 
   const columns: Column<BudgetPlanItemGroup>[] = [
-    {
-      Header: 'ID',
-      accessor: 'id',
-    },
-    {
-      Header: 'Budget Code',
-      accessor: 'budgetCode',
-      minWidth: 300,
-    },
-    {
-      Header: 'Units',
-      accessor: 'item',
-      minWidth: 100,
-    },
-    {
-      Header: 'Currency',
-      accessor: 'currency',
-      minWidth: 150,
-    },
+    { Header: 'ID', accessor: 'id' },
+    { Header: 'Budget Code', accessor: 'budgetCode', minWidth: 300 },
+    { Header: 'Units', accessor: 'item', minWidth: 100 },
+    { Header: 'Currency', accessor: 'currency' },
     {
       Header: 'Total USD',
       accessor: 'totalAmountUsd',
-      minWidth: 200,
       Cell: ({ row }: CellProps<BudgetPlanItemGroup>) => {
         return row.values.totalAmountUsd.toLocaleString('en-EN');
       },
@@ -186,7 +118,6 @@ const DetailBudgetPlan: NextPage = () => {
     {
       Header: 'Total IDR',
       accessor: 'totalAmount',
-      minWidth: 200,
       Cell: ({ row }: CellProps<BudgetPlanItemGroup>) => {
         return row.values.totalAmount.toLocaleString('id-Id');
       },
@@ -205,7 +136,6 @@ const DetailBudgetPlan: NextPage = () => {
     {
       Header: 'Created At',
       accessor: 'createdAt',
-      minWidth: 200,
       Cell: ({ row }: CellProps<BudgetPlanItemGroup>) => {
         return moment(row.values.createdAt).format('YYYY-MM-DD');
       },
@@ -215,7 +145,10 @@ const DetailBudgetPlan: NextPage = () => {
       Cell: ({ cell }: CellProps<BudgetPlanItemGroup>) => {
         return (
           <div className="d-flex flex-column" style={{ minWidth: 100 }}>
-            <Link href={`/budget-plans/${id}/${cell.row.values.id}`} passHref>
+            <Link
+              href={`/budget-plans/${idBudgetPlan}/${cell.row.values.id}`}
+              passHref
+            >
               <Button className="mb-1">Detail</Button>
             </Link>
           </div>
@@ -272,7 +205,7 @@ const DetailBudgetPlan: NextPage = () => {
 
         <Row>
           <Col lg={12}>
-            <Link href={`/budget-plans/${id}/edit`} passHref>
+            <Link href={`/budget-plans/${idBudgetPlan}/edit`} passHref>
               <Button variant="primary" className="float-right">
                 Edit
               </Button>
@@ -286,7 +219,10 @@ const DetailBudgetPlan: NextPage = () => {
           <Col lg={12} className="d-md-flex mt-40 mb-32 align-items-center">
             <h3 className="mb-3 mb-md-0 text__blue">Budget Plan Item Groups</h3>
             <div className="ml-auto d-flex flex-column flex-md-row">
-              <Link href={`/budget-plans/${id}/create-items`} passHref>
+              <Link
+                href={`/budget-plans/${idBudgetPlan}/create-items`}
+                passHref
+              >
                 <Button className="mb-1">+ Add Item</Button>
               </Link>
             </div>
@@ -298,47 +234,65 @@ const DetailBudgetPlan: NextPage = () => {
               data={dataHookBudgetPlanItemGroup.data}
               actions={
                 <>
-                  {!isUserApproval && (
+                  {userCanHandleData && (
                     <>
                       <LoadingButton
                         variant="red"
                         size="sm"
                         className="mr-2"
                         disabled={mutationDeleteBudgetPlanItemGroup.isLoading}
-                        onClick={handleDeleteMultipleBudgetPlanItemsGroups}
                         isLoading={mutationDeleteBudgetPlanItemGroup.isLoading}
+                        onClick={() =>
+                          handleMultipleAction(ActionBudgetPlanItemGroup.Delete)
+                        }
                       >
                         Delete
                       </LoadingButton>
                       <LoadingButton
                         size="sm"
                         className="mr-2"
-                        disabled={mutationSubmitBudgetPlanItemGroup.isLoading}
-                        onClick={handleSubmitMultipleBudgetPlanItemsGroups}
+                        disabled={
+                          mutationSubmitBudgetPlanItemGroup.isLoading ||
+                          !disableMultipleAction(canSubmit)
+                        }
                         isLoading={mutationSubmitBudgetPlanItemGroup.isLoading}
+                        onClick={() =>
+                          handleMultipleAction(ActionBudgetPlanItemGroup.Submit)
+                        }
                       >
                         Submit
                       </LoadingButton>
                     </>
                   )}
-
-                  {isUserApproval && (
+                  {userCanApproveData && (
                     <>
                       <ApproveModal
+                        disabledToggle={disableMultipleAction(canApprove)}
                         onSend={(data) =>
-                          handleApprovaltMultipleBudgetPlanItemsGroups(data)
+                          handleMultipleAction(
+                            ActionBudgetPlanItemGroup.Approval,
+                            data
+                          )
                         }
                         classButton="mr-2"
                       />
                       <ReviseModal
+                        disabledToggle={disableMultipleAction(canApprove)}
                         onSend={(data) =>
-                          handleApprovaltMultipleBudgetPlanItemsGroups(data)
+                          handleMultipleAction(
+                            ActionBudgetPlanItemGroup.Approval,
+                            data
+                          )
                         }
                         classButton="mr-2"
                       />
                       <RejectModal
+                        disabledToggle={disableMultipleAction(canApprove)}
                         onSend={(data) =>
-                          handleApprovaltMultipleBudgetPlanItemsGroups(data)
+                          handleMultipleAction(
+                            ActionBudgetPlanItemGroup.Approval,
+                            data
+                          )
                         }
                       />
                     </>

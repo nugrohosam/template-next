@@ -89,6 +89,10 @@ const BudgetPlanGroupItemList: NextPage = () => {
     pageSize: 10,
   });
 
+  // permission
+  const { canDelete, canEdit } = permissionBudgetPlanItemHelpers(profile?.type);
+  const { canApprove } = permissionBudgetPlanItemGroupHelpers(profile?.type);
+
   // handle delete
   const { mutationDeleteBudgetPlanItems, handleDeleteBudgetPlanItems } =
     useBudgetPlanItemHelpers();
@@ -108,10 +112,7 @@ const BudgetPlanGroupItemList: NextPage = () => {
     }
   };
 
-  // permission
-  const { canDelete, canEdit } = permissionBudgetPlanItemHelpers(profile?.type);
-  const { canApprove } = permissionBudgetPlanItemGroupHelpers(profile?.type);
-
+  // handle approval
   const { handleApprovalBudgetPlanItemGroup } = useBudgetPlanItemGroupHelpers();
   const approveBudgetPlanItemGroup = (data: ApprovalField) => {
     handleApprovalBudgetPlanItemGroup({

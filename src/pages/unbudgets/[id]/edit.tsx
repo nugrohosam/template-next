@@ -10,7 +10,10 @@ import UnbudgetModal from 'components/ui/Modal/Unbudget/UnbudgetModal';
 import SimpleTable from 'components/ui/Table/SimpleTable';
 import { PeriodeType } from 'constants/period';
 import { useAttachmentHelpers } from 'modules/attachment/helpers';
-import { useFetchCurrentBudgetPlan } from 'modules/budgetPlan/hook';
+import {
+  useFetchBudgetPlanDetail,
+  useFetchCurrentBudgetPlan,
+} from 'modules/budgetPlan/hook';
 import { getValueItemByMonth } from 'modules/budgetPlanItem/helpers';
 import { useDecodeToken } from 'modules/custom/useDecodeToken';
 import { useDownloadTemplateHelpers } from 'modules/downloadTemplate/helpers';
@@ -103,11 +106,9 @@ const EditUnbudget: NextPage = () => {
 
   const dataHookUnbudgetDetail = useFetchUnbudgetDetail(idUnbudget);
   const dataHookUnbudgetItems = useFetchUnbudgetItems(idUnbudget, {});
-  const dataHookCurrentBudgetPlan = useFetchCurrentBudgetPlan({
-    departmentCode: profile?.jobGroup as string,
-    districtCode: profile?.districtCode as string,
-    divisionCode: profile?.division as string,
-  });
+  const dataHookBudgetPlanDetail = useFetchBudgetPlanDetail(
+    dataHookUnbudgetDetail.data?.idCapexBudgetPlan as string
+  );
   useEffect(() => {
     if (dataHookUnbudgetDetail.data) {
       reset({
@@ -369,19 +370,19 @@ const EditUnbudget: NextPage = () => {
             <Col lg={6}>
               <h4 className="profile-detail__info--title mb-1">District</h4>
               <h3 className="profile-detail__info--subtitle">
-                {dataHookCurrentBudgetPlan.data?.districtCode || '-'}
+                {dataHookBudgetPlanDetail.data?.districtCode || '-'}
               </h3>
             </Col>
             <Col lg={6}>
               <h4 className="profile-detail__info--title mb-1">Divisi</h4>
               <h3 className="profile-detail__info--subtitle">
-                {dataHookCurrentBudgetPlan?.data?.divisionCode || '-'}
+                {dataHookBudgetPlanDetail?.data?.divisionCode || '-'}
               </h3>
             </Col>
             <Col lg={6}>
               <h4 className="profile-detail__info--title mb-1">Departemen</h4>
               <h3 className="profile-detail__info--subtitle">
-                {dataHookCurrentBudgetPlan?.data?.departmentCode || '-'}
+                {dataHookBudgetPlanDetail?.data?.departmentCode || '-'}
               </h3>
             </Col>
           </Row>
@@ -389,13 +390,13 @@ const EditUnbudget: NextPage = () => {
             <Col lg={6}>
               <h4 className="profile-detail__info--title mb-1">Year</h4>
               <h3 className="profile-detail__info--subtitle">
-                {dataHookCurrentBudgetPlan?.data?.periodYear || '-'}
+                {dataHookBudgetPlanDetail?.data?.periodYear || '-'}
               </h3>
             </Col>
             <Col lg={6}>
               <h4 className="profile-detail__info--title mb-1">Period</h4>
               <h3 className="profile-detail__info--subtitle">
-                {dataHookCurrentBudgetPlan?.data?.periodType || '-'}
+                {dataHookBudgetPlanDetail?.data?.periodType || '-'}
               </h3>
             </Col>
           </Row>
@@ -486,7 +487,7 @@ const EditUnbudget: NextPage = () => {
                   </div>
                   <UnbudgetModal
                     isBuilding={watchIsBuilding}
-                    period={dataHookCurrentBudgetPlan?.data?.periodType}
+                    period={dataHookBudgetPlanDetail?.data?.periodType}
                     {...(watchBudgetPlanItems?.length > 0 && {
                       inPageUpdate: {
                         idAssetGroup:

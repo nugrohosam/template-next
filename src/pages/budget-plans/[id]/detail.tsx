@@ -299,19 +299,30 @@ const DetailBudgetPlan: NextPage = () => {
               actions={
                 <>
                   {!isUserApproval && (
-                    <LoadingButton
-                      variant="red"
-                      size="sm"
-                      className="mr-2"
-                      disabled={mutationDeleteBudgetPlanItemGroup.isLoading}
-                      onClick={handleDeleteMultipleBudgetPlanItemsGroups}
-                      isLoading={mutationDeleteBudgetPlanItemGroup.isLoading}
-                    >
-                      Delete
-                    </LoadingButton>
+                    <>
+                      <LoadingButton
+                        variant="red"
+                        size="sm"
+                        className="mr-2"
+                        disabled={mutationDeleteBudgetPlanItemGroup.isLoading}
+                        onClick={handleDeleteMultipleBudgetPlanItemsGroups}
+                        isLoading={mutationDeleteBudgetPlanItemGroup.isLoading}
+                      >
+                        Delete
+                      </LoadingButton>
+                      <LoadingButton
+                        size="sm"
+                        className="mr-2"
+                        disabled={mutationSubmitBudgetPlanItemGroup.isLoading}
+                        onClick={handleSubmitMultipleBudgetPlanItemsGroups}
+                        isLoading={mutationSubmitBudgetPlanItemGroup.isLoading}
+                      >
+                        Submit
+                      </LoadingButton>
+                    </>
                   )}
 
-                  {isUserApproval ? (
+                  {isUserApproval && (
                     <>
                       <ApproveModal
                         onSend={(data) =>
@@ -331,16 +342,6 @@ const DetailBudgetPlan: NextPage = () => {
                         }
                       />
                     </>
-                  ) : (
-                    <LoadingButton
-                      size="sm"
-                      className="mr-2"
-                      disabled={mutationSubmitBudgetPlanItemGroup.isLoading}
-                      onClick={handleSubmitMultipleBudgetPlanItemsGroups}
-                      isLoading={mutationSubmitBudgetPlanItemGroup.isLoading}
-                    >
-                      Submit
-                    </LoadingButton>
                   )}
                 </>
               }

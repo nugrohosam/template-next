@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import { ButtonVariant } from 'react-bootstrap/esm/types';
-import { FieldErrors } from 'react-hook-form';
 
 interface ModalBoxProps {
   buttonTitle: string;
@@ -12,7 +11,7 @@ interface ModalBoxProps {
   classButton?: string;
   wordingSubmit?: string;
   dialogClassName?: string;
-  isError?: FieldErrors;
+  isError?: boolean;
   onSend: () => void;
   onClikModal?: () => void;
 }

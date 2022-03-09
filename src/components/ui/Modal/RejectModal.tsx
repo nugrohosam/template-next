@@ -26,7 +26,7 @@ const RejectModal: React.FC<RejectModalProps> = ({ onSend, classButton }) => {
   const {
     handleSubmit,
     control,
-    formState: { errors },
+    formState: { errors, isValid },
   } = useForm<ApprovalField>({
     mode: 'onChange',
     resolver: yupResolver(schema),
@@ -40,7 +40,7 @@ const RejectModal: React.FC<RejectModalProps> = ({ onSend, classButton }) => {
       classButton={classButton}
       title="Are you sure to processed this data ?"
       onSend={handleSubmit(onSend)}
-      isError={errors}
+      isError={!isValid}
     >
       <p className="text-center required">Enter a remark</p>
       <Form>

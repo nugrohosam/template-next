@@ -57,7 +57,7 @@ const NonBuildingUnbudgetModal: React.FC<UnbudgetModalProps> = ({
   const {
     handleSubmit,
     control,
-    formState: { errors },
+    formState: { errors, isValid },
     watch,
     resetField,
     setValue,
@@ -164,6 +164,7 @@ const NonBuildingUnbudgetModal: React.FC<UnbudgetModalProps> = ({
   };
 
   const onModalOpened = () => {
+    setValue('currencyRate', currencyRate);
     if (inPageUpdate) {
       /**
        * special condition when create item in update page,
@@ -238,6 +239,7 @@ const NonBuildingUnbudgetModal: React.FC<UnbudgetModalProps> = ({
       title="Add Unbudget Item"
       wordingSubmit="Save"
       dialogClassName="modal-90w"
+      isError={!isValid}
       onSend={handleSubmit(handleSubmitForm)}
       onClikModal={onModalOpened}
     >

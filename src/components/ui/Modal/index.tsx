@@ -12,6 +12,7 @@ interface ModalBoxProps {
   wordingSubmit?: string;
   dialogClassName?: string;
   isError?: boolean;
+  disabledToggle?: boolean;
   onSend: () => void;
   onClikModal?: () => void;
 }
@@ -26,6 +27,7 @@ const ModalBox: React.FC<ModalBoxProps> = ({
   wordingSubmit,
   dialogClassName,
   isError,
+  disabledToggle = false,
   onSend,
   onClikModal,
 }) => {
@@ -48,8 +50,9 @@ const ModalBox: React.FC<ModalBoxProps> = ({
     <>
       <Button
         variant={buttonVariant}
-        onClick={handleClickModal}
         className={classButton ? classButton : ''}
+        disabled={disabledToggle}
+        onClick={handleClickModal}
       >
         {buttonTitle}
       </Button>

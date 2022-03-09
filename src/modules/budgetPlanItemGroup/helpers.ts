@@ -1,3 +1,4 @@
+import { rejects } from 'assert';
 import { UserType } from 'constants/user';
 import { ApprovalStatus } from 'modules/approval/entities';
 import { toast } from 'react-toastify';
@@ -5,9 +6,49 @@ import { showErrorMessage } from 'utils/helpers';
 
 import { BudgetPlanItemGroupStatus } from './constant';
 import { ApprovalBudgetPlanItemGroup } from './entities';
-import { useApprovalBudgetPlanItemGroups } from './hook';
+import {
+  useApprovalBudgetPlanItemGroups,
+  useDeleteBudgetPlanItemGroups,
+  useSubmitBudgetPlanItemGroups,
+} from './hook';
 
 export const useBudgetPlanItemGroupHelpers = () => {
+  const mutationSubmitBudgetPlanItemGroup = useSubmitBudgetPlanItemGroups();
+  const handleSubmitBudgetPlanItemGroups = (ids: string[]) => {
+    return new Promise((resolve, reject) => {
+      mutationSubmitBudgetPlanItemGroup.mutate(ids, {
+        onSuccess: (result) => {
+          resolve(result);
+          toast('Data Submited!');
+        },
+        onError: (error) => {
+          reject(error);
+          console.error('Failed to submit data', error);
+          toast(error.message, { autoClose: false });
+          showErrorMessage(error);
+        },
+      });
+    });
+  };
+
+  const mutationDeleteBudgetPlanItemGroup = useDeleteBudgetPlanItemGroups();
+  const handleDeleteBudgetPlanItemGroups = (ids: string[]) => {
+    return new Promise((resolve, reject) => {
+      mutationDeleteBudgetPlanItemGroup.mutate(ids, {
+        onSuccess: (result) => {
+          resolve(result);
+          toast('Data Deleted!');
+        },
+        onError: (error) => {
+          reject(error);
+          console.error('Failed to delete data', error);
+          toast(error.message, { autoClose: false });
+          showErrorMessage(error);
+        },
+      });
+    });
+  };
+
   const mutationApprovalBudgetPlanItemGroup = useApprovalBudgetPlanItemGroups();
   const handleApprovalBudgetPlanItemGroup = (
     data: ApprovalBudgetPlanItemGroup
@@ -44,6 +85,10 @@ export const useBudgetPlanItemGroupHelpers = () => {
   };
 
   return {
+    mutationSubmitBudgetPlanItemGroup,
+    handleSubmitBudgetPlanItemGroups,
+    mutationDeleteBudgetPlanItemGroup,
+    handleDeleteBudgetPlanItemGroups,
     mutationApprovalBudgetPlanItemGroup,
     handleApprovalBudgetPlanItemGroup,
   };
@@ -52,13 +97,25 @@ export const useBudgetPlanItemGroupHelpers = () => {
 export const permissionBudgetPlanItemGroupHelpers = (
   role: string | undefined
 ) => {
-  const userCanApproveData = role === UserType.DeptPicAssetHoCapex;
+  const userCanHandleData =
+    role === UserType.AdminCapex || role === UserType.PicCapex;
+  const userCanApproveData =
+    role === UserType.ApprovalBudgetPlanCapex ||
+    role === UserType.DeptPicAssetHoCapex;
 
-  const canApprove = (status: string | undefined) => {
-    if (!userCanApproveData) return false;
-    const statusAccess = [BudgetPlanItemGroupStatus.WaitingApprovalPicAssetHo];
+  const canSubmit = (status: string | undefined) => {
+    if (!userCanHandleData) return false;
+    const statusAccess = [
+      BudgetPlanItemGroupStatus.Draft,
+      BudgetPlanItemGroupStatus.Revise,
+    ];
     return statusAccess.includes(status as BudgetPlanItemGroupStatus);
   };
 
-  return { userCanApproveData, canApprove };
+  const canApprove = (status: string | undefined) => {
+    if (!userCanApproveData) return false;
+    return status?.includes(BudgetPlanItemGroupStatus.WaitingApproval);
+  };
+
+  return { userCanHandleData, userCanApproveData, canSubmit, canApprove };
 };

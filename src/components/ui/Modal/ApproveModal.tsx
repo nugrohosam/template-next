@@ -14,9 +14,14 @@ import * as yup from 'yup';
 interface ApproveModalProps {
   onSend: (data: ApprovalField) => void;
   classButton?: string;
+  disabledToggle?: boolean;
 }
 
-const ApproveModal: React.FC<ApproveModalProps> = ({ onSend, classButton }) => {
+const ApproveModal: React.FC<ApproveModalProps> = ({
+  onSend,
+  classButton,
+  disabledToggle,
+}) => {
   const schema = yup.object().shape({
     status: yup.string().required(),
   });
@@ -35,6 +40,7 @@ const ApproveModal: React.FC<ApproveModalProps> = ({ onSend, classButton }) => {
       buttonTitle="Approve"
       buttonVariant="green"
       classButton={classButton}
+      disabledToggle={disabledToggle}
       title="Are you sure to processed this data ?"
       onSend={handleSubmit(onSend)}
     >

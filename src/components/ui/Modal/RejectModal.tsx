@@ -15,9 +15,14 @@ import ModalBox from '.';
 interface RejectModalProps {
   onSend: (data: ApprovalField) => void;
   classButton?: string;
+  disabledToggle?: boolean;
 }
 
-const RejectModal: React.FC<RejectModalProps> = ({ onSend, classButton }) => {
+const RejectModal: React.FC<RejectModalProps> = ({
+  onSend,
+  classButton,
+  disabledToggle,
+}) => {
   const schema = yup.object().shape({
     notes: yup.string().required('Required field'),
     status: yup.string().required(),
@@ -38,6 +43,7 @@ const RejectModal: React.FC<RejectModalProps> = ({ onSend, classButton }) => {
       buttonVariant="red"
       submitButtonVariant="red"
       classButton={classButton}
+      disabledToggle={disabledToggle}
       title="Are you sure to processed this data ?"
       onSend={handleSubmit(onSend)}
       isError={!isValid}

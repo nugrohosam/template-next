@@ -102,8 +102,7 @@ const CreateOverBudget: NextPage = () => {
         setIsAttachmentUploaded(true);
       },
       onError: (error) => {
-        setIsAttachmentUploaded(true); // TODO: set to false, masih set true karena module upload overbudget belum ready
-        setValue('attachment', 'attachment_overbudget.pdf'); // TODO: hapus baris ini, sekarang API upload belum ready, buar bisa submit data
+        setIsAttachmentUploaded(false);
         setValidationError(error, setError);
         toast(error.message, { autoClose: false });
       },

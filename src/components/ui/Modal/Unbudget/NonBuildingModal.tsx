@@ -116,10 +116,12 @@ const NonBuildingUnbudgetModal: React.FC<UnbudgetModalProps> = ({
 
   const changeCatalog = (idCapexCatalog: string) => {
     const found = catalogOptions.find((item) => item.id === idCapexCatalog);
-    if (watchCurrency && found) {
+    if (found) {
+      const currency = found.primaryCurrency || null;
+      setValue('currency', currency);
       setValue(
         'pricePerUnit',
-        watchCurrency === Currency.Idr ? found?.priceInIdr : found?.priceInUsd
+        currency === Currency.Idr ? found?.priceInIdr : found?.priceInUsd
       );
     }
   };

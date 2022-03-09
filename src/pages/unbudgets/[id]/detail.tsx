@@ -7,7 +7,9 @@ import AuditTimeline from 'components/ui/Timeline/AuditTimeline';
 import { useAttachmentHelpers } from 'modules/attachment/helpers';
 import { ResourceType } from 'modules/audit/parent/entities';
 import { useFetchAudits } from 'modules/audit/parent/hook';
+import { useFetchCurrentBudgetPlan } from 'modules/budgetPlan/hook';
 import { getValueItemByMonth } from 'modules/budgetPlanItem/helpers';
+import { useDecodeToken } from 'modules/custom/useDecodeToken';
 import { UnbudgetItem } from 'modules/unbudget/entities';
 import {
   useFetchUnbudgetDetail,
@@ -34,6 +36,7 @@ const breadCrumb: PathBreadcrumb[] = [
 const UnbudgetDetails: NextPage = () => {
   const router = useRouter();
   const unbudgetId = router.query.id as string;
+  const [profile] = useDecodeToken();
 
   const [selectedSort, setSelectedSort] = useState<SortingRule<any>[]>([]);
   const { params, setPageNumber, setPageSize, setSearch, setSortingRules } =
@@ -41,7 +44,6 @@ const UnbudgetDetails: NextPage = () => {
 
   const dataHookUnbudgetDetail = useFetchUnbudgetDetail(unbudgetId);
   const dataHookUnbudgetItems = useFetchUnbudgetItems(unbudgetId, params);
-  const { handleDownloadAttachment } = useAttachmentHelpers();
   const auditHook = useFetchAudits({
     resourceId: unbudgetId,
     resourceType: ResourceType.Unbudget,
@@ -50,6 +52,12 @@ const UnbudgetDetails: NextPage = () => {
     pageNumber: 1,
     pageSize: 10,
   });
+  const dataHookCurrentBudgetPlan = useFetchCurrentBudgetPlan({
+    departmentCode: profile?.jobGroup as string,
+    districtCode: profile?.districtCode as string,
+    divisionCode: profile?.division as string,
+  });
+  const { handleDownloadAttachment } = useAttachmentHelpers();
 
   const columns: Column<UnbudgetItem>[] = [
     { Header: 'ID', accessor: 'id' },
@@ -261,19 +269,19 @@ const UnbudgetDetails: NextPage = () => {
           <Col lg={6}>
             <h4 className="profile-detail__info--title mb-1">District</h4>
             <h3 className="profile-detail__info--subtitle">
-              {dataHookUnbudgetDetail?.data?.districtCode || '-'}
+              {dataHookCurrentBudgetPlan.data?.districtCode || '-'}
             </h3>
           </Col>
           <Col lg={6}>
             <h4 className="profile-detail__info--title mb-1">Divisi</h4>
             <h3 className="profile-detail__info--subtitle">
-              {dataHookUnbudgetDetail?.data?.divisionCode || '-'}
+              {dataHookCurrentBudgetPlan?.data?.divisionCode || '-'}
             </h3>
           </Col>
           <Col lg={6}>
             <h4 className="profile-detail__info--title mb-1">Departemen</h4>
             <h3 className="profile-detail__info--subtitle">
-              {dataHookUnbudgetDetail?.data?.departmentCode || '-'}
+              {dataHookCurrentBudgetPlan?.data?.departmentCode || '-'}
             </h3>
           </Col>
         </Row>
@@ -281,13 +289,13 @@ const UnbudgetDetails: NextPage = () => {
           <Col lg={6}>
             <h4 className="profile-detail__info--title mb-1">Year</h4>
             <h3 className="profile-detail__info--subtitle">
-              {dataHookUnbudgetDetail?.data?.periodYear || '-'}
+              {dataHookCurrentBudgetPlan?.data?.periodYear || '-'}
             </h3>
           </Col>
           <Col lg={6}>
             <h4 className="profile-detail__info--title mb-1">Period</h4>
             <h3 className="profile-detail__info--subtitle">
-              {dataHookUnbudgetDetail?.data?.periodType || '-'}
+              {dataHookCurrentBudgetPlan?.data?.periodType || '-'}
             </h3>
           </Col>
         </Row>

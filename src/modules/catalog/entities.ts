@@ -1,9 +1,10 @@
+import { Currency } from 'constants/currency';
 import type { AssetGroup } from 'modules/assetGroup/entities';
 
 export type Catalog = {
   id: string;
   detail: string;
-  primaryCurrency: string;
+  primaryCurrency: Currency;
   priceInIdr: number;
   priceInUsd: number;
   status: string;

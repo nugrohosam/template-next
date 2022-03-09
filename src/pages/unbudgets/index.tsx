@@ -6,13 +6,9 @@ import ApproveModal from 'components/ui/Modal/ApproveModal';
 import RejectModal from 'components/ui/Modal/RejectModal';
 import ReviseModal from 'components/ui/Modal/ReviseModal';
 import DataTable, { usePaginateParams } from 'components/ui/Table/DataTable';
-import { UserType } from 'constants/user';
 import { ApprovalField, ApprovalStatus } from 'modules/approval/entities';
 import { useDecodeToken } from 'modules/custom/useDecodeToken';
-import {
-  UnbudgetStatus,
-  UnbudgetStatusOptions,
-} from 'modules/unbudget/constant';
+import { UnbudgetStatusOptions } from 'modules/unbudget/constant';
 import { Unbudget } from 'modules/unbudget/entities';
 import {
   permissionUnbudgetHelpers,
@@ -49,6 +45,8 @@ const UnbudgetList: NextPage = () => {
   } = usePaginateParams();
 
   const dataHookUnbudgets = useFetchUnbudgets(params);
+
+  // handle actions
   const {
     mutationDeleteUnbudgets,
     handleDeleteUnbudgets,
@@ -58,7 +56,6 @@ const UnbudgetList: NextPage = () => {
     handleCancelUnbudgets,
     handleApprovalUnbudgets,
   } = useUnbudgetHelpers();
-
   const handleMultipleActionUnbudget = async (
     action: ActionUnbudget,
     data?: ApprovalField

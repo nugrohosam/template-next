@@ -10,7 +10,9 @@ import UnbudgetModal from 'components/ui/Modal/Unbudget/UnbudgetModal';
 import SimpleTable from 'components/ui/Table/SimpleTable';
 import { PeriodeType } from 'constants/period';
 import { useAttachmentHelpers } from 'modules/attachment/helpers';
+import { useFetchCurrentBudgetPlan } from 'modules/budgetPlan/hook';
 import { getValueItemByMonth } from 'modules/budgetPlanItem/helpers';
+import { useDecodeToken } from 'modules/custom/useDecodeToken';
 import { useDownloadTemplateHelpers } from 'modules/downloadTemplate/helpers';
 import {
   BudgetPlanItemOfUnbudgetForm,
@@ -30,9 +32,6 @@ import { CellProps, Column } from 'react-table';
 import { setValidationError } from 'utils/helpers';
 import * as yup from 'yup';
 
-// TODO: period masih hardcode
-const periodNow = PeriodeType.Mb;
-
 const schema = yup.object().shape({
   unbudgetBackground: yup.string().required(),
   unbudgetImpactIfNotRealized: yup.string().required(),
@@ -42,6 +41,7 @@ const schema = yup.object().shape({
 const EditUnbudget: NextPage = () => {
   const router = useRouter();
   const idUnbudget = router.query.id as string;
+  const [profile] = useDecodeToken();
 
   const [selectedRow, setSelectedRow] = useState<Record<string, boolean>>({});
 
@@ -88,9 +88,10 @@ const EditUnbudget: NextPage = () => {
       watchOutstandingPlanPaymentAttachmentFile,
     outstandingRetentionAttachmentFile: watchOutstandingRetentionAttachmentFile,
   } = watch();
-  const controlledFields = fields.map(
-    (field, index) => watchBudgetPlanItems[index]
-  );
+  const controlledFields =
+    fields.map((field, index) => ({
+      ...(watchBudgetPlanItems && watchBudgetPlanItems[index]),
+    })) || [];
 
   useEffect(() => {
     replace([]);
@@ -102,6 +103,11 @@ const EditUnbudget: NextPage = () => {
 
   const dataHookUnbudgetDetail = useFetchUnbudgetDetail(idUnbudget);
   const dataHookUnbudgetItems = useFetchUnbudgetItems(idUnbudget, {});
+  const dataHookCurrentBudgetPlan = useFetchCurrentBudgetPlan({
+    departmentCode: profile?.jobGroup as string,
+    districtCode: profile?.districtCode as string,
+    divisionCode: profile?.division as string,
+  });
   useEffect(() => {
     if (dataHookUnbudgetDetail.data) {
       reset({
@@ -362,25 +368,35 @@ const EditUnbudget: NextPage = () => {
           <Row>
             <Col lg={6}>
               <h4 className="profile-detail__info--title mb-1">District</h4>
-              <h3 className="profile-detail__info--subtitle">JIEP</h3>
+              <h3 className="profile-detail__info--subtitle">
+                {dataHookCurrentBudgetPlan.data?.districtCode || '-'}
+              </h3>
             </Col>
             <Col lg={6}>
               <h4 className="profile-detail__info--title mb-1">Divisi</h4>
-              <h3 className="profile-detail__info--subtitle">FATB</h3>
+              <h3 className="profile-detail__info--subtitle">
+                {dataHookCurrentBudgetPlan?.data?.divisionCode || '-'}
+              </h3>
             </Col>
             <Col lg={6}>
               <h4 className="profile-detail__info--title mb-1">Departemen</h4>
-              <h3 className="profile-detail__info--subtitle">TREA</h3>
+              <h3 className="profile-detail__info--subtitle">
+                {dataHookCurrentBudgetPlan?.data?.departmentCode || '-'}
+              </h3>
             </Col>
           </Row>
           <Row>
             <Col lg={6}>
               <h4 className="profile-detail__info--title mb-1">Year</h4>
-              <h3 className="profile-detail__info--subtitle">2022</h3>
+              <h3 className="profile-detail__info--subtitle">
+                {dataHookCurrentBudgetPlan?.data?.periodYear || '-'}
+              </h3>
             </Col>
             <Col lg={6}>
               <h4 className="profile-detail__info--title mb-1">Period</h4>
-              <h3 className="profile-detail__info--subtitle">{periodNow}</h3>
+              <h3 className="profile-detail__info--subtitle">
+                {dataHookCurrentBudgetPlan?.data?.periodType || '-'}
+              </h3>
             </Col>
           </Row>
 
@@ -470,7 +486,7 @@ const EditUnbudget: NextPage = () => {
                   </div>
                   <UnbudgetModal
                     isBuilding={watchIsBuilding}
-                    period={periodNow}
+                    period={dataHookCurrentBudgetPlan?.data?.periodType}
                     {...(watchBudgetPlanItems?.length > 0 && {
                       inPageUpdate: {
                         idAssetGroup:

@@ -6,15 +6,14 @@ import ApproveModal from 'components/ui/Modal/ApproveModal';
 import RejectModal from 'components/ui/Modal/RejectModal';
 import ReviseModal from 'components/ui/Modal/ReviseModal';
 import DataTable, { usePaginateParams } from 'components/ui/Table/DataTable';
-import { UserType } from 'constants/user';
 import { ApprovalField, ApprovalStatus } from 'modules/approval/entities';
 import { useDecodeToken } from 'modules/custom/useDecodeToken';
-import {
-  UnbudgetStatus,
-  UnbudgetStatusOptions,
-} from 'modules/unbudget/constant';
+import { UnbudgetStatusOptions } from 'modules/unbudget/constant';
 import { Unbudget } from 'modules/unbudget/entities';
-import { useUnbudgetHelpers } from 'modules/unbudget/helpers';
+import {
+  permissionUnbudgetHelpers,
+  useUnbudgetHelpers,
+} from 'modules/unbudget/helpers';
 import { useFetchUnbudgets } from 'modules/unbudget/hook';
 import moment from 'moment';
 import type { NextPage } from 'next';
@@ -46,6 +45,8 @@ const UnbudgetList: NextPage = () => {
   } = usePaginateParams();
 
   const dataHookUnbudgets = useFetchUnbudgets(params);
+
+  // handle actions
   const {
     mutationDeleteUnbudgets,
     handleDeleteUnbudgets,
@@ -55,7 +56,6 @@ const UnbudgetList: NextPage = () => {
     handleCancelUnbudgets,
     handleApprovalUnbudgets,
   } = useUnbudgetHelpers();
-
   const handleMultipleActionUnbudget = async (
     action: ActionUnbudget,
     data?: ApprovalField
@@ -81,25 +81,15 @@ const UnbudgetList: NextPage = () => {
     }
   };
 
-  // permission
-  const isUserAdminCapex = profile?.type === UserType.AdminCapex;
-  const isUserApproval = () => {
-    const type = [
-      UserType.ApprovalBudgetPlanCapex,
-      UserType.DeptPicAssetHoCapex,
-    ];
-    return type.includes(profile?.type as UserType);
-  };
-
-  const canSubmit = (status: string) =>
-    status === UnbudgetStatus.Draft || status === UnbudgetStatus.Revise;
-  const canDelete = (status: string) =>
-    status === UnbudgetStatus.Draft || status === UnbudgetStatus.Cancel;
-  const canCancel = (status: string) =>
-    status === UnbudgetStatus.Draft || status === UnbudgetStatus.Revise;
-  const canEdit = (status: string) =>
-    status === UnbudgetStatus.Draft || status === UnbudgetStatus.Revise;
-
+  // permisison
+  const {
+    userCanHandleData,
+    userCanApproveData,
+    canCancel,
+    canDelete,
+    canEdit,
+    canSubmit,
+  } = permissionUnbudgetHelpers(profile?.type);
   const disableMultipleAction = (canAction: (item: string) => void) => {
     const items =
       Object.keys(selectedRow).map(
@@ -190,7 +180,7 @@ const UnbudgetList: NextPage = () => {
             data={dataHookUnbudgets.data}
             actions={
               <>
-                {isUserAdminCapex && (
+                {userCanHandleData && (
                   <>
                     <LoadingButton
                       variant="red"
@@ -237,7 +227,7 @@ const UnbudgetList: NextPage = () => {
                     </LoadingButton>
                   </>
                 )}
-                {isUserApproval() && (
+                {userCanApproveData && (
                   <>
                     <ApproveModal
                       onSend={(data) =>

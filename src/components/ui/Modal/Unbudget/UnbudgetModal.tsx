@@ -14,7 +14,7 @@ export interface UnbudgetModalProps {
   isBuilding?: boolean;
   myItem?: BudgetPlanItemOfUnbudgetForm;
   buttonTitle?: string;
-  period: PeriodeType;
+  period: PeriodeType | string | undefined;
 }
 
 const UnbudgetModal: React.FC<UnbudgetModalProps> = ({

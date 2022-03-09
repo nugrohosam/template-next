@@ -17,7 +17,7 @@ export function getValueItemByMonth(
   isBuilding: boolean,
   currency: Currency
 ) {
-  const foundItem = items.find((item) => item.month == month);
+  const foundItem = items?.find((item) => item.month == month);
   if (!foundItem) return '-';
 
   if (isBuilding) {

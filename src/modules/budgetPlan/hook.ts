@@ -8,9 +8,11 @@ import {
 
 import {
   createBudgetPlan,
+  CurrentBudgetPlanParams,
   deleteBudgetPlan,
   fetchBudgetPlan,
   fetchBudgetPlanDetail,
+  fetchCurrenntBudgetPlan,
   updateBudgetPlan,
 } from './api';
 import { BudgetPlan, BudgetPlanForm } from './entities';
@@ -28,6 +30,14 @@ export const useFetchBudgetPlanDetail = (
     ['budget-plan-detail', idBudgetPlan],
     () => fetchBudgetPlanDetail(idBudgetPlan),
     { enabled: !!idBudgetPlan }
+  );
+};
+
+export const useFetchCurrentBudgetPlan = (
+  params: CurrentBudgetPlanParams
+): UseQueryResult<BudgetPlan> => {
+  return useQuery(['current-budget-plan'], () =>
+    fetchCurrenntBudgetPlan(params)
   );
 };
 

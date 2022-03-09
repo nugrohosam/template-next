@@ -1,7 +1,9 @@
+import { UserType } from 'constants/user';
 import { ApprovalStatus } from 'modules/approval/entities';
 import { toast } from 'react-toastify';
 import { showErrorMessage } from 'utils/helpers';
 
+import { UnbudgetStatus } from './constant';
 import { ApprovalUnbudgetForm, UnbudgetForm } from './entities';
 import {
   useApprovalUnbudgets,
@@ -152,5 +154,45 @@ export const useUnbudgetHelpers = () => {
     handleCancelUnbudgets,
     mutationApprovalUnbudgets,
     handleApprovalUnbudgets,
+  };
+};
+
+export const permissionUnbudgetHelpers = (role: string | undefined) => {
+  const userCanHandleData = role === UserType.AdminCapex;
+  const userCanApproveData =
+    role === UserType.ApprovalBudgetPlanCapex ||
+    role === UserType.DeptPicAssetHoCapex;
+
+  const canSubmit = (status: string | undefined) => {
+    if (!userCanHandleData) return false;
+    const statusAccess = [UnbudgetStatus.Draft, UnbudgetStatus.Revise];
+    return statusAccess.includes(status as UnbudgetStatus);
+  };
+
+  const canDelete = (status: string | undefined) => {
+    if (!userCanHandleData) return false;
+    const statusAccess = [UnbudgetStatus.Draft, UnbudgetStatus.Cancel];
+    return statusAccess.includes(status as UnbudgetStatus);
+  };
+
+  const canCancel = (status: string | undefined) => {
+    if (!userCanHandleData) return false;
+    const statusAccess = [UnbudgetStatus.Draft, UnbudgetStatus.Revise];
+    return statusAccess.includes(status as UnbudgetStatus);
+  };
+
+  const canEdit = (status: string | undefined) => {
+    if (!userCanHandleData) return false;
+    const statusAccess = [UnbudgetStatus.Draft, UnbudgetStatus.Revise];
+    return statusAccess.includes(status as UnbudgetStatus);
+  };
+
+  return {
+    userCanHandleData,
+    userCanApproveData,
+    canSubmit,
+    canDelete,
+    canCancel,
+    canEdit,
   };
 };

@@ -1,7 +1,7 @@
 import { Paginate, PaginateParams, ResponseData } from 'modules/common/types';
 import axios from 'utils/axios';
 
-import { BudgetPlan, BudgetPlanForm } from './entities';
+import { BudgetPlan, BudgetPlanForm, CurrentBudgetPlan } from './entities';
 
 export const fetchBudgetPlan = async (
   params: PaginateParams
@@ -18,6 +18,21 @@ export const fetchBudgetPlanDetail = async (
 ): Promise<BudgetPlan> => {
   const result = await axios.get<ResponseData<BudgetPlan>>(
     `v1/budgetplan/${idBudgetPlan}`
+  );
+  return result.data.data;
+};
+
+export interface CurrentBudgetPlanParams {
+  districtCode: string;
+  divisionCode: string;
+  departmentCode: string;
+}
+export const fetchCurrenntBudgetPlan = async (
+  params: CurrentBudgetPlanParams
+): Promise<CurrentBudgetPlan> => {
+  const result = await axios.get<ResponseData<CurrentBudgetPlan>>(
+    `v1/budgetplan/final`,
+    { params }
   );
   return result.data.data;
 };

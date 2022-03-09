@@ -10,7 +10,9 @@ import UnbudgetModal from 'components/ui/Modal/Unbudget/UnbudgetModal';
 import SimpleTable from 'components/ui/Table/SimpleTable';
 import { PeriodeType } from 'constants/period';
 import { useAttachmentHelpers } from 'modules/attachment/helpers';
+import { useFetchCurrentBudgetPlan } from 'modules/budgetPlan/hook';
 import { getValueItemByMonth } from 'modules/budgetPlanItem/helpers';
+import { useDecodeToken } from 'modules/custom/useDecodeToken';
 import { useDownloadTemplateHelpers } from 'modules/downloadTemplate/helpers';
 import {
   BudgetPlanItemOfUnbudgetForm,
@@ -25,9 +27,6 @@ import { useFieldArray, useForm } from 'react-hook-form';
 import { CellProps, Column } from 'react-table';
 import { setValidationError } from 'utils/helpers';
 import * as yup from 'yup';
-
-// TODO: period masih hardcode
-const periodNow = PeriodeType.Mb;
 
 const breadCrumb: PathBreadcrumb[] = [
   {
@@ -48,6 +47,8 @@ const schema = yup.object().shape({
 
 const CreateUnbudget: NextPage = () => {
   const router = useRouter();
+  const [profile] = useDecodeToken();
+
   const [selectedRow, setSelectedRow] = useState<Record<string, boolean>>({});
 
   const {
@@ -88,6 +89,12 @@ const CreateUnbudget: NextPage = () => {
     resetField('outstandingRetentionAttachment');
     resetField('outstandingRetentionAttachmentFile');
   }, [replace, resetField, watchIsBuilding]);
+
+  const dataHookCurrentBudgetPlan = useFetchCurrentBudgetPlan({
+    departmentCode: profile?.jobGroup as string,
+    districtCode: profile?.districtCode as string,
+    divisionCode: profile?.division as string,
+  });
 
   const { mutationCreateUnbudget, handleCreateUnbudget } = useUnbudgetHelpers();
   const submitCreateUnbudget = (data: UnbudgetForm) => {
@@ -324,25 +331,35 @@ const CreateUnbudget: NextPage = () => {
           <Row>
             <Col lg={6}>
               <h4 className="profile-detail__info--title mb-1">District</h4>
-              <h3 className="profile-detail__info--subtitle">JIEP</h3>
+              <h3 className="profile-detail__info--subtitle">
+                {dataHookCurrentBudgetPlan.data?.districtCode || '-'}
+              </h3>
             </Col>
             <Col lg={6}>
               <h4 className="profile-detail__info--title mb-1">Divisi</h4>
-              <h3 className="profile-detail__info--subtitle">FATB</h3>
+              <h3 className="profile-detail__info--subtitle">
+                {dataHookCurrentBudgetPlan?.data?.divisionCode || '-'}
+              </h3>
             </Col>
             <Col lg={6}>
               <h4 className="profile-detail__info--title mb-1">Departemen</h4>
-              <h3 className="profile-detail__info--subtitle">TREA</h3>
+              <h3 className="profile-detail__info--subtitle">
+                {dataHookCurrentBudgetPlan?.data?.departmentCode || '-'}
+              </h3>
             </Col>
           </Row>
           <Row>
             <Col lg={6}>
               <h4 className="profile-detail__info--title mb-1">Year</h4>
-              <h3 className="profile-detail__info--subtitle">2022</h3>
+              <h3 className="profile-detail__info--subtitle">
+                {dataHookCurrentBudgetPlan?.data?.periodYear || '-'}
+              </h3>
             </Col>
             <Col lg={6}>
               <h4 className="profile-detail__info--title mb-1">Period</h4>
-              <h3 className="profile-detail__info--subtitle">{periodNow}</h3>
+              <h3 className="profile-detail__info--subtitle">
+                {dataHookCurrentBudgetPlan?.data?.periodType || '-'}
+              </h3>
             </Col>
           </Row>
 
@@ -424,7 +441,7 @@ const CreateUnbudget: NextPage = () => {
                   </div>
                   <UnbudgetModal
                     isBuilding={watchIsBuilding}
-                    period={periodNow}
+                    period={dataHookCurrentBudgetPlan?.data?.periodType}
                     onSend={append}
                   ></UnbudgetModal>
                 </div>

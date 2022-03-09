@@ -55,10 +55,9 @@ const CreatePeriodActual: NextPage = () => {
 
   useEffect(() => {
     reset({
-      departmentCode: profile?.job_group,
-      districtCode: profile?.district_code,
-      // TODO: division code masih hardcode
-      divisionCode: 'FATB',
+      departmentCode: profile?.jobGroup,
+      districtCode: profile?.districtCode,
+      divisionCode: profile?.division,
     });
   }, [profile, reset]);
 

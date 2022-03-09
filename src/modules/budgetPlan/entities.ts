@@ -16,3 +16,14 @@ export interface BudgetPlanForm {
   divisionCode: string;
   departmentCode: string;
 }
+
+export interface CurrentBudgetPlan {
+  id: string;
+  periodType: string;
+  periodYear: number;
+  districtCode: string;
+  divisionCode: string;
+  departmentCode: string;
+  reviewBodDueDate: string;
+  createdAt: string;
+}

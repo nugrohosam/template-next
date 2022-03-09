@@ -1,9 +1,15 @@
 import { Currency } from 'constants/currency';
+import { UserType } from 'constants/user';
 import { toast } from 'react-toastify';
 import { showErrorMessage } from 'utils/helpers';
 
+import { BudgetPlanItemStatus } from './constant';
 import { BudgetPlanItemForm, ItemOfBudgetPlanItem } from './entities';
-import { useCreateBudgetPlanItem, useUpdateBudgetPlanItem } from './hook';
+import {
+  useCreateBudgetPlanItem,
+  useDeleteBudgetPlanitems,
+  useUpdateBudgetPlanItem,
+} from './hook';
 
 export function getValueItemByMonth(
   items: ItemOfBudgetPlanItem[],
@@ -61,10 +67,53 @@ export const useBudgetPlanItemHelpers = () => {
     });
   };
 
+  const mutationDeleteBudgetPlanItems = useDeleteBudgetPlanitems();
+  const handleDeleteBudgetPlanItems = (ids: string[]) => {
+    return new Promise((resolve, reject) => {
+      mutationDeleteBudgetPlanItems.mutate(ids, {
+        onSuccess: (result) => {
+          resolve(result);
+          toast('Data Deleted!');
+        },
+        onError: (error) => {
+          reject(error);
+          console.error('Failed to Delete data', error);
+          toast(error.message, { autoClose: false });
+          showErrorMessage(error);
+        },
+      });
+    });
+  };
+
   return {
     mutationCreateBudgetPlanItem,
     handleCreateBudgetPlanItem,
     mutationUpdateBudgetPlanItem,
     handleUpdateBudgetPlanItem,
+    mutationDeleteBudgetPlanItems,
+    handleDeleteBudgetPlanItems,
   };
+};
+
+export const permissionBudgetPlanItemHelpers = (role: string | undefined) => {
+  const userCanHandleData =
+    role === UserType.AdminCapex || role === UserType.PicCapex;
+
+  const canEdit = (status: string | undefined) => {
+    if (!userCanHandleData) return false;
+    const statusAccess = [
+      BudgetPlanItemStatus.Draft,
+      BudgetPlanItemStatus.Reject,
+      BudgetPlanItemStatus.Revise,
+    ];
+    return statusAccess.includes(status as BudgetPlanItemStatus);
+  };
+
+  const canDelete = (status: string | undefined) => {
+    if (!userCanHandleData) return false;
+    const statusAccess = [BudgetPlanItemStatus.Draft];
+    return statusAccess.includes(status as BudgetPlanItemStatus);
+  };
+
+  return { userCanHandleData, canEdit, canDelete };
 };

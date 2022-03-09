@@ -8,20 +8,24 @@ import ReviseModal from 'components/ui/Modal/ReviseModal';
 import DataTable, { usePaginateParams } from 'components/ui/Table/DataTable';
 import Loader from 'components/ui/Table/Loader';
 import AuditTimeline from 'components/ui/Timeline/AuditTimeline';
-import { UserType } from 'constants/user';
 import { ApprovalField } from 'modules/approval/entities';
 import { ResourceType } from 'modules/audit/parent/entities';
 import { useFetchAudits } from 'modules/audit/parent/hook';
-import { getValueItemByMonth } from 'modules/budgetPlanItem/helpers';
-import { useDeleteBudgetPlanitems } from 'modules/budgetPlanItem/hook';
+import {
+  getValueItemByMonth,
+  permissionBudgetPlanItemHelpers,
+  useBudgetPlanItemHelpers,
+} from 'modules/budgetPlanItem/helpers';
 import {
   BudgetPlanItemGroupItem,
-  BudgetPlanItemGroupStatus,
   BuildingAttachment,
   BuildingAttachmentType,
 } from 'modules/budgetPlanItemGroup/entities';
 import {
-  useApprovalBudgetPlanItemGroups,
+  permissionBudgetPlanItemGroupHelpers,
+  useBudgetPlanItemGroupHelpers,
+} from 'modules/budgetPlanItemGroup/helpers';
+import {
   useFetchBudgetPlanItemGroupDetail,
   useFetchBudgetPlanItemGroupItems,
   useFetchBuildingAttachments,
@@ -31,10 +35,9 @@ import type { NextPage } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
-import { Button, Col, Container, Row } from 'react-bootstrap';
+import { Button, Col, Row } from 'react-bootstrap';
 import { CellProps, Column, SortingRule } from 'react-table';
-import { toast } from 'react-toastify';
-import { getAllIds, showErrorMessage } from 'utils/helpers';
+import { getAllIds } from 'utils/helpers';
 
 const BudgetPlanGroupItemList: NextPage = () => {
   const [profile] = useDecodeToken();
@@ -77,33 +80,6 @@ const BudgetPlanGroupItemList: NextPage = () => {
     dataHookBudgetPlanItemGroup?.data?.isBuilding || false
   );
 
-  // handle delete
-  const mutationDeleteBudgetPlanItems = useDeleteBudgetPlanitems();
-  const deleteBudgetPlan = (ids: string[]) => {
-    mutationDeleteBudgetPlanItems.mutate(ids, {
-      onSuccess: () => {
-        setSelectedRow({});
-        dataHookBudgetPlanItemGroup.refetch();
-        dataHookBudgetPlanItemGroupItems.refetch();
-        toast('Data Deleted!');
-      },
-      onError: (error) => {
-        console.error('Failed to Delete data', error);
-        toast(error.message, { autoClose: false });
-        showErrorMessage(error);
-      },
-    });
-  };
-  const handleDeleteMultipleBudgetPlan = () => {
-    const ids = getAllIds(
-      selectedRow,
-      dataHookBudgetPlanItemGroupItems.data
-    ) as string[];
-    if (ids?.length > 0) {
-      if (confirm('Delete selected data?')) deleteBudgetPlan(ids);
-    }
-  };
-
   const auditHook = useFetchAudits({
     resourceId: budgetPlanGroupId,
     resourceType: ResourceType.BudgetPlanItemGroup,
@@ -113,51 +89,36 @@ const BudgetPlanGroupItemList: NextPage = () => {
     pageSize: 10,
   });
 
-  // permission
-  const isUserApprovalBudgetPlanCapex =
-    profile?.type === UserType.ApprovalBudgetPlanCapex;
-  const isUserAdminCapex = profile?.type === UserType.AdminCapex;
-  const isUserDeptPicAssetHoCapex =
-    profile?.type === UserType.DeptPicAssetHoCapex;
-  const canEdit = () => {
-    if (!isUserAdminCapex) return false;
-    const statusAccess = [
-      BudgetPlanItemGroupStatus.Draft,
-      BudgetPlanItemGroupStatus.Reject,
-      BudgetPlanItemGroupStatus.Revise,
-    ];
-    return statusAccess.includes(
-      dataHookBudgetPlanItemGroup?.data?.status as BudgetPlanItemGroupStatus
-    );
-  };
-  const canDelete = () => {
-    if (!isUserAdminCapex) return false;
-    const statusAccess = [BudgetPlanItemGroupStatus.Draft];
-    return statusAccess.includes(
-      dataHookBudgetPlanItemGroup?.data?.status as BudgetPlanItemGroupStatus
-    );
+  // handle delete
+  const { mutationDeleteBudgetPlanItems, handleDeleteBudgetPlanItems } =
+    useBudgetPlanItemHelpers();
+  const deleteMultipleBudgetPlanItem = () => {
+    const ids = getAllIds(
+      selectedRow,
+      dataHookBudgetPlanItemGroupItems.data
+    ) as string[];
+    if (ids?.length > 0) {
+      if (confirm('Delete selected data?')) {
+        handleDeleteBudgetPlanItems(ids).then(() => {
+          setSelectedRow({});
+          dataHookBudgetPlanItemGroup.refetch();
+          dataHookBudgetPlanItemGroupItems.refetch();
+        });
+      }
+    }
   };
 
-  const approvalBudgetPlanItemGroupMutation = useApprovalBudgetPlanItemGroups();
-  const handleApprovalBudgetPlanItemGroup = (data: ApprovalField) => {
-    approvalBudgetPlanItemGroupMutation.mutate(
-      {
-        idBudgetPlanItemGroups: [budgetPlanGroupId],
-        status: data.status,
-        remark: data.notes,
-      },
-      {
-        onSuccess: () => {
-          router.push(`/budget-plans/${budgetPlanId}/detail`);
-          toast('Data approved!');
-        },
-        onError: (error) => {
-          console.log('Failed to approve data', error);
-          toast(error.message, { autoClose: false });
-          showErrorMessage(error);
-        },
-      }
-    );
+  // permission
+  const { canDelete, canEdit } = permissionBudgetPlanItemHelpers(profile?.type);
+  const { canApprove } = permissionBudgetPlanItemGroupHelpers(profile?.type);
+
+  const { handleApprovalBudgetPlanItemGroup } = useBudgetPlanItemGroupHelpers();
+  const approveBudgetPlanItemGroup = (data: ApprovalField) => {
+    handleApprovalBudgetPlanItemGroup({
+      idBudgetPlanItemGroups: [budgetPlanGroupId],
+      status: data.status,
+      remark: data.notes,
+    }).then(() => router.push(`/budget-plans/${budgetPlanId}/detail`));
   };
 
   const columns: Column<BudgetPlanItemGroupItem>[] = [
@@ -170,15 +131,18 @@ const BudgetPlanGroupItemList: NextPage = () => {
       accessor: 'detail',
       minWidth: 300,
       Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) =>
-        row.values.catalog?.detail || '-',
+        dataHookBudgetPlanItemGroup.data?.isBuilding
+          ? row.values.detail
+          : row.values.catalog?.detail || '-',
     },
     {
       Header: 'Asset Group',
       accessor: 'assetGroup',
-      minWidth: 200,
       Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) => (
         <div style={{ minWidth: 200 }}>
-          {row.values.catalog?.assetGroup?.assetGroup || '-'}
+          {dataHookBudgetPlanItemGroup.data?.isBuilding
+            ? row.values.assetGroup?.assetGroup
+            : row.values.catalog?.assetGroup?.assetGroup || '-'}
         </div>
       ),
     },
@@ -186,21 +150,18 @@ const BudgetPlanGroupItemList: NextPage = () => {
     {
       Header: 'Price/Unit',
       accessor: 'pricePerUnit',
-      minWidth: 200,
       Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) =>
         row.values.pricePerUnit.toLocaleString('id-Id'),
     },
     {
       Header: 'Total USD',
       accessor: 'totalAmountUsd',
-      minWidth: 200,
       Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) =>
         row.values.totalAmountUsd.toLocaleString('en-EN'),
     },
     {
       Header: 'Total IDR',
       accessor: 'totalAmount',
-      minWidth: 200,
       Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) =>
         row.values.totalAmount.toLocaleString('id-Id'),
     },
@@ -441,13 +402,13 @@ const BudgetPlanGroupItemList: NextPage = () => {
               columns={columns}
               data={dataHookBudgetPlanItemGroupItems.data}
               actions={
-                canDelete() && (
+                canDelete(dataHookBudgetPlanItemGroup?.data?.status) && (
                   <LoadingButton
                     variant="red"
                     size="sm"
                     className="mr-2"
                     disabled={mutationDeleteBudgetPlanItems.isLoading}
-                    onClick={handleDeleteMultipleBudgetPlan}
+                    onClick={deleteMultipleBudgetPlanItem}
                     isLoading={mutationDeleteBudgetPlanItems.isLoading}
                   >
                     Delete
@@ -455,7 +416,7 @@ const BudgetPlanGroupItemList: NextPage = () => {
                 )
               }
               addOns={
-                canEdit() && (
+                canEdit(dataHookBudgetPlanItemGroup?.data?.status) && (
                   <Link
                     href={`/budget-plans/${budgetPlanId}/${budgetPlanGroupId}/edit`}
                     passHref
@@ -469,7 +430,7 @@ const BudgetPlanGroupItemList: NextPage = () => {
               selectedRows={selectedRow}
               hiddenColumns={['id', 'catalog', 'items']}
               paginateParams={params}
-              {...(canDelete() && {
+              {...(canDelete(dataHookBudgetPlanItemGroup?.data?.status) && {
                 onSelectedRowsChanged: (rows) => setSelectedRow(rows),
               })}
               onSelectedSortChanged={(sort) => {
@@ -548,26 +509,28 @@ const BudgetPlanGroupItemList: NextPage = () => {
         </>
       )}
 
-      {isUserDeptPicAssetHoCapex &&
-        dataHookBudgetPlanItemGroup?.data?.status ===
-          'WAITING APPROVAL PIC ASSET HO' && (
-          <Panel>
+      {canApprove(dataHookBudgetPlanItemGroup?.data?.status) && (
+        <Panel>
+          <Row>
             <Col lg={12}>
-              <ApproveModal
-                onSend={(data) => handleApprovalBudgetPlanItemGroup(data)}
-                classButton="mr-2"
-              />
-              <ReviseModal
-                onSend={(data) => handleApprovalBudgetPlanItemGroup(data)}
-                classButton="mr-2"
-              />
-              <RejectModal
-                onSend={(data) => handleApprovalBudgetPlanItemGroup(data)}
-                classButton="mr-2"
-              />
+              <div className="float-right">
+                <ApproveModal
+                  onSend={approveBudgetPlanItemGroup}
+                  classButton="mr-2"
+                />
+                <ReviseModal
+                  onSend={approveBudgetPlanItemGroup}
+                  classButton="mr-2"
+                />
+                <RejectModal
+                  onSend={approveBudgetPlanItemGroup}
+                  classButton="mr-2"
+                />
+              </div>
             </Col>
-          </Panel>
-        )}
+          </Row>
+        </Panel>
+      )}
     </DetailLayout>
   );
 };

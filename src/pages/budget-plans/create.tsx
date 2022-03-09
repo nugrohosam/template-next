@@ -55,8 +55,8 @@ const CreatePeriodActual: NextPage = () => {
 
   useEffect(() => {
     reset({
-      departmentCode: profile?.jobGroup,
-      districtCode: profile?.districtCode,
+      departmentCode: profile?.job_group,
+      districtCode: profile?.district_code,
       divisionCode: profile?.division,
     });
   }, [profile, reset]);

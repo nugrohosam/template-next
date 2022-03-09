@@ -53,8 +53,8 @@ const UnbudgetDetails: NextPage = () => {
     pageSize: 10,
   });
   const dataHookCurrentBudgetPlan = useFetchCurrentBudgetPlan({
-    departmentCode: profile?.jobGroup as string,
-    districtCode: profile?.districtCode as string,
+    departmentCode: profile?.job_group as string,
+    districtCode: profile?.district_code as string,
     divisionCode: profile?.division as string,
   });
   const { handleDownloadAttachment } = useAttachmentHelpers();

@@ -91,8 +91,8 @@ const CreateUnbudget: NextPage = () => {
   }, [replace, resetField, watchIsBuilding]);
 
   const dataHookCurrentBudgetPlan = useFetchCurrentBudgetPlan({
-    departmentCode: profile?.jobGroup as string,
-    districtCode: profile?.districtCode as string,
+    departmentCode: profile?.job_group as string,
+    districtCode: profile?.district_code as string,
     divisionCode: profile?.division as string,
   });
 
@@ -326,6 +326,7 @@ const CreateUnbudget: NextPage = () => {
       backButtonClick={router.back}
       title="Create Unbudget"
     >
+      {JSON.stringify(profile)}
       <Panel>
         <Form onSubmit={handleSubmit(submitCreateUnbudget)}>
           <Row>

@@ -2,12 +2,6 @@ import { Currency } from 'constants/currency';
 import { AssetGroup } from 'modules/assetGroup/entities';
 import { BudgetPlanItem } from 'modules/budgetPlanItem/entities';
 
-export enum BudgetPlanItemGroupStatus {
-  Draft = 'DRAFT',
-  Revise = 'REVISE',
-  Reject = 'REJECT',
-}
-
 export enum BuildingAttachmentType {
   OutstandingPlanPayment = 'OUTSTANDING PLAN PAYMENT',
   OutstandingRetention = 'OUTSTANDING RETENTION',

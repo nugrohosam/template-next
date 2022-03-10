@@ -1,3 +1,4 @@
+import { Currency } from 'constants/currency';
 import { Paginate, ResponseError } from 'modules/common/types';
 import { UseFormSetError } from 'react-hook-form';
 import { toast } from 'react-toastify';
@@ -101,4 +102,28 @@ export const snakeCaseToCamelCase = (str: string) => {
     .replace(/([-_][a-z])/g, (group) =>
       group.toUpperCase().replace('-', '').replace('_', '')
     );
+};
+
+export const formatMoney = (
+  nominal: string | number | null | undefined,
+  currency: Currency | null,
+  defaultResult?: string | number
+) => {
+  const emptyResult = defaultResult || 0;
+  if (!nominal || !currency) return emptyResult;
+
+  let total;
+  switch (currency) {
+    case Currency.Idr:
+      total = nominal.toLocaleString('id-Id');
+      break;
+    case Currency.Usd:
+      total = nominal.toLocaleString('en-En');
+      break;
+    default:
+      total = emptyResult;
+      break;
+  }
+
+  return total;
 };

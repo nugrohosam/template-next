@@ -8,6 +8,7 @@ import ReviseModal from 'components/ui/Modal/ReviseModal';
 import DataTable, { usePaginateParams } from 'components/ui/Table/DataTable';
 import Loader from 'components/ui/Table/Loader';
 import AuditTimeline from 'components/ui/Timeline/AuditTimeline';
+import { Currency } from 'constants/currency';
 import { ApprovalField } from 'modules/approval/entities';
 import { ResourceType } from 'modules/audit/parent/entities';
 import { useFetchAudits } from 'modules/audit/parent/hook';
@@ -37,7 +38,7 @@ import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import { Button, Col, Row } from 'react-bootstrap';
 import { CellProps, Column, SortingRule } from 'react-table';
-import { getAllIds } from 'utils/helpers';
+import { formatMoney, getAllIds } from 'utils/helpers';
 
 const BudgetPlanGroupItemList: NextPage = () => {
   const [profile] = useDecodeToken();
@@ -152,19 +153,19 @@ const BudgetPlanGroupItemList: NextPage = () => {
       Header: 'Price/Unit',
       accessor: 'pricePerUnit',
       Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) =>
-        row.values.pricePerUnit.toLocaleString('id-Id'),
+        formatMoney(row.values.pricePerUnit, Currency.Idr, '-'),
     },
     {
       Header: 'Total USD',
       accessor: 'totalAmountUsd',
       Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) =>
-        row.values.totalAmountUsd.toLocaleString('en-EN'),
+        formatMoney(row.values.totalAmountUsd, Currency.Usd, '-'),
     },
     {
       Header: 'Total IDR',
       accessor: 'totalAmount',
       Cell: ({ row }: CellProps<BudgetPlanItemGroupItem>) =>
-        row.values.totalAmount.toLocaleString('id-Id'),
+        formatMoney(row.values.totalAmount, Currency.Idr, '-'),
     },
     {
       Header: 'Jan',
@@ -374,16 +375,20 @@ const BudgetPlanGroupItemList: NextPage = () => {
           <Col lg={6}>
             <h4 className="profile-detail__info--title mb-1">Total USD</h4>
             <h3 className="profile-detail__info--subtitle">
-              {dataHookBudgetPlanItemGroup?.data?.totalAmountUsd?.toLocaleString(
-                'en-En'
+              {formatMoney(
+                dataHookBudgetPlanItemGroup.data?.totalAmountUsd,
+                Currency.Usd,
+                '-'
               )}
             </h3>
           </Col>
           <Col lg={6}>
             <h4 className="profile-detail__info--title mb-1">Total IDR</h4>
             <h3 className="profile-detail__info--subtitle">
-              {dataHookBudgetPlanItemGroup?.data?.totalAmount?.toLocaleString(
-                'id-Id'
+              {formatMoney(
+                dataHookBudgetPlanItemGroup.data?.totalAmount,
+                Currency.Idr,
+                '-'
               )}
             </h3>
           </Col>

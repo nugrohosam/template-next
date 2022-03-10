@@ -6,6 +6,7 @@ import LoadingButton from 'components/ui/Button/LoadingButton';
 import DetailLayout from 'components/ui/DetailLayout';
 import BudgetPlanItemModal from 'components/ui/Modal/BudgetPlanItem/BudgetPlanItemModal';
 import SimpleTable from 'components/ui/Table/SimpleTable';
+import { Currency } from 'constants/currency';
 import { useAttachmentHelpers } from 'modules/attachment/helpers';
 import {
   BudgetPlanItemForm,
@@ -26,7 +27,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Button, Col, Form, FormGroup, FormLabel, Row } from 'react-bootstrap';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { CellProps, Column } from 'react-table';
-import { setValidationError } from 'utils/helpers';
+import { formatMoney, setValidationError } from 'utils/helpers';
 
 const UpdateBudgetPlanItems: NextPage = () => {
   const router = useRouter();
@@ -174,19 +175,19 @@ const UpdateBudgetPlanItems: NextPage = () => {
         Header: 'Price/Unit',
         accessor: 'pricePerUnit',
         Cell: ({ row }: CellProps<BudgetPlanItemOfBudgetPlanItemForm>) =>
-          row.values.pricePerUnit?.toLocaleString('id-Id') || '-',
+          formatMoney(row.values.pricePerUnit, Currency.Idr, '-'),
       },
       {
         Header: 'Total USD',
         accessor: 'totalAmountUsd',
         Cell: ({ row }: CellProps<BudgetPlanItemOfBudgetPlanItemForm>) =>
-          row.values.totalAmountUsd?.toLocaleString('en-EN') || '-',
+          formatMoney(row.values.totalAmountUsd, Currency.Usd, '-'),
       },
       {
         Header: 'Total IDR',
         accessor: 'totalAmount',
         Cell: ({ row }: CellProps<BudgetPlanItemOfBudgetPlanItemForm>) =>
-          row.values.totalAmount?.toLocaleString('id-Id') || '-',
+          formatMoney(row.values.totalAmount, Currency.Idr, '-'),
       },
       {
         Header: 'Jan',

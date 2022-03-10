@@ -6,6 +6,7 @@ import ApproveModal from 'components/ui/Modal/ApproveModal';
 import RejectModal from 'components/ui/Modal/RejectModal';
 import ReviseModal from 'components/ui/Modal/ReviseModal';
 import DataTable, { usePaginateParams } from 'components/ui/Table/DataTable';
+import { Currency } from 'constants/currency';
 import { ApprovalField, ApprovalStatus } from 'modules/approval/entities';
 import { useDecodeToken } from 'modules/custom/useDecodeToken';
 import { UnbudgetStatusOptions } from 'modules/unbudget/constant';
@@ -22,7 +23,7 @@ import React, { useState } from 'react';
 import { Badge, Button, Col, Row } from 'react-bootstrap';
 import Select from 'react-select';
 import { CellProps, Column, SortingRule } from 'react-table';
-import { getAllIds } from 'utils/helpers';
+import { formatMoney, getAllIds } from 'utils/helpers';
 
 enum ActionUnbudget {
   Submit = 'SUBMIT',
@@ -108,13 +109,13 @@ const UnbudgetList: NextPage = () => {
       Header: 'Total USD',
       accessor: 'totalAmountUsd',
       Cell: ({ row }: CellProps<Unbudget>) =>
-        row.values.totalAmountUsd?.toLocaleString('en-EN') || '-',
+        formatMoney(row.values.totalAmountUsd, Currency.Usd, '-'),
     },
     {
       Header: 'Total IDR',
       accessor: 'totalAmount',
       Cell: ({ row }: CellProps<Unbudget>) =>
-        row.values.totalAmount?.toLocaleString('id-Id') || '-',
+        formatMoney(row.values.totalAmount, Currency.Idr, '-'),
     },
     {
       Header: 'Status',

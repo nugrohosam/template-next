@@ -3,6 +3,7 @@ import ButtonActions from 'components/ui/Button/ButtonActions';
 import LoadingButton from 'components/ui/Button/LoadingButton';
 import ContentLayout from 'components/ui/ContentLayout';
 import DataTable, { usePaginateParams } from 'components/ui/Table/DataTable';
+import { Currency } from 'constants/currency';
 import { Catalog } from 'modules/catalog/entities';
 import {
   useDeleteCatalogs,
@@ -17,7 +18,7 @@ import { Button, Col, Row } from 'react-bootstrap';
 import Select, { OptionsType } from 'react-select';
 import { CellProps, Column, SortingRule } from 'react-table';
 import { toast } from 'react-toastify';
-import { getAllIds, showErrorMessage } from 'utils/helpers';
+import { formatMoney, getAllIds, showErrorMessage } from 'utils/helpers';
 
 const CatalogsIndex: NextPage = () => {
   const [selectedRow, setSelectedRow] = useState<Record<string, boolean>>({});
@@ -104,16 +105,14 @@ const CatalogsIndex: NextPage = () => {
       {
         Header: 'Price (IDR)',
         accessor: 'priceInIdr',
-        Cell: ({ cell }: CellProps<Catalog>) => {
-          return cell.row.values.priceInIdr.toLocaleString('id-Id');
-        },
+        Cell: ({ row }: CellProps<Catalog>) =>
+          formatMoney(row.values.priceInIdr, Currency.Idr, '-'),
       },
       {
         Header: 'Price (USD)',
         accessor: 'priceInUsd',
-        Cell: ({ cell }: CellProps<Catalog>) => {
-          return cell.row.values.priceInUsd.toLocaleString('en-Us');
-        },
+        Cell: ({ row }: CellProps<Catalog>) =>
+          formatMoney(row.values.priceInUsd, Currency.Usd, '-'),
       },
       {
         Header: 'Status',

@@ -247,18 +247,12 @@ const OverBudgetIndex: NextPage = () => {
                       Delete
                     </LoadingButton>
                     <LoadingButton
-                      variant="warning"
+                      variant="orange"
                       size="sm"
                       className="mr-2"
                       disabled={deleteOverBudgetMutation.isLoading}
                       onClick={() => handleDeleteMultipleOverBudgets('Cancel')}
                       isLoading={false}
-                      style={{
-                        fontWeight: 'bold',
-                        fontSize: '12px',
-                        letterSpacing: '1.5px',
-                        lineHeight: '16px',
-                      }}
                     >
                       Cancel
                     </LoadingButton>

@@ -328,13 +328,7 @@ const CreateOverBudget: NextPage = () => {
               Save
             </LoadingButton>
             <LoadingButton
-              variant="success"
-              style={{
-                fontWeight: 'bold',
-                fontSize: '12px',
-                letterSpacing: '1.5px',
-                lineHeight: '16px',
-              }}
+              variant="green"
               type="submit"
               isLoading={createOverBudgetMutation.isLoading}
               disabled={!isValid || createOverBudgetMutation.isLoading}

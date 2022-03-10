@@ -1,9 +1,8 @@
 import { Paginate, PaginateParams, ResponseData } from 'modules/common/types';
 import axios from 'utils/axios';
 
-import { AssetGroupSummary } from './entities';
+import { AssetGroupSummary, InterveneField } from './entities';
 
-// TODO: data masih pakai paginate (API dummy), tunggu update design API tanpa paginate
 export const fetchAssetGroupSummary = async (
   idAssetGroup: string,
   params: PaginateParams
@@ -11,6 +10,17 @@ export const fetchAssetGroupSummary = async (
   const result = await axios.get<ResponseData<Paginate<AssetGroupSummary>>>(
     `v1/summaries/${idAssetGroup}`,
     { params }
+  );
+  return result.data.data;
+};
+
+export const interveneSummaryAssetGroup = async (
+  idAssetGroup: string,
+  data: InterveneField
+): Promise<InterveneField> => {
+  const result = await axios.post<ResponseData<InterveneField>>(
+    `v1/summaries/${idAssetGroup}/intervene`,
+    data
   );
   return result.data.data;
 };

@@ -84,9 +84,9 @@ export const cancelUnbudgets = async (idUnbudgets: string[]): Promise<null> => {
 export const approvalUnbudgets = async (
   data: ApprovalUnbudgetForm
 ): Promise<null> => {
-  const result = await axios.patch<ResponseData<null>>(
+  const result = await axios.put<ResponseData<null>>(
     'v1/unbudgets/approval',
-    { data }
+    data
   );
   return result.data.data;
 };

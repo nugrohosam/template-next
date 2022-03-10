@@ -92,10 +92,6 @@ const EditUnbudget: NextPage = () => {
       watchOutstandingPlanPaymentAttachmentFile,
     outstandingRetentionAttachmentFile: watchOutstandingRetentionAttachmentFile,
   } = watch();
-  const controlledFields =
-    fields.map((field, index) => ({
-      ...(watchBudgetPlanItems && watchBudgetPlanItems[index]),
-    })) || [];
 
   useEffect(() => {
     replace([]);
@@ -463,7 +459,7 @@ const EditUnbudget: NextPage = () => {
             <SimpleTable
               classTable="table-admin table-inherit"
               columns={columns}
-              items={controlledFields}
+              items={fields}
               selectedRows={selectedRow}
               hiddenColumns={[
                 'items',

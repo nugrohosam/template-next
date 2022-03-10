@@ -91,6 +91,10 @@ export const parseMenuToUrl = (menu: string) => {
       ? '/master-capex/budget-periods'
       : menu === 'summary'
       ? '/summary'
+      : menu === 'overbudgets'
+      ? '/overbudgets'
+      : menu === 'reclass'
+      ? '/reclass'
       : '/';
   return url;
 };

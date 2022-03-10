@@ -137,6 +137,8 @@ const EditUnbudget: NextPage = () => {
     delete data.unbudgetAttachmentFile;
     delete data.outstandingPlanPaymentAttachmentFile;
     delete data.outstandingRetentionAttachmentFile;
+    data.idCapexBudgetPlan = dataHookUnbudgetDetail.data
+      ?.idCapexBudgetPlan as string;
 
     handleUpdateUnbudget(idUnbudget, data)
       .then(() => router.push(`/unbudgets/${idUnbudget}/detail`))

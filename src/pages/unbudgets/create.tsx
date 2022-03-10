@@ -102,6 +102,7 @@ const CreateUnbudget: NextPage = () => {
     delete data.unbudgetAttachmentFile;
     delete data.outstandingPlanPaymentAttachmentFile;
     delete data.outstandingRetentionAttachmentFile;
+    data.idCapexBudgetPlan = dataHookCurrentBudgetPlan.data?.id as string;
 
     handleCreateUnbudget(data)
       .then(() => router.push(`/unbudgets`))
@@ -128,11 +129,7 @@ const CreateUnbudget: NextPage = () => {
         (watchIsBuilding ? row.values.detail : row.values.catalog?.detail) ||
         '-',
     },
-    {
-      Header: 'Currency',
-      accessor: 'currency',
-      minWidth: 150,
-    },
+    { Header: 'Currency', accessor: 'currency' },
     {
       Header: 'Price/Unit',
       accessor: 'pricePerUnit',

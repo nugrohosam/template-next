@@ -55,6 +55,7 @@ export type ItemOfUnbudgetItem = {
 };
 
 export interface UnbudgetForm {
+  idCapexBudgetPlan: string;
   unbudgetBackground: string;
   unbudgetImpactIfNotRealized: string;
   unbudgetAttachment: string;

@@ -158,7 +158,7 @@ export const useUnbudgetHelpers = () => {
 };
 
 export const permissionUnbudgetHelpers = (role: string | undefined) => {
-  const userCanHandleData = role === UserType.AdminCapex;
+  const userCanHandleData = role === UserType.PicCapex;
   const userCanApproveData =
     role === UserType.ApprovalBudgetPlanCapex ||
     role === UserType.DeptPicAssetHoCapex;

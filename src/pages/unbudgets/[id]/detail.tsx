@@ -77,14 +77,9 @@ const UnbudgetDetails: NextPage = () => {
   };
 
   // permisison
-  const {
-    userCanHandleData,
-    userCanApproveData,
-    canCancel,
-    canDelete,
-    canEdit,
-    canSubmit,
-  } = permissionUnbudgetHelpers(profile?.type);
+  const { userCanApproveData, canEdit } = permissionUnbudgetHelpers(
+    profile?.type
+  );
 
   const columns: Column<UnbudgetItem>[] = [
     { Header: 'ID', accessor: 'id' },

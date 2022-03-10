@@ -76,9 +76,6 @@ const UpdateBudgetPlanItems: NextPage = () => {
       watchOutstandingPlanPaymentAttachmentFile,
     outstandingRetentionAttachmentFile: watchOutstandingRetentionAttachmentFile,
   } = watch();
-  const controlledFields = fields.map(
-    (field, index) => watchBudgetPlanItems[index]
-  );
 
   useEffect(() => {
     if (dataHookBudgetPlanItemGroup.data?.isBuilding) {
@@ -102,8 +99,8 @@ const UpdateBudgetPlanItems: NextPage = () => {
       dataHookBudgetPlanItemGroupItems.data?.items.map((item) => ({
         ...item,
         idAssetGroup: watchIsBuilding
-          ? item.assetGroup.id
-          : item.catalog?.assetGroup.id,
+          ? item.assetGroup?.id
+          : item.catalog?.assetGroup?.id,
         idCapexCatalog: item.catalog?.id,
       })) || []
     );
@@ -373,7 +370,7 @@ const UpdateBudgetPlanItems: NextPage = () => {
             <SimpleTable
               classTable="table-admin table-inherit"
               columns={columns}
-              items={controlledFields}
+              items={fields}
               selectedRows={selectedRow}
               hiddenColumns={[
                 'items',

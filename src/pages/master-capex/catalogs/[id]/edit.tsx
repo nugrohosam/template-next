@@ -23,7 +23,7 @@ import {
   Row,
 } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
-import { setValidationError } from 'utils/helpers';
+import { formatMoney, setValidationError } from 'utils/helpers';
 import * as yup from 'yup';
 
 const breadCrumb: PathBreadcrumb[] = [
@@ -158,7 +158,7 @@ const EditCatalog: NextPage = () => {
                 <FormLabel>Currency Rate</FormLabel>
                 <FormControl
                   type="text"
-                  value={currencyRate.toLocaleString('id-Id')}
+                  value={formatMoney(currencyRate, Currency.Idr)}
                   disabled
                 />
               </FormGroup>

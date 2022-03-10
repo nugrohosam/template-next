@@ -8,6 +8,7 @@ import LoadingButton from 'components/ui/Button/LoadingButton';
 import DetailLayout from 'components/ui/DetailLayout';
 import UnbudgetModal from 'components/ui/Modal/Unbudget/UnbudgetModal';
 import SimpleTable from 'components/ui/Table/SimpleTable';
+import { Currency } from 'constants/currency';
 import { PeriodeType } from 'constants/period';
 import { useAttachmentHelpers } from 'modules/attachment/helpers';
 import { useFetchCurrentBudgetPlan } from 'modules/budgetPlan/hook';
@@ -25,7 +26,7 @@ import { useEffect, useState } from 'react';
 import { Button, Col, Form, FormGroup, FormLabel, Row } from 'react-bootstrap';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { CellProps, Column } from 'react-table';
-import { setValidationError } from 'utils/helpers';
+import { formatMoney, setValidationError } from 'utils/helpers';
 import * as yup from 'yup';
 
 const breadCrumb: PathBreadcrumb[] = [
@@ -136,19 +137,19 @@ const CreateUnbudget: NextPage = () => {
       Header: 'Price/Unit',
       accessor: 'pricePerUnit',
       Cell: ({ row }: CellProps<BudgetPlanItemOfUnbudgetForm>) =>
-        row.values.pricePerUnit?.toLocaleString('id-Id') || '-',
+        formatMoney(row.values.pricePerUnit, Currency.Idr, '-'),
     },
     {
       Header: 'Total USD',
       accessor: 'totalAmountUsd',
       Cell: ({ row }: CellProps<BudgetPlanItemOfUnbudgetForm>) =>
-        row.values.totalAmountUsd?.toLocaleString('en-EN') || '-',
+        formatMoney(row.values.totalAmountUsd, Currency.Usd, '-'),
     },
     {
       Header: 'Total IDR',
       accessor: 'totalAmount',
       Cell: ({ row }: CellProps<BudgetPlanItemOfUnbudgetForm>) =>
-        row.values.totalAmount?.toLocaleString('id-Id') || '-',
+        formatMoney(row.values.totalAmount, Currency.Idr, '-'),
     },
     {
       Header: 'Jan',

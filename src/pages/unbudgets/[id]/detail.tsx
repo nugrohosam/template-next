@@ -4,6 +4,7 @@ import DetailLayout from 'components/ui/DetailLayout';
 import DataTable, { usePaginateParams } from 'components/ui/Table/DataTable';
 import Loader from 'components/ui/Table/Loader';
 import AuditTimeline from 'components/ui/Timeline/AuditTimeline';
+import { Currency } from 'constants/currency';
 import { useAttachmentHelpers } from 'modules/attachment/helpers';
 import { ResourceType } from 'modules/audit/parent/entities';
 import { useFetchAudits } from 'modules/audit/parent/hook';
@@ -24,6 +25,7 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import { Button, Col, Row } from 'react-bootstrap';
 import { CellProps, Column, SortingRule } from 'react-table';
+import { formatMoney } from 'utils/helpers';
 
 const breadCrumb: PathBreadcrumb[] = [
   {
@@ -86,19 +88,19 @@ const UnbudgetDetails: NextPage = () => {
       Header: 'Price/Unit',
       accessor: 'pricePerUnit',
       Cell: ({ row }: CellProps<UnbudgetItem>) =>
-        row.values.pricePerUnit.toLocaleString('id-Id'),
+        formatMoney(row.values.pricePerunit, Currency.Idr, '-'),
     },
     {
       Header: 'Total USD',
       accessor: 'totalAmountUsd',
       Cell: ({ row }: CellProps<UnbudgetItem>) =>
-        row.values.totalAmountUsd.toLocaleString('en-EN'),
+        formatMoney(row.values.totalAmountUsd, Currency.Usd, '-'),
     },
     {
       Header: 'Total IDR',
       accessor: 'totalAmount',
       Cell: ({ row }: CellProps<UnbudgetItem>) =>
-        row.values.totalAmount.toLocaleString('id-Id'),
+        formatMoney(row.values.totalAmount, Currency.Idr, '-'),
     },
     {
       Header: 'Jan',
@@ -329,17 +331,21 @@ const UnbudgetDetails: NextPage = () => {
           <Col lg={6}>
             <h4 className="profile-detail__info--title mb-1">Total USD</h4>
             <h3 className="profile-detail__info--subtitle">
-              {dataHookUnbudgetDetail?.data?.totalAmountUsd?.toLocaleString(
-                'en-En'
-              ) || '-'}
+              {formatMoney(
+                dataHookUnbudgetDetail.data?.totalAmountUsd,
+                Currency.Usd,
+                '-'
+              )}
             </h3>
           </Col>
           <Col lg={6}>
             <h4 className="profile-detail__info--title mb-1">Total IDR</h4>
             <h3 className="profile-detail__info--subtitle">
-              {dataHookUnbudgetDetail?.data?.totalAmount?.toLocaleString(
-                'id-Id'
-              ) || '-'}
+              {formatMoney(
+                dataHookUnbudgetDetail.data?.totalAmount,
+                Currency.Idr,
+                '-'
+              )}
             </h3>
           </Col>
         </Row>

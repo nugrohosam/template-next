@@ -7,6 +7,7 @@ import type { NextPage } from 'next';
 import React, { useState } from 'react';
 import { Col } from 'react-bootstrap';
 import { CellProps, Column, SortingRule } from 'react-table';
+import { formatMoney } from 'utils/helpers';
 
 const columns: Column<BudgetReference>[] = [
   { Header: 'Budget Code', accessor: 'budgetCode', minWidth: 200 },
@@ -24,18 +25,14 @@ const columns: Column<BudgetReference>[] = [
     accessor: 'balance',
     minWidth: 150,
     Cell: ({ row }: CellProps<BudgetReference>) =>
-      row.values.balance?.toLocaleString(
-        row.values.currency === Currency.Usd ? 'en-En' : 'id-Id'
-      ) || '-',
+      formatMoney(row.values.balance, row.values.currency, '-'),
   },
   {
     Header: 'Currency Balance',
     accessor: 'currentBalance',
     minWidth: 200,
     Cell: ({ row }: CellProps<BudgetReference>) =>
-      row.values.currentBalance?.toLocaleString(
-        row.values.currency === Currency.Usd ? 'en-En' : 'id-Id'
-      ) || '-',
+      formatMoney(row.values.currentBalance, row.values.currency, '-'),
   },
 ];
 

@@ -3,6 +3,7 @@ import LoadingButton from 'components/ui/Button/LoadingButton';
 import ContentLayout from 'components/ui/ContentLayout';
 import ConfirmationModal from 'components/ui/Modal/OutstandingBudget/ConfirmationModal';
 import DataTable, { usePaginateParams } from 'components/ui/Table/DataTable';
+import { Currency } from 'constants/currency';
 import {
   confirmOutstandingBudget,
   confirmOutstandingBudgetField,
@@ -19,7 +20,7 @@ import React, { useMemo, useState } from 'react';
 import { Button, Col } from 'react-bootstrap';
 import { CellProps, Column, SortingRule } from 'react-table';
 import { toast } from 'react-toastify';
-import { getAllIds, showErrorMessage } from 'utils/helpers';
+import { formatMoney, getAllIds, showErrorMessage } from 'utils/helpers';
 
 const OutstandingBudgets: NextPage = () => {
   const [selectedSort, setSelectedSort] = useState<SortingRule<any>[]>([]);
@@ -95,7 +96,7 @@ const OutstandingBudgets: NextPage = () => {
         Cell: ({ cell }: CellProps<outstandingBudget>) => {
           return (
             <div className="text-right">
-              {cell.row.values.leftInformation.toLocaleString('id-Id')}
+              {formatMoney(cell.row.values.leftInformation, Currency.Idr)}
             </div>
           );
         },
@@ -109,7 +110,7 @@ const OutstandingBudgets: NextPage = () => {
         Cell: ({ cell }: CellProps<outstandingBudget>) => {
           return (
             <div className="text-right">
-              {cell.row.values.usedInformation.toLocaleString('id-Id')}
+              {formatMoney(cell.row.values.usedInformation, Currency.Idr)}
             </div>
           );
         },
@@ -123,8 +124,9 @@ const OutstandingBudgets: NextPage = () => {
         Cell: ({ cell }: CellProps<outstandingBudget>) => {
           return (
             <div className="text-right">
-              {cell.row.values.originalSisaBudgetUsdS1CurrentPeriod.toLocaleString(
-                'id-Id'
+              {formatMoney(
+                cell.row.values.originalSisaBudgetUsdS1CurrentPeriod,
+                Currency.Idr
               )}
             </div>
           );
@@ -139,7 +141,7 @@ const OutstandingBudgets: NextPage = () => {
         Cell: ({ cell }: CellProps<outstandingBudget>) => {
           return (
             <div className="text-right">
-              {cell.row.values.originalQuantity.toLocaleString('id-Id')}
+              {formatMoney(cell.row.values.originalQuantity, Currency.Idr)}
             </div>
           );
         },
@@ -153,8 +155,9 @@ const OutstandingBudgets: NextPage = () => {
         Cell: ({ cell }: CellProps<outstandingBudget>) => {
           return (
             <div className="text-right">
-              {cell.row.values.realisasiSisaBudgetS1CurrentPeriod.toLocaleString(
-                'id-Id'
+              {formatMoney(
+                cell.row.values.realisasiSisaBudgetS1CurrentPeriod,
+                Currency.Idr
               )}
             </div>
           );
@@ -169,7 +172,10 @@ const OutstandingBudgets: NextPage = () => {
         Cell: ({ cell }: CellProps<outstandingBudget>) => {
           return (
             <div className="text-right">
-              {cell.row.values.adjustedLeftInformation.toLocaleString('id-Id')}
+              {formatMoney(
+                cell.row.values.adjustedLeftInformation,
+                Currency.Idr
+              )}
             </div>
           );
         },
@@ -183,8 +189,9 @@ const OutstandingBudgets: NextPage = () => {
         Cell: ({ cell }: CellProps<outstandingBudget>) => {
           return (
             <div className="text-right">
-              {cell.row.values.quantityRealisasiS1CurrentPeriod.toLocaleString(
-                'id-Id'
+              {formatMoney(
+                cell.row.values.quantityRealisasiS1CurrentPeriod,
+                Currency.Idr
               )}
             </div>
           );
@@ -199,8 +206,9 @@ const OutstandingBudgets: NextPage = () => {
         Cell: ({ cell }: CellProps<outstandingBudget>) => {
           return (
             <div className="text-right">
-              {cell.row.values.totalPengajuanBudgetUsdS1CurrentPeriod.toLocaleString(
-                'id-Id'
+              {formatMoney(
+                cell.row.values.totalPengajuanBudgetUsdS1CurrentPeriod,
+                Currency.Idr
               )}
             </div>
           );
@@ -215,7 +223,10 @@ const OutstandingBudgets: NextPage = () => {
         Cell: ({ cell }: CellProps<outstandingBudget>) => {
           return (
             <div className="text-right">
-              {cell.row.values.adjustmentCurrentPeriod.toLocaleString('id-Id')}
+              {formatMoney(
+                cell.row.values.adjustmentCurrentPeriod,
+                Currency.Idr
+              )}
             </div>
           );
         },
@@ -229,8 +240,9 @@ const OutstandingBudgets: NextPage = () => {
         Cell: ({ cell }: CellProps<outstandingBudget>) => {
           return (
             <div className="text-right">
-              {cell.row.values.adjustedSisaBudgetUsdS1CurrentPeriod.toLocaleString(
-                'id-Id'
+              {formatMoney(
+                cell.row.values.adjustedSisaBudgetUsdS1CurrentPeriod,
+                Currency.Idr
               )}
             </div>
           );
@@ -252,8 +264,9 @@ const OutstandingBudgets: NextPage = () => {
         Cell: ({ cell }: CellProps<outstandingBudget>) => {
           return (
             <div className="text-right">
-              {cell.row.values.adjustedRealisasiSisaBudgetS1CurrentPeriod.toLocaleString(
-                'id-Id'
+              {formatMoney(
+                cell.row.values.adjustedRealisasiSisaBudgetS1CurrentPeriod,
+                Currency.Idr
               )}
             </div>
           );

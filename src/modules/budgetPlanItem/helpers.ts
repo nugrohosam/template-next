@@ -1,7 +1,7 @@
 import { Currency } from 'constants/currency';
 import { UserType } from 'constants/user';
 import { toast } from 'react-toastify';
-import { showErrorMessage } from 'utils/helpers';
+import { formatMoney, showErrorMessage } from 'utils/helpers';
 
 import { BudgetPlanItemStatus } from './constant';
 import { BudgetPlanItemForm, ItemOfBudgetPlanItem } from './entities';
@@ -22,9 +22,7 @@ export function getValueItemByMonth(
 
   if (isBuilding) {
     const amount = +foundItem.amount;
-    return amount?.toLocaleString(
-      currency === Currency.Usd ? 'en-En' : 'id-Id'
-    );
+    return formatMoney(amount, currency);
   } else {
     return foundItem.quantity;
   }

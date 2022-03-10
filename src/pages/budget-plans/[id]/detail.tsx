@@ -7,9 +7,9 @@ import RejectModal from 'components/ui/Modal/RejectModal';
 import ReviseModal from 'components/ui/Modal/ReviseModal';
 import DataTable, { usePaginateParams } from 'components/ui/Table/DataTable';
 import Loader from 'components/ui/Table/Loader';
+import { Currency } from 'constants/currency';
 import { ApprovalField, ApprovalStatus } from 'modules/approval/entities';
 import { useFetchBudgetPlanDetail } from 'modules/budgetPlan/hook';
-import { BudgetPlanItemGroupStatus } from 'modules/budgetPlanItemGroup/constant';
 import { BudgetPlanItemGroup } from 'modules/budgetPlanItemGroup/entities';
 import {
   permissionBudgetPlanItemGroupHelpers,
@@ -24,7 +24,7 @@ import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import { Badge, Button, Col, Row } from 'react-bootstrap';
 import { CellProps, Column, SortingRule } from 'react-table';
-import { getAllIds } from 'utils/helpers';
+import { formatMoney, getAllIds } from 'utils/helpers';
 
 const breadCrumb: PathBreadcrumb[] = [
   {
@@ -111,16 +111,14 @@ const DetailBudgetPlan: NextPage = () => {
     {
       Header: 'Total USD',
       accessor: 'totalAmountUsd',
-      Cell: ({ row }: CellProps<BudgetPlanItemGroup>) => {
-        return row.values.totalAmountUsd.toLocaleString('en-EN');
-      },
+      Cell: ({ row }: CellProps<BudgetPlanItemGroup>) =>
+        formatMoney(row.values.totalAmountUsd, Currency.Usd, '-'),
     },
     {
       Header: 'Total IDR',
       accessor: 'totalAmount',
-      Cell: ({ row }: CellProps<BudgetPlanItemGroup>) => {
-        return row.values.totalAmount.toLocaleString('id-Id');
-      },
+      Cell: ({ row }: CellProps<BudgetPlanItemGroup>) =>
+        formatMoney(row.values.totalAmount, Currency.Idr, '-'),
     },
     {
       Header: 'Status',

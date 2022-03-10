@@ -13,6 +13,7 @@ import React, { useEffect, useMemo } from 'react';
 import { Col, FormControl, FormGroup, FormLabel, Row } from 'react-bootstrap';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { CellProps, Column } from 'react-table';
+import { formatMoney } from 'utils/helpers';
 import * as yup from 'yup';
 
 import SimpleTable from '../../Table/SimpleTable';
@@ -181,7 +182,11 @@ const IsBuildingBudgetPlanItemModal: React.FC<
         <Col lg={6}>
           <FormGroup>
             <FormLabel>Kurs</FormLabel>
-            <FormControl type="text" value={watchCurrencyRate} disabled />
+            <FormControl
+              type="text"
+              value={formatMoney(watchCurrencyRate, Currency.Idr)}
+              disabled
+            />
           </FormGroup>
         </Col>
       </Row>
@@ -230,7 +235,7 @@ const IsBuildingBudgetPlanItemModal: React.FC<
             <FormLabel>Total IDR</FormLabel>
             <FormControl
               type="text"
-              value={totalAmount(Currency.Idr).toLocaleString('id-Id')}
+              value={formatMoney(totalAmount(Currency.Idr), Currency.Idr)}
               disabled
             />
           </FormGroup>
@@ -240,7 +245,7 @@ const IsBuildingBudgetPlanItemModal: React.FC<
             <FormLabel>Total USD</FormLabel>
             <FormControl
               type="text"
-              value={totalAmount(Currency.Usd).toLocaleString('en-EN')}
+              value={formatMoney(totalAmount(Currency.Usd), Currency.Usd)}
               disabled
             />
           </FormGroup>

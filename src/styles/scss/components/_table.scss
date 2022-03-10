@@ -81,6 +81,42 @@
 .table-admin {
   &.table,
   .table {
+    &.striped-sticky {
+      thead {
+        tr:nth-child(-n + 2) {
+          position: sticky;
+          top: 0;
+          z-index: 10;
+        }
+        tr:nth-child(2) th:first-child {
+          position: sticky;
+          top: 0;
+          left: 0;
+        }
+      }
+      tbody {
+        tr td:first-child {
+          position: sticky;
+          top: 0;
+          left: 0;
+        }
+        tr {
+          &:nth-child(even) {
+            background-color: #eeeeee;
+            td {
+              background-color: #eeeeee;
+            }
+          }
+
+          &:nth-child(odd) {
+            background-color: #e0dfdf;
+            td {
+              background-color: #e0dfdf;
+            }
+          }
+        }
+      }
+    }
     thead {
       th {
         letter-spacing: 1.12px;

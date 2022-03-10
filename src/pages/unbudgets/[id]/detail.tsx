@@ -8,13 +8,11 @@ import { Currency } from 'constants/currency';
 import { useAttachmentHelpers } from 'modules/attachment/helpers';
 import { ResourceType } from 'modules/audit/parent/entities';
 import { useFetchAudits } from 'modules/audit/parent/hook';
-import {
-  useFetchBudgetPlanDetail,
-  useFetchCurrentBudgetPlan,
-} from 'modules/budgetPlan/hook';
+import { useFetchBudgetPlanDetail } from 'modules/budgetPlan/hook';
 import { getValueItemByMonth } from 'modules/budgetPlanItem/helpers';
 import { useDecodeToken } from 'modules/custom/useDecodeToken';
 import { UnbudgetItem } from 'modules/unbudget/entities';
+import { permissionUnbudgetHelpers } from 'modules/unbudget/helpers';
 import {
   useFetchUnbudgetDetail,
   useFetchUnbudgetItems,
@@ -22,7 +20,7 @@ import {
 import type { NextPage } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Button, Col, Row } from 'react-bootstrap';
 import { CellProps, Column, SortingRule } from 'react-table';
 import { formatMoney } from 'utils/helpers';
@@ -62,6 +60,16 @@ const UnbudgetDetails: NextPage = () => {
   );
   const { handleDownloadAttachment } = useAttachmentHelpers();
 
+  // permisison
+  const {
+    userCanHandleData,
+    userCanApproveData,
+    canCancel,
+    canDelete,
+    canEdit,
+    canSubmit,
+  } = permissionUnbudgetHelpers(profile?.type);
+
   const columns: Column<UnbudgetItem>[] = [
     { Header: 'ID', accessor: 'id' },
     { Header: 'Catalog', accessor: 'catalog' },
@@ -83,24 +91,24 @@ const UnbudgetDetails: NextPage = () => {
         </div>
       ),
     },
-    { Header: 'Currency', accessor: 'currency', minWidth: 150 },
+    { Header: 'Currency', accessor: 'currency' },
     {
       Header: 'Price/Unit',
       accessor: 'pricePerUnit',
       Cell: ({ row }: CellProps<UnbudgetItem>) =>
-        formatMoney(row.values.pricePerunit, Currency.Idr, '-'),
+        formatMoney(row.values.pricePerunit, Currency.Idr),
     },
     {
       Header: 'Total USD',
       accessor: 'totalAmountUsd',
       Cell: ({ row }: CellProps<UnbudgetItem>) =>
-        formatMoney(row.values.totalAmountUsd, Currency.Usd, '-'),
+        formatMoney(row.values.totalAmountUsd, Currency.Usd),
     },
     {
       Header: 'Total IDR',
       accessor: 'totalAmount',
       Cell: ({ row }: CellProps<UnbudgetItem>) =>
-        formatMoney(row.values.totalAmount, Currency.Idr, '-'),
+        formatMoney(row.values.totalAmount, Currency.Idr),
     },
     {
       Header: 'Jan',
@@ -304,6 +312,13 @@ const UnbudgetDetails: NextPage = () => {
         </Row>
       </Panel>
 
+      {auditHook.data?.items && auditHook.data?.items.length > 0 && (
+        <>
+          <br />
+          <AuditTimeline audit={auditHook.data} />
+        </>
+      )}
+
       <br />
 
       <Panel>
@@ -392,28 +407,21 @@ const UnbudgetDetails: NextPage = () => {
           </Col>
         </Row>
 
-        <br />
-
-        <Row>
-          <Col lg={12}>
-            <Link href={`/unbudgets/${unbudgetId}/edit`} passHref>
-              <Button variant="primary" className="float-right">
-                Edit
-              </Button>
-            </Link>
-          </Col>
-        </Row>
+        {canEdit(dataHookUnbudgetDetail.data?.status) && (
+          <>
+            <br />
+            <Row>
+              <Col lg={12}>
+                <Link href={`/unbudgets/${unbudgetId}/edit`} passHref>
+                  <Button variant="primary" className="float-right">
+                    Edit
+                  </Button>
+                </Link>
+              </Col>
+            </Row>
+          </>
+        )}
       </Panel>
-
-      {auditHook.data?.items && auditHook.data?.items.length > 0 && (
-        <>
-          <br />
-          <AuditTimeline audit={auditHook.data} />
-        </>
-      )}
-
-      <br />
-
       <Panel>
         <Row>
           {dataHookUnbudgetItems.data && (

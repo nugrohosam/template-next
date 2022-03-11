@@ -84,7 +84,7 @@ const ConfirmModal: React.FC<ConfirmationModalProps> = ({
 
   return (
     <ModalBox
-      buttonTitle="Confirmation"
+      buttonTitle="Confirm"
       buttonVariant="primary"
       submitButtonVariant="primary"
       classButton={classButton}

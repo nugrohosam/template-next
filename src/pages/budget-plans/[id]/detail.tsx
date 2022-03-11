@@ -1,4 +1,5 @@
 import Panel from 'components/form/Panel';
+import { customStyles } from 'components/form/SingleSelect';
 import { PathBreadcrumb } from 'components/ui/Breadcrumb';
 import LoadingButton from 'components/ui/Button/LoadingButton';
 import DetailLayout from 'components/ui/DetailLayout';
@@ -10,6 +11,7 @@ import Loader from 'components/ui/Table/Loader';
 import { Currency } from 'constants/currency';
 import { ApprovalField, ApprovalStatus } from 'modules/approval/entities';
 import { useFetchBudgetPlanDetail } from 'modules/budgetPlan/hook';
+import { BudgetPlanItemGroupStatusOptions } from 'modules/budgetPlanItemGroup/constant';
 import { BudgetPlanItemGroup } from 'modules/budgetPlanItemGroup/entities';
 import {
   permissionBudgetPlanItemGroupHelpers,
@@ -23,6 +25,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useState } from 'react';
 import { Badge, Button, Col, Row } from 'react-bootstrap';
+import Select from 'react-select';
 import { CellProps, Column, SortingRule } from 'react-table';
 import { formatMoney, getAllIds } from 'utils/helpers';
 
@@ -50,8 +53,14 @@ const DetailBudgetPlan: NextPage = () => {
 
   const [selectedRow, setSelectedRow] = useState<Record<string, boolean>>({});
   const [selectedSort, setSelectedSort] = useState<SortingRule<any>[]>([]);
-  const { params, setPageNumber, setPageSize, setSearch, setSortingRules } =
-    usePaginateParams();
+  const {
+    params,
+    setPageNumber,
+    setPageSize,
+    setSearch,
+    setSortingRules,
+    setFiltersParams,
+  } = usePaginateParams();
 
   const dataHook = useFetchBudgetPlanDetail(idBudgetPlan);
   const dataHookBudgetPlanItemGroup = useFetchBudgetPlanItemGroups({
@@ -296,6 +305,34 @@ const DetailBudgetPlan: NextPage = () => {
                     </>
                   )}
                 </>
+              }
+              filters={
+                <Col lg={12} className="mb-32 px-0">
+                  <div className="setup-detail p-4">
+                    <Row>
+                      <Col lg={6}>
+                        <p className="mb-1">Status</p>
+                        <Select
+                          placeholder="Select Status"
+                          isClearable
+                          options={BudgetPlanItemGroupStatusOptions}
+                          styles={{
+                            ...customStyles(),
+                            menu: () => ({
+                              zIndex: 99,
+                            }),
+                          }}
+                          onChange={(val) =>
+                            setFiltersParams(
+                              'status',
+                              (val?.value as string) || ''
+                            )
+                          }
+                        />
+                      </Col>
+                    </Row>
+                  </div>
+                </Col>
               }
               isLoading={dataHook.isFetching}
               selectedSort={selectedSort}

@@ -110,7 +110,7 @@ export const snakeCaseToCamelCase = (str: string) => {
 
 export const formatMoney = (
   nominal: string | number | null | undefined,
-  currency: Currency | null,
+  currency: Currency | null | undefined,
   defaultResult?: string | number
 ) => {
   const emptyResult = defaultResult || 0;

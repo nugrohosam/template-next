@@ -4,11 +4,16 @@ import { toast } from 'react-toastify';
 import { formatMoney, showErrorMessage } from 'utils/helpers';
 
 import { BudgetPlanItemStatus } from './constant';
-import { BudgetPlanItemForm, ItemOfBudgetPlanItem } from './entities';
+import {
+  BudgetPlanItemForm,
+  ItemOfBudgetPlanItem,
+  UploadBudgetPlanItemUForm,
+} from './entities';
 import {
   useCreateBudgetPlanItem,
   useDeleteBudgetPlanitems,
   useUpdateBudgetPlanItem,
+  useUploadBudgetPlanItems,
 } from './hook';
 
 export function getValueItemByMonth(
@@ -83,6 +88,28 @@ export const useBudgetPlanItemHelpers = () => {
     });
   };
 
+  const mutationUploadBudgetPlanItems = useUploadBudgetPlanItems();
+  const handleUploadBudgetPlanItems = (data: UploadBudgetPlanItemUForm) => {
+    const formData = new FormData();
+    formData.append('file', data.file[0]);
+    formData.append('idBudgetPlan', data.idBudgetPlan);
+
+    return new Promise((resolve, reject) => {
+      mutationUploadBudgetPlanItems.mutate(formData, {
+        onSuccess: (result) => {
+          resolve(result);
+          toast('Data uploaded!');
+        },
+        onError: (error) => {
+          reject(error);
+          console.error('Failed to Delete data', error);
+          toast(error.message, { autoClose: false });
+          showErrorMessage(error);
+        },
+      });
+    });
+  };
+
   return {
     mutationCreateBudgetPlanItem,
     handleCreateBudgetPlanItem,
@@ -90,6 +117,8 @@ export const useBudgetPlanItemHelpers = () => {
     handleUpdateBudgetPlanItem,
     mutationDeleteBudgetPlanItems,
     handleDeleteBudgetPlanItems,
+    mutationUploadBudgetPlanItems,
+    handleUploadBudgetPlanItems,
   };
 };
 

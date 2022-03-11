@@ -5,6 +5,7 @@ import {
   createBudgetPlanItem,
   deleteBudgetPlanItems,
   updateBudgetPlanItem,
+  uploadBudgetPlanItems,
 } from './api';
 import { BudgetPlanItem, BudgetPlanItemForm } from './entities';
 
@@ -32,4 +33,12 @@ export const useDeleteBudgetPlanitems = (): UseMutationResult<
   return useMutation((idBudgetPlanItems) =>
     deleteBudgetPlanItems(idBudgetPlanItems)
   );
+};
+
+export const useUploadBudgetPlanItems = (): UseMutationResult<
+  null,
+  ResponseError,
+  FormData
+> => {
+  return useMutation(uploadBudgetPlanItems);
 };

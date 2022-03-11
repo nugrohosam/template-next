@@ -226,6 +226,9 @@ const DetailBudgetPlan: NextPage = () => {
           <Col lg={12} className="d-md-flex mt-40 mb-32 align-items-center">
             <h3 className="mb-3 mb-md-0 text__blue">Budget Plan Item Groups</h3>
             <div className="ml-auto d-flex flex-column flex-md-row">
+              <Link href={`/budget-plans/${idBudgetPlan}/upload`} passHref>
+                <Button className="mb-1 mr-2">Upload</Button>
+              </Link>
               <Link
                 href={`/budget-plans/${idBudgetPlan}/create-items`}
                 passHref

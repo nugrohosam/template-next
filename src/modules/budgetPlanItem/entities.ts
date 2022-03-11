@@ -44,3 +44,8 @@ export interface BudgetPlanItemOfBudgetPlanItemForm {
   id?: string;
   catalog?: Catalog;
 }
+
+export interface UploadBudgetPlanItemUForm {
+  file: File[];
+  idBudgetPlan: string;
+}

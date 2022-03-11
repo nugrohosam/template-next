@@ -1,20 +1,25 @@
 import Panel from 'components/form/Panel';
 import { PathBreadcrumb } from 'components/ui/Breadcrumb';
 import DetailLayout from 'components/ui/DetailLayout';
+import ApproveModal from 'components/ui/Modal/ApproveModal';
+import RejectModal from 'components/ui/Modal/RejectModal';
+import ReviseModal from 'components/ui/Modal/ReviseModal';
 import DataTable, { usePaginateParams } from 'components/ui/Table/DataTable';
 import Loader from 'components/ui/Table/Loader';
 import AuditTimeline from 'components/ui/Timeline/AuditTimeline';
 import { Currency } from 'constants/currency';
+import { ApprovalField } from 'modules/approval/entities';
 import { useAttachmentHelpers } from 'modules/attachment/helpers';
 import { ResourceType } from 'modules/audit/parent/entities';
 import { useFetchAudits } from 'modules/audit/parent/hook';
-import {
-  useFetchBudgetPlanDetail,
-  useFetchCurrentBudgetPlan,
-} from 'modules/budgetPlan/hook';
+import { useFetchBudgetPlanDetail } from 'modules/budgetPlan/hook';
 import { getValueItemByMonth } from 'modules/budgetPlanItem/helpers';
 import { useDecodeToken } from 'modules/custom/useDecodeToken';
 import { UnbudgetItem } from 'modules/unbudget/entities';
+import {
+  permissionUnbudgetHelpers,
+  useUnbudgetHelpers,
+} from 'modules/unbudget/helpers';
 import {
   useFetchUnbudgetDetail,
   useFetchUnbudgetItems,
@@ -22,7 +27,7 @@ import {
 import type { NextPage } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Button, Col, Row } from 'react-bootstrap';
 import { CellProps, Column, SortingRule } from 'react-table';
 import { formatMoney } from 'utils/helpers';
@@ -40,17 +45,17 @@ const breadCrumb: PathBreadcrumb[] = [
 
 const UnbudgetDetails: NextPage = () => {
   const router = useRouter();
-  const unbudgetId = router.query.id as string;
+  const idUnbudget = router.query.id as string;
   const [profile] = useDecodeToken();
 
   const [selectedSort, setSelectedSort] = useState<SortingRule<any>[]>([]);
   const { params, setPageNumber, setPageSize, setSearch, setSortingRules } =
     usePaginateParams();
 
-  const dataHookUnbudgetDetail = useFetchUnbudgetDetail(unbudgetId);
-  const dataHookUnbudgetItems = useFetchUnbudgetItems(unbudgetId, params);
+  const dataHookUnbudgetDetail = useFetchUnbudgetDetail(idUnbudget);
+  const dataHookUnbudgetItems = useFetchUnbudgetItems(idUnbudget, params);
   const auditHook = useFetchAudits({
-    resourceId: unbudgetId,
+    resourceId: idUnbudget,
     resourceType: ResourceType.Unbudget,
     orderBy: 'asc',
     order: 'created_at',
@@ -61,6 +66,20 @@ const UnbudgetDetails: NextPage = () => {
     dataHookUnbudgetDetail.data?.idCapexBudgetPlan as string
   );
   const { handleDownloadAttachment } = useAttachmentHelpers();
+  // handle actions
+  const { handleApprovalUnbudgets } = useUnbudgetHelpers();
+  const approvalUnbudget = (data: ApprovalField) => {
+    handleApprovalUnbudgets({
+      idUnbudgets: [idUnbudget],
+      status: data?.status,
+      remark: data?.notes,
+    });
+  };
+
+  // permisison
+  const { userCanApproveData, canEdit } = permissionUnbudgetHelpers(
+    profile?.type
+  );
 
   const columns: Column<UnbudgetItem>[] = [
     { Header: 'ID', accessor: 'id' },
@@ -83,24 +102,24 @@ const UnbudgetDetails: NextPage = () => {
         </div>
       ),
     },
-    { Header: 'Currency', accessor: 'currency', minWidth: 150 },
+    { Header: 'Currency', accessor: 'currency' },
     {
       Header: 'Price/Unit',
       accessor: 'pricePerUnit',
       Cell: ({ row }: CellProps<UnbudgetItem>) =>
-        formatMoney(row.values.pricePerunit, Currency.Idr, '-'),
+        formatMoney(row.values.pricePerunit, Currency.Idr),
     },
     {
       Header: 'Total USD',
       accessor: 'totalAmountUsd',
       Cell: ({ row }: CellProps<UnbudgetItem>) =>
-        formatMoney(row.values.totalAmountUsd, Currency.Usd, '-'),
+        formatMoney(row.values.totalAmountUsd, Currency.Usd),
     },
     {
       Header: 'Total IDR',
       accessor: 'totalAmount',
       Cell: ({ row }: CellProps<UnbudgetItem>) =>
-        formatMoney(row.values.totalAmount, Currency.Idr, '-'),
+        formatMoney(row.values.totalAmount, Currency.Idr),
     },
     {
       Header: 'Jan',
@@ -304,6 +323,13 @@ const UnbudgetDetails: NextPage = () => {
         </Row>
       </Panel>
 
+      {auditHook.data?.items && auditHook.data?.items.length > 0 && (
+        <>
+          <br />
+          <AuditTimeline audit={auditHook.data} />
+        </>
+      )}
+
       <br />
 
       <Panel>
@@ -393,27 +419,25 @@ const UnbudgetDetails: NextPage = () => {
         </Row>
 
         <br />
-
         <Row>
           <Col lg={12}>
-            <Link href={`/unbudgets/${unbudgetId}/edit`} passHref>
-              <Button variant="primary" className="float-right">
-                Edit
-              </Button>
-            </Link>
+            {canEdit(dataHookUnbudgetDetail.data?.status) && (
+              <Link href={`/unbudgets/${idUnbudget}/edit`} passHref>
+                <Button variant="primary" className="float-right">
+                  Edit
+                </Button>
+              </Link>
+            )}
+            {userCanApproveData && (
+              <div className="float-right">
+                <ApproveModal onSend={approvalUnbudget} classButton="mr-2" />
+                <ReviseModal onSend={approvalUnbudget} classButton="mr-2" />
+                <RejectModal onSend={approvalUnbudget} />
+              </div>
+            )}
           </Col>
         </Row>
       </Panel>
-
-      {auditHook.data?.items && auditHook.data?.items.length > 0 && (
-        <>
-          <br />
-          <AuditTimeline audit={auditHook.data} />
-        </>
-      )}
-
-      <br />
-
       <Panel>
         <Row>
           {dataHookUnbudgetItems.data && (

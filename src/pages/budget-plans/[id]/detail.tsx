@@ -251,7 +251,7 @@ const DetailBudgetPlan: NextPage = () => {
                         className="mr-2"
                         disabled={
                           mutationSubmitBudgetPlanItemGroup.isLoading ||
-                          !disableMultipleAction(canSubmit)
+                          disableMultipleAction(canSubmit)
                         }
                         isLoading={mutationSubmitBudgetPlanItemGroup.isLoading}
                         onClick={() =>

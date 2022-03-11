@@ -21,8 +21,6 @@ export type OverBudget = {
 export type OverBudgetDetail = OverBudget & {
   budgetReference: BudgetReference;
   attachment: string;
-  description: string;
-  quantity: number;
   workflowApprovalId: number;
 };
 

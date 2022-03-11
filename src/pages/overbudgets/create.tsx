@@ -26,7 +26,11 @@ import {
 } from 'react-bootstrap';
 import { FieldError, useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
-import { setValidationError, showErrorMessage } from 'utils/helpers';
+import {
+  formatMoney,
+  setValidationError,
+  showErrorMessage,
+} from 'utils/helpers';
 import * as yup from 'yup';
 
 const breadCrumb: PathBreadcrumb[] = [
@@ -65,7 +69,7 @@ const CreateOverBudget: NextPage = () => {
 
   const [budgetRefDetail, setBudgetRefDetail] = useState({
     description: '',
-    quantity: '',
+    quantity: 0,
     currency: '',
     pricePerUnit: '',
   });
@@ -142,12 +146,14 @@ const CreateOverBudget: NextPage = () => {
 
     if (budgetReference) {
       setValue('currentBalance', budgetReference?.currentBalance);
-      // TODO: beberapa atribut belum di-provide API
       setBudgetRefDetail({
-        description: 'Budget Reference Description',
-        quantity: '3',
+        description: budgetReference?.description || '-',
+        quantity: budgetReference?.qty || 0,
         currency: budgetReference?.currency,
-        pricePerUnit: '100000',
+        pricePerUnit: formatMoney(
+          budgetReference?.pricePerUnit,
+          budgetReference?.currency
+        ).toString(),
       });
     }
   };
@@ -155,10 +161,7 @@ const CreateOverBudget: NextPage = () => {
   const additionalBudget = watch('additionalBudgetPerUnit');
   useEffect(() => {
     if (additionalBudget) {
-      setValue(
-        'overbudget',
-        parseInt(budgetRefDetail.quantity) * additionalBudget
-      );
+      setValue('overbudget', budgetRefDetail.quantity * additionalBudget);
     }
   });
 

@@ -21,7 +21,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { Button, Col, Row } from 'react-bootstrap';
 import { toast } from 'react-toastify';
-import { showErrorMessage } from 'utils/helpers';
+import { formatMoney, showErrorMessage } from 'utils/helpers';
 
 const DetailOverBudget: NextPage = () => {
   const breadCrumb: PathBreadcrumb[] = [
@@ -77,6 +77,7 @@ const DetailOverBudget: NextPage = () => {
       }
     );
   };
+  const currency = dataHook?.data?.budgetReference.currency;
 
   return (
     <DetailLayout
@@ -104,12 +105,14 @@ const DetailOverBudget: NextPage = () => {
         <Row>
           <Col lg={6}>
             <h4 className="profile-detail__info--title mb-1">Description</h4>
-            <h3 className="profile-detail__info--subtitle">Description</h3>
+            <h3 className="profile-detail__info--subtitle">
+              {dataHook.data?.budgetReference.description || '-'}
+            </h3>
           </Col>
           <Col lg={6}>
             <h4 className="profile-detail__info--title mb-1">Quantity</h4>
             <h3 className="profile-detail__info--subtitle">
-              {dataHook?.data?.quantity}
+              {dataHook?.data?.budgetReference.qty}
             </h3>
           </Col>
         </Row>
@@ -122,7 +125,12 @@ const DetailOverBudget: NextPage = () => {
           </Col>
           <Col lg={6}>
             <h4 className="profile-detail__info--title mb-1">Price Per Unit</h4>
-            <h3 className="profile-detail__info--subtitle">300.000</h3>
+            <h3 className="profile-detail__info--subtitle">
+              {formatMoney(
+                dataHook?.data?.budgetReference.pricePerUnit,
+                currency
+              )}
+            </h3>
           </Col>
         </Row>
         <Row>
@@ -131,13 +139,13 @@ const DetailOverBudget: NextPage = () => {
               Additional Budget/Unit
             </h4>
             <h3 className="profile-detail__info--subtitle">
-              {dataHook?.data?.additionalBudgetPerUnit}
+              {formatMoney(dataHook?.data?.additionalBudgetPerUnit, currency)}
             </h3>
           </Col>
           <Col lg={6}>
             <h4 className="profile-detail__info--title mb-1">Over Budget</h4>
             <h3 className="profile-detail__info--subtitle">
-              {dataHook?.data?.overBudget}
+              {formatMoney(dataHook?.data?.overBudget, currency)}
             </h3>
           </Col>
         </Row>

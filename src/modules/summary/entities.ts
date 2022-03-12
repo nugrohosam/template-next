@@ -1,6 +1,5 @@
 import { PeriodeType } from '../../constants/period';
-export type AssetGroupSummary = {
-  idBudgetPlan: string;
+export type Summary = {
   districtCode: string;
   actualYtdCurrentPeriod: number;
   outstandingPrPo: number;
@@ -18,6 +17,13 @@ export type AssetGroupSummary = {
   totalMb: number;
   mbVsOlFyCurrentPeriod: number;
   mbVsOlFyCurrentPeriodPercentage: number;
+};
+
+export type TotalSummaryData = Omit<Summary, 'districtCode'>;
+
+export type AssetGroupSummary = {
+  districtType: string;
+  summaryData: Summary[];
 };
 
 export type InterveneField = {

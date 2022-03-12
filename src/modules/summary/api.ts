@@ -1,15 +1,13 @@
-import { Paginate, PaginateParams, ResponseData } from 'modules/common/types';
+import { ResponseData } from 'modules/common/types';
 import axios from 'utils/axios';
 
 import { AssetGroupSummary, InterveneField } from './entities';
 
 export const fetchAssetGroupSummary = async (
-  idAssetGroup: string,
-  params: PaginateParams
-): Promise<Paginate<AssetGroupSummary>> => {
-  const result = await axios.get<ResponseData<Paginate<AssetGroupSummary>>>(
-    `v1/summaries/${idAssetGroup}`,
-    { params }
+  idAssetGroup: string
+): Promise<AssetGroupSummary> => {
+  const result = await axios.get<ResponseData<AssetGroupSummary>>(
+    `v1/summaries/${idAssetGroup}`
   );
   return result.data.data;
 };

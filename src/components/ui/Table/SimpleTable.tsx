@@ -31,6 +31,7 @@ interface Props<T extends object = {}> {
   columns: Array<Column<T>>;
   items?: Array<T>;
   classTable?: string;
+  classThead?: string;
   isLoading?: boolean;
   selectedRows?: Record<IdType<T>, boolean>;
   selectedSort?: Array<SortingRule<T>>;
@@ -46,6 +47,7 @@ function SimpleTable<T extends object = {}>({
   columns,
   items = [],
   classTable,
+  classThead,
   isLoading = false,
   selectedRows,
   selectedSort = [],
@@ -174,7 +176,7 @@ function SimpleTable<T extends object = {}>({
           className={classTable || 'table-admin'}
           responsive
         >
-          <thead>
+          <thead className={classThead}>
             {headerGroups.map((headerGroup, parent_index) => (
               <tr {...headerGroup.getHeaderGroupProps()} key={parent_index}>
                 {headerGroup.headers.map((column, child_index) =>

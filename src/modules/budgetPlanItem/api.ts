@@ -31,3 +31,14 @@ export const deleteBudgetPlanItems = async (
   });
   return result.data.data;
 };
+
+export const uploadBudgetPlanItems = async (data: FormData): Promise<null> => {
+  const result = await axios.post<ResponseData<null>>(
+    'v1/budgetplanitems/upload',
+    data,
+    {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }
+  );
+  return result.data.data;
+};

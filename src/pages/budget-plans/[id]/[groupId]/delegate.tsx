@@ -8,9 +8,11 @@ import DetailLayout from 'components/ui/DetailLayout';
 import { useAttachmentHelpers } from 'modules/attachment/helpers';
 import { DelegateApprovalForm } from 'modules/budgetPlanItemGroup/entities';
 import { useBudgetPlanItemGroupHelpers } from 'modules/budgetPlanItemGroup/helpers';
+import { useFetchBudgetPlanItemGroupDetail } from 'modules/budgetPlanItemGroup/hook';
 import { useUserOptions } from 'modules/user/helpers';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
+import { useEffect } from 'react';
 import { Button, Col, Form, FormGroup, FormLabel, Row } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import { setValidationError } from 'utils/helpers';
@@ -56,6 +58,18 @@ const UploadBudgetPlanItem: NextPage = () => {
   });
   const { attachmentFile: watchAttachmentFile } = watch();
 
+  const dataHookBudgetPlanItemGroup =
+    useFetchBudgetPlanItemGroupDetail(idBudgetPlanGroup);
+  useEffect(() => {
+    if (dataHookBudgetPlanItemGroup.data) {
+      setValue('nrp', dataHookBudgetPlanItemGroup.data.delegateApprovalNrp);
+      setValue(
+        'attachment',
+        dataHookBudgetPlanItemGroup.data.delegateAttachment
+      );
+    }
+  }, [dataHookBudgetPlanItemGroup.data, setValue]);
+
   const { mutationDelegateApproval, handleDelegateApproval } =
     useBudgetPlanItemGroupHelpers();
   const submitForm = (data: DelegateApprovalForm) => {
@@ -67,6 +81,7 @@ const UploadBudgetPlanItem: NextPage = () => {
       .catch((error) => setValidationError(error, setError));
   };
 
+  const { handleDownloadAttachment } = useAttachmentHelpers();
   const { handleUploadAttachment } = useAttachmentHelpers();
   const uploadAttachment = (attachment: keyof DelegateApprovalForm) => {
     const file = getValues(`${attachment}File` as keyof DelegateApprovalForm);
@@ -119,6 +134,24 @@ const UploadBudgetPlanItem: NextPage = () => {
                 >
                   <p className="mb-0">Upload</p>
                 </Button>
+                {dataHookBudgetPlanItemGroup.data?.delegateAttachment && (
+                  <>
+                    <br />
+                    <Button
+                      variant="link"
+                      className="mt-2 p-0 font-xs"
+                      onClick={() =>
+                        handleDownloadAttachment({
+                          fileName: dataHookBudgetPlanItemGroup.data
+                            ?.delegateAttachment as string,
+                          module: 'budget plan',
+                        })
+                      }
+                    >
+                      <p>Download Previous Delegate</p>
+                    </Button>
+                  </>
+                )}
               </FormGroup>
             </Col>
           </Row>

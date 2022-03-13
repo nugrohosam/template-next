@@ -5,9 +5,10 @@ import { toast } from 'react-toastify';
 import { showErrorMessage } from 'utils/helpers';
 
 import { BudgetPlanItemGroupStatus } from './constant';
-import { ApprovalBudgetPlanItemGroup } from './entities';
+import { ApprovalBudgetPlanItemGroup, DelegateApprovalForm } from './entities';
 import {
   useApprovalBudgetPlanItemGroups,
+  useDelegateApproval,
   useDeleteBudgetPlanItemGroups,
   useSubmitBudgetPlanItemGroups,
 } from './hook';
@@ -84,6 +85,30 @@ export const useBudgetPlanItemGroupHelpers = () => {
     });
   };
 
+  const mutationDelegateApproval = useDelegateApproval();
+  const handleDelegateApproval = (
+    idBudgetPlanItemGroup: string,
+    data: DelegateApprovalForm
+  ) => {
+    return new Promise((resolve, reject) => {
+      mutationDelegateApproval.mutate(
+        { idBudgetPlanItemGroup, data },
+        {
+          onSuccess: (result) => {
+            resolve(result);
+            toast(`Successfully delegate approval!`);
+          },
+          onError: (error) => {
+            reject(error);
+            console.error(`Failed to delegate approval`, error);
+            toast(error.message, { autoClose: false });
+            showErrorMessage(error);
+          },
+        }
+      );
+    });
+  };
+
   return {
     mutationSubmitBudgetPlanItemGroup,
     handleSubmitBudgetPlanItemGroups,
@@ -91,6 +116,8 @@ export const useBudgetPlanItemGroupHelpers = () => {
     handleDeleteBudgetPlanItemGroups,
     mutationApprovalBudgetPlanItemGroup,
     handleApprovalBudgetPlanItemGroup,
+    mutationDelegateApproval,
+    handleDelegateApproval,
   };
 };
 
@@ -102,6 +129,7 @@ export const permissionBudgetPlanItemGroupHelpers = (
   const userCanApproveData =
     role === UserType.ApprovalBudgetPlanCapex ||
     role === UserType.DeptPicAssetHoCapex;
+  const userCanDelegateApproval = role === UserType.AdminCapex;
 
   const canSubmit = (status: string | undefined) => {
     if (!userCanHandleData) return false;
@@ -117,5 +145,17 @@ export const permissionBudgetPlanItemGroupHelpers = (
     return status?.includes(BudgetPlanItemGroupStatus.WaitingApproval);
   };
 
-  return { userCanHandleData, userCanApproveData, canSubmit, canApprove };
+  const canDelegateApprove = (status: string | undefined) => {
+    if (!userCanDelegateApproval) return false;
+    return status?.includes(BudgetPlanItemGroupStatus.WaitingApproval);
+  };
+
+  return {
+    userCanHandleData,
+    userCanApproveData,
+    userCanDelegateApproval,
+    canSubmit,
+    canApprove,
+    canDelegateApprove,
+  };
 };

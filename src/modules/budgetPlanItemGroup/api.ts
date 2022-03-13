@@ -7,6 +7,7 @@ import {
   BudgetPlanItemGroupItem,
   BuildingAttachment,
   BuildingAttachmentType,
+  DelegateApprovalForm,
 } from './entities';
 
 export interface BudgetPlanItemGroupsParams extends PaginateParams {
@@ -85,6 +86,21 @@ export const fetchBuildingAttachments = async (
     {
       params,
     }
+  );
+  return result.data.data;
+};
+
+export interface DelegateApprovalParams {
+  idBudgetPlanItemGroup: string;
+  data: DelegateApprovalForm;
+}
+export const delegateApproval = async ({
+  idBudgetPlanItemGroup,
+  data,
+}: DelegateApprovalParams): Promise<null> => {
+  const result = await axios.put<ResponseData<null>>(
+    `v1/budgetplanitemgroups/${idBudgetPlanItemGroup}/delegate`,
+    data
   );
   return result.data.data;
 };

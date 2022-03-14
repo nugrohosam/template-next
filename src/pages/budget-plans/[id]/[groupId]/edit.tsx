@@ -68,14 +68,8 @@ const UpdateBudgetPlanItems: NextPage = () => {
   const { fields, replace, append, remove, update } = useFieldArray({
     control,
     name: 'budgetPlanItems',
+    keyName: 'key',
   });
-  const controlledFields =
-    fields.map((field, index) => {
-      return {
-        ...field,
-        ...(watchBudgetPlanItems && watchBudgetPlanItems[index]),
-      };
-    }) || [];
   const {
     isBuilding: watchIsBuilding,
     budgetPlanItems: watchBudgetPlanItems,
@@ -378,7 +372,7 @@ const UpdateBudgetPlanItems: NextPage = () => {
             <SimpleTable
               classTable="table-admin table-inherit"
               columns={columns}
-              items={controlledFields}
+              items={fields}
               selectedRows={selectedRow}
               hiddenColumns={[
                 'items',

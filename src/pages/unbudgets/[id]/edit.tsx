@@ -83,6 +83,7 @@ const EditUnbudget: NextPage = () => {
   const { fields, remove, append, replace } = useFieldArray({
     control,
     name: 'budgetPlanItems',
+    keyName: 'key',
   });
   const {
     isBuilding: watchIsBuilding,

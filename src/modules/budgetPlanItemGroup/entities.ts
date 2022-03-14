@@ -22,6 +22,10 @@ export type BudgetPlanItemGroup = {
   workflowApprovalNrp: [];
   workflowApprovalPosition: [];
   workflowApprovalName: [];
+  delegateApprovalNrp: string;
+  delegateApprovalPosition: string;
+  delegateApprovalName: string;
+  delegateAttachment: string;
   createdAt: string;
 };
 
@@ -48,3 +52,11 @@ export type BuildingAttachment = {
   mbIdr: number;
   mbUsd: number;
 };
+
+export interface DelegateApprovalForm {
+  nrp: string;
+  attachment: string;
+
+  // Save File
+  attachmentFile?: File[];
+}

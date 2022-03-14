@@ -10,6 +10,8 @@ import {
   approvalBudgetPlanItemGroups,
   BudgetPlanItemGroupsParams,
   BuildingAttachmentParams,
+  delegateApproval,
+  DelegateApprovalParams,
   deleteBudgetPlanItemGroups,
   fetchBudgetPlanItemGroupDetail,
   fetchBudgetPlanItemGroupItems,
@@ -22,6 +24,7 @@ import {
   BudgetPlanItemGroup,
   BudgetPlanItemGroupItem,
   BuildingAttachment,
+  DelegateApprovalForm,
 } from './entities';
 
 export const useFetchBudgetPlanItemGroups = (
@@ -93,4 +96,12 @@ export const useFetchBuildingAttachments = (
       enabled: isBuilding && !!idBudgetPlanItemGroup,
     }
   );
+};
+
+export const useDelegateApproval = (): UseMutationResult<
+  null,
+  ResponseError,
+  DelegateApprovalParams
+> => {
+  return useMutation(delegateApproval);
 };

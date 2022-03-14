@@ -10,7 +10,7 @@ export const useAttachmentHelpers = () => {
   const handleDownloadAttachment = (params: DownloadAttachmentParams) => {
     downloadAttachmanetMutation.mutate(params, {
       onSuccess: () => {
-        toast('File downloaded successfully!');
+        toast('Successfully download file!');
       },
       onError: (error) => {
         toast('Failed to download file', { autoClose: false });

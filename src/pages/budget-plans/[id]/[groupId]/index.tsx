@@ -10,6 +10,7 @@ import Loader from 'components/ui/Table/Loader';
 import AuditTimeline from 'components/ui/Timeline/AuditTimeline';
 import { Currency } from 'constants/currency';
 import { ApprovalField } from 'modules/approval/entities';
+import { useAttachmentHelpers } from 'modules/attachment/helpers';
 import { ResourceType } from 'modules/audit/parent/entities';
 import { useFetchAudits } from 'modules/audit/parent/hook';
 import {
@@ -43,13 +44,13 @@ import { formatMoney, getAllIds } from 'utils/helpers';
 const BudgetPlanGroupItemList: NextPage = () => {
   const [profile] = useDecodeToken();
   const router = useRouter();
-  const budgetPlanId = router.query.id as string;
-  const budgetPlanGroupId = router.query.groupId as string;
+  const idBudgetPlan = router.query.id as string;
+  const idBudgetPlanGroup = router.query.groupId as string;
 
   const breadCrumb: PathBreadcrumb[] = [
     {
       label: 'Detail Budget Plan',
-      link: `/budget-plans/${budgetPlanId}/detail`,
+      link: `/budget-plans/${idBudgetPlan}/detail`,
     },
     {
       label: 'Detail',
@@ -63,26 +64,26 @@ const BudgetPlanGroupItemList: NextPage = () => {
     usePaginateParams();
 
   const dataHookBudgetPlanItemGroup =
-    useFetchBudgetPlanItemGroupDetail(budgetPlanGroupId);
+    useFetchBudgetPlanItemGroupDetail(idBudgetPlanGroup);
   const dataHookBudgetPlanItemGroupItems = useFetchBudgetPlanItemGroupItems(
-    budgetPlanGroupId,
+    idBudgetPlanGroup,
     params
   );
 
   const dataHookOutstandingPlanPayment = useFetchBuildingAttachments(
-    budgetPlanGroupId,
+    idBudgetPlanGroup,
     { ...params, type: BuildingAttachmentType.OutstandingPlanPayment },
     dataHookBudgetPlanItemGroup?.data?.isBuilding || false
   );
 
   const dataHookOutstandingRetention = useFetchBuildingAttachments(
-    budgetPlanGroupId,
+    idBudgetPlanGroup,
     { ...params, type: BuildingAttachmentType.OutstandingRetention },
     dataHookBudgetPlanItemGroup?.data?.isBuilding || false
   );
 
   const auditHook = useFetchAudits({
-    resourceId: budgetPlanGroupId,
+    resourceId: idBudgetPlanGroup,
     resourceType: ResourceType.BudgetPlanItemGroup,
     orderBy: 'asc',
     order: 'created_at',
@@ -92,7 +93,8 @@ const BudgetPlanGroupItemList: NextPage = () => {
 
   // permission
   const { canDelete, canEdit } = permissionBudgetPlanItemHelpers(profile?.type);
-  const { canApprove } = permissionBudgetPlanItemGroupHelpers(profile?.type);
+  const { canApprove, canDelegateApprove } =
+    permissionBudgetPlanItemGroupHelpers(profile?.type);
 
   // handle delete
   const { mutationDeleteBudgetPlanItems, handleDeleteBudgetPlanItems } =
@@ -117,11 +119,13 @@ const BudgetPlanGroupItemList: NextPage = () => {
   const { handleApprovalBudgetPlanItemGroup } = useBudgetPlanItemGroupHelpers();
   const approveBudgetPlanItemGroup = (data: ApprovalField) => {
     handleApprovalBudgetPlanItemGroup({
-      idBudgetPlanItemGroups: [budgetPlanGroupId],
+      idBudgetPlanItemGroups: [idBudgetPlanGroup],
       status: data.status,
       remark: data.notes,
-    }).then(() => router.push(`/budget-plans/${budgetPlanId}/detail`));
+    }).then(() => router.push(`/budget-plans/${idBudgetPlan}/detail`));
   };
+
+  const { handleDownloadAttachment } = useAttachmentHelpers();
 
   const columns: Column<BudgetPlanItemGroupItem>[] = [
     { Header: 'ID', accessor: 'id' },
@@ -353,6 +357,21 @@ const BudgetPlanGroupItemList: NextPage = () => {
       <Panel>
         {dataHookBudgetPlanItemGroup.isLoading && <Loader size="sm" />}
 
+        {canDelegateApprove(dataHookBudgetPlanItemGroup?.data?.status) && (
+          <Row>
+            <Col lg={12}>
+              <Link
+                href={`/budget-plans/${idBudgetPlan}/${idBudgetPlanGroup}/delegate`}
+                passHref
+              >
+                <Button variant="warning" className="float-right" size="sm">
+                  Delegate
+                </Button>
+              </Link>
+            </Col>
+          </Row>
+        )}
+
         <Row>
           <Col lg={12}>
             <h4 className="profile-detail__info--title mb-1">Budget Code</h4>
@@ -392,16 +411,39 @@ const BudgetPlanGroupItemList: NextPage = () => {
               )}
             </h3>
           </Col>
+          {dataHookBudgetPlanItemGroup.data?.delegateAttachment && (
+            <Col lg={6}>
+              <h4 className="profile-detail__info--title mb-1">Delegate To</h4>
+              <h3 className="profile-detail__info--subtitle">
+                <Button
+                  variant="link"
+                  className="p-0"
+                  size="sm"
+                  onClick={() =>
+                    handleDownloadAttachment({
+                      fileName: dataHookBudgetPlanItemGroup.data
+                        ?.delegateAttachment as string,
+                      module: 'budget plan',
+                    })
+                  }
+                >
+                  <p className="mb-0">
+                    {`${dataHookBudgetPlanItemGroup.data?.delegateApprovalNrp} - ${dataHookBudgetPlanItemGroup.data?.delegateApprovalName}`}
+                  </p>
+                </Button>
+              </h3>
+            </Col>
+          )}
         </Row>
 
-        <br />
-
         {auditHook.data?.items && auditHook.data?.items.length > 0 && (
-          <AuditTimeline audit={auditHook.data} />
+          <>
+            <br />
+            <AuditTimeline audit={auditHook.data} />
+          </>
         )}
 
         <br />
-
         <Row>
           {dataHookBudgetPlanItemGroupItems.data && (
             <DataTable
@@ -424,7 +466,7 @@ const BudgetPlanGroupItemList: NextPage = () => {
               addOns={
                 canEdit(dataHookBudgetPlanItemGroup?.data?.status) && (
                   <Link
-                    href={`/budget-plans/${budgetPlanId}/${budgetPlanGroupId}/edit`}
+                    href={`/budget-plans/${idBudgetPlan}/${idBudgetPlanGroup}/edit`}
                     passHref
                   >
                     <Button variant="primary">Edit</Button>

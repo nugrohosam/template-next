@@ -80,10 +80,8 @@ const PurchaseRequestsIndex: NextPage = () => {
             <ButtonActions
               hrefDetail={`/purchase-requests/${cell.row.values.id}/detail`}
               hrefEdit={`/purchase-requests/${cell.row.values.id}/edit`}
-              // onDelete={() => {
-              //   if (confirm('Delete data?'))
-              //     deleteBudgetPeriod([cell.row.values.id]);
-              // }}
+              // TODO: add handle delete
+              // onDelete
             />
           );
         },
@@ -116,6 +114,7 @@ const PurchaseRequestsIndex: NextPage = () => {
                   size="sm"
                   className="mr-2"
                   disabled={false}
+                  // TODO: add handle delete
                   // onClick={() => handleDeleteMultiplePurchaseRequests}
                   isLoading={false}
                 >
@@ -126,6 +125,7 @@ const PurchaseRequestsIndex: NextPage = () => {
                   size="sm"
                   className="mr-2"
                   disabled={false}
+                  // TODO: add handle submit
                   // onClick={handleMultipleSubmitPurchaseRequests}
                   isLoading={false}
                 >

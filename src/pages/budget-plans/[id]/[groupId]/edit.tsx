@@ -69,6 +69,13 @@ const UpdateBudgetPlanItems: NextPage = () => {
     control,
     name: 'budgetPlanItems',
   });
+  const controlledFields =
+    fields.map((field, index) => {
+      return {
+        ...field,
+        ...(watchBudgetPlanItems && watchBudgetPlanItems[index]),
+      };
+    }) || [];
   const {
     isBuilding: watchIsBuilding,
     budgetPlanItems: watchBudgetPlanItems,
@@ -99,7 +106,7 @@ const UpdateBudgetPlanItems: NextPage = () => {
       dataHookBudgetPlanItemGroupItems.data?.items.map((item) => ({
         ...item,
         idAssetGroup: watchIsBuilding
-          ? item.assetGroup?.id
+          ? item.assetGroupId
           : item.catalog?.assetGroup?.id,
         idCapexCatalog: item.catalog?.id,
       })) || []
@@ -112,6 +119,7 @@ const UpdateBudgetPlanItems: NextPage = () => {
     delete data.outstandingPlanPaymentAttachmentFile;
     delete data.outstandingRetentionAttachmentFile;
     data.idCapexBudgetPlan = idBudgetPlan;
+    data.idBudgetPlanItemGroup = idBudgetPlanGroup;
     data.budgetPlanItems.map((item) => {
       delete item.catalog;
       return item;
@@ -370,7 +378,7 @@ const UpdateBudgetPlanItems: NextPage = () => {
             <SimpleTable
               classTable="table-admin table-inherit"
               columns={columns}
-              items={fields}
+              items={controlledFields}
               selectedRows={selectedRow}
               hiddenColumns={[
                 'items',

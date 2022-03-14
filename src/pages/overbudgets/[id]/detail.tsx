@@ -5,6 +5,7 @@ import ApproveModal from 'components/ui/Modal/ApproveModal';
 import RejectModal from 'components/ui/Modal/RejectModal';
 import ReviseModal from 'components/ui/Modal/ReviseModal';
 import AuditTimeline from 'components/ui/Timeline/AuditTimeline';
+import { Currency } from 'constants/currency';
 import { OverBudgetStatus } from 'constants/status';
 import { UserType } from 'constants/user';
 import { ApprovalField } from 'modules/approval/entities';
@@ -128,7 +129,7 @@ const DetailOverBudget: NextPage = () => {
             <h3 className="profile-detail__info--subtitle">
               {formatMoney(
                 dataHook?.data?.budgetReference.pricePerUnit,
-                currency
+                Currency.Idr
               )}
             </h3>
           </Col>
@@ -139,13 +140,16 @@ const DetailOverBudget: NextPage = () => {
               Additional Budget/Unit
             </h4>
             <h3 className="profile-detail__info--subtitle">
-              {formatMoney(dataHook?.data?.additionalBudgetPerUnit, currency)}
+              {formatMoney(
+                dataHook?.data?.additionalBudgetPerUnit,
+                Currency.Idr
+              )}
             </h3>
           </Col>
           <Col lg={6}>
             <h4 className="profile-detail__info--title mb-1">Over Budget</h4>
             <h3 className="profile-detail__info--subtitle">
-              {formatMoney(dataHook?.data?.overBudget, currency)}
+              {formatMoney(dataHook?.data?.overBudget, Currency.Idr)}
             </h3>
           </Col>
         </Row>

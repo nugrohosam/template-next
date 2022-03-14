@@ -81,39 +81,49 @@
 .table-admin {
   &.table,
   .table {
-    &.striped-sticky {
+    &.striped {
+      // striped for general
+      tr {
+        &:nth-child(even) {
+          background-color: #eeeeee;
+        }
+
+        &:nth-child(odd) {
+          background-color: #e0dfdf;
+        }
+      }
+      // striped for summary table (sticky first column)
+      &--summary {
+        tr:nth-child(even) td {
+          background-color: #eeeeee;
+        }
+
+        tr:nth-child(odd) td {
+          background-color: #e0dfdf;
+        }
+      }
+    }
+    &.summary-sticky {
       thead {
-        tr:nth-child(-n + 2) {
+        text-align: center;
+        tr:nth-child(2) th {
+          &:first-child {
+            left: 0;
+            z-index: 11;
+          }
           position: sticky;
           top: 0;
           z-index: 10;
         }
-        tr:nth-child(2) th:first-child {
-          position: sticky;
-          top: 0;
-          left: 0;
-        }
       }
       tbody {
+        tr:nth-last-child(4) td {
+          background-color: #f7f7f7;
+        }
         tr td:first-child {
           position: sticky;
           top: 0;
           left: 0;
-        }
-        tr {
-          &:nth-child(even) {
-            background-color: #eeeeee;
-            td {
-              background-color: #eeeeee;
-            }
-          }
-
-          &:nth-child(odd) {
-            background-color: #e0dfdf;
-            td {
-              background-color: #e0dfdf;
-            }
-          }
         }
       }
     }

@@ -2,20 +2,24 @@ import Panel from 'components/form/Panel';
 import { PathBreadcrumb } from 'components/ui/Breadcrumb';
 import DetailLayout from 'components/ui/DetailLayout';
 import InterveneModal from 'components/ui/Modal/InterveneModal';
-import DataTable, { usePaginateParams } from 'components/ui/Table/DataTable';
 import Loader from 'components/ui/Table/Loader';
+import SimpleTable from 'components/ui/Table/SimpleTable';
 import { PeriodeType } from 'constants/period';
 import { useFetchAssetGroupDetail } from 'modules/assetGroup/hook';
-import { AssetGroupSummary, InterveneField } from 'modules/summary/entities';
+import {
+  AssetGroupSummary,
+  InterveneField,
+  Summary,
+  TotalSummaryData,
+} from 'modules/summary/entities';
 import {
   useFetchAssetGroupSummary,
   useInterveneSummaryAssetGroup,
 } from 'modules/summary/hook';
 import { NextPage } from 'next';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
-import React from 'react';
-import { Button, Col, Container, Row } from 'react-bootstrap';
+import React, { useMemo } from 'react';
+import { Col, Row } from 'react-bootstrap';
 import { CellProps, Column } from 'react-table';
 import { toast } from 'react-toastify';
 import { showErrorMessage } from 'utils/helpers';
@@ -35,12 +39,81 @@ const SummaryByAssetGroup: NextPage = () => {
   const router = useRouter();
   const id = router.query.id as string;
 
-  const { params } = usePaginateParams();
-
   const assetGroupDetailHook = useFetchAssetGroupDetail(id);
-  const dataSummaryHook = useFetchAssetGroupSummary(id, params);
+  const dataSummaryHook = useFetchAssetGroupSummary(id);
+
+  const parsingDataHook = (data: any) => {
+    let summaryArr: any[] = [];
+    let totalArr: any[] = [
+      {
+        name: 'Total Pama Mining',
+        isCategory: true,
+      },
+      {
+        name: 'Total Pama Others',
+        isCategory: true,
+      },
+      {
+        name: 'Total Pama Parents',
+        isCategory: true,
+      },
+    ];
+
+    if (data.length !== 0) {
+      data.forEach((item: AssetGroupSummary, idx: number) => {
+        summaryArr.push({
+          name: item.districtType === 'Mining' ? 'PAMA MINING' : 'PAMA OTHERS',
+          isCategory: true,
+        });
+        if (item.summaryData.length !== 0) {
+          item.summaryData.forEach((summaryItem: Summary) => {
+            summaryArr.push({
+              ...summaryItem,
+              isCategory: false,
+            });
+            Object.keys(summaryItem).forEach((key) => {
+              if (key !== 'districtCode') {
+                totalArr[idx][`${key}`] = item.summaryData
+                  .map((prop) => prop[key as keyof TotalSummaryData])
+                  .reduce(
+                    (prevValue, currentValue) => prevValue + currentValue,
+                    0
+                  );
+              }
+            });
+          });
+        }
+      });
+      summaryArr.push({ isCategory: true });
+      Object.keys(totalArr[0]).forEach((key) => {
+        if (key !== 'name' && key !== 'isCategory') {
+          totalArr[2][`${key}`] = summaryArr
+            .filter((item) => !item.isCategory)
+            .map((prop) => prop[key as keyof TotalSummaryData])
+            .reduce((prevValue, currentValue) => prevValue + currentValue, 0);
+        }
+      });
+    }
+    const totalAmountAllDistrict = summaryArr
+      .filter((data) => data.totalMb)
+      .map((data) => data.totalMb)
+      .reduce(
+        (prevValue, currentValue) => prevValue + currentValue,
+        0
+      ) as number;
+
+    summaryArr = summaryArr.concat(totalArr);
+
+    return { summaryArr, totalAmountAllDistrict };
+  };
+
+  const parsedDataHook = useMemo<any>(
+    () => parsingDataHook(dataSummaryHook.data || []),
+    [dataSummaryHook.data]
+  );
 
   const interveneMutation = useInterveneSummaryAssetGroup();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleIntervene = (data: InterveneField) => {
     interveneMutation.mutate(
       {
@@ -68,243 +141,260 @@ const SummaryByAssetGroup: NextPage = () => {
     );
   };
 
-  const columns: Column<AssetGroupSummary>[] = [
-    {
-      Header: 'District',
-      id: 'district',
-      Cell: ({ row }: CellProps<AssetGroupSummary>) => {
-        return row.original.districtCode;
+  const columns = useMemo<Column<any>[]>(
+    () => [
+      {
+        Header: 'District',
+        accessor: 'name',
+        Cell: ({ row }: CellProps<any>) => {
+          return (
+            <div className={row.values.isCategory ? 'font-weight-bold' : ''}>
+              {row.values.isCategory
+                ? row.values.name
+                : row.original.districtCode}
+            </div>
+          );
+        },
+        minWidth: 160,
       },
-    },
-    {
-      Header: 'Current Period',
-      columns: [
-        {
-          Header: 'Actual YTD',
-          accessor: 'actualYtdCurrentPeriod',
-          Cell: ({ row }: CellProps<AssetGroupSummary>) => {
-            return row.values.actualYtdCurrentPeriod?.toLocaleString('id-Id');
+      {
+        Header: 'Current Period',
+        columns: [
+          {
+            Header: 'Actual YTD',
+            accessor: 'actualYtdCurrentPeriod',
+            Cell: ({ row }: CellProps<AssetGroupSummary>) => {
+              return (
+                row.values.actualYtdCurrentPeriod?.toLocaleString('id-Id') || ''
+              );
+            },
           },
-          minWidth: 140,
-        },
-        {
-          Header: 'Outstanding PR + PO',
-          accessor: 'outstandingPrPo',
-          Cell: ({ row }: CellProps<AssetGroupSummary>) => {
-            return row.values.actualYtdCurrentPeriod?.toLocaleString('id-Id');
+          {
+            Header: 'Outstanding PR + PO',
+            accessor: 'outstandingPrPo',
+            Cell: ({ row }: CellProps<AssetGroupSummary>) => {
+              return (
+                row.values.actualYtdCurrentPeriod?.toLocaleString('id-Id') || ''
+              );
+            },
           },
-          minWidth: 240,
-        },
-        {
-          Header: 'Outstanding Budgets',
-          accessor: 'outstandingBudgets',
-          Cell: ({ row }: CellProps<AssetGroupSummary>) => {
-            return row.values.outstandingBudgets?.toLocaleString('id-Id');
+          {
+            Header: 'Outstanding Budgets',
+            accessor: 'outstandingBudgets',
+            Cell: ({ row }: CellProps<AssetGroupSummary>) => {
+              return (
+                row.values.outstandingBudgets?.toLocaleString('id-Id') || ''
+              );
+            },
           },
-          minWidth: 240,
-        },
-        {
-          Header: 'Total Outstanding',
-          accessor: 'totalOutstanding',
-          Cell: ({ row }: CellProps<AssetGroupSummary>) => {
-            return row.values.totalOutstanding?.toLocaleString('id-Id');
+          {
+            Header: 'Total Outstanding',
+            accessor: 'totalOutstanding',
+            Cell: ({ row }: CellProps<AssetGroupSummary>) => {
+              return row.values.totalOutstanding?.toLocaleString('id-Id') || '';
+            },
           },
-          minWidth: 240,
-        },
-        {
-          Header: 'Total Estimate Full Year',
-          accessor: 'totalEstimateFullYearCurrentPeriod',
-          Cell: ({ row }: CellProps<AssetGroupSummary>) => {
-            return row.values.totalEstimateFullYearCurrentPeriod?.toLocaleString(
-              'id-Id'
-            );
+          {
+            Header: 'Total Estimate Full Year',
+            accessor: 'totalEstimateFullYearCurrentPeriod',
+            Cell: ({ row }: CellProps<AssetGroupSummary>) => {
+              return (
+                row.values.totalEstimateFullYearCurrentPeriod?.toLocaleString(
+                  'id-Id'
+                ) || ''
+              );
+            },
           },
-          minWidth: 260,
-        },
-      ],
-    },
-    {
-      Header: 'Adjustment Plan Capex Current Period',
-      columns: [
-        {
-          Header: 'Outstanding PR + PO',
-          accessor: 'adjustmentOutstandingPrPo',
-          Cell: ({ row }: CellProps<AssetGroupSummary>) => {
-            return row.values.adjustmentOutstandingPrPo?.toLocaleString(
-              'id-Id'
-            );
-          },
-          minWidth: 240,
-        },
-        {
-          Header: 'Outstanding Plan Budgets',
-          accessor: 'adjustmentOutstandingBudgets',
-          Cell: ({ row }: CellProps<AssetGroupSummary>) => {
-            return row.values.adjustmentOutstandingBudgets?.toLocaleString(
-              'id-Id'
-            );
-          },
-          minWidth: 240,
-        },
-        {
-          Header: 'Total',
-          accessor: 'totalAdjustmentCurrentPeriod',
-          Cell: ({ row }: CellProps<AssetGroupSummary>) => {
-            return row.values.totalAdjustmentCurrentPeriod?.toLocaleString(
-              'id-Id'
-            );
-          },
-          minWidth: 110,
-        },
-      ],
-    },
-    {
-      Header: 'Outstanding',
-      columns: [
-        {
-          Header: () => (
-            <div>
-              Plan S2 Current Period
-              <br /> (Incl OS PR-PO + Budgtes)
-            </div>
-          ),
-          accessor: 'outstandingPlanS2CurrentPeriod',
-          Cell: ({ row }: CellProps<AssetGroupSummary>) => {
-            return row.values.outstandingPlanS2CurrentPeriod?.toLocaleString(
-              'id-Id'
-            );
-          },
-          minWidth: 270,
-        },
-      ],
-    },
-    {
-      Header: 'Estimate',
-      columns: [
-        {
-          Header: () => (
-            <div>
-              Outlook
-              <br /> FY Current Period
-            </div>
-          ),
-          accessor: 'estimaterOutlookFyCurrentPeriod',
-          Cell: ({ row }: CellProps<AssetGroupSummary>) => {
-            return row.values.estimaterOutlookFyCurrentPeriod?.toLocaleString(
-              'id-Id'
-            );
-          },
-          minWidth: 180,
-        },
-      ],
-    },
-    {
-      Header: 'MB',
-      columns: [
-        {
-          Header: () => (
-            <div>
-              Approval
-              <br /> Capex
-            </div>
-          ),
-          accessor: 'approvalCapex',
-          Cell: ({ row }: CellProps<AssetGroupSummary>) => {
-            return row.values.approvalCapex?.toLocaleString('id-Id');
-          },
-          minWidth: 220,
-        },
-        {
-          Header: () => (
-            <div>
-              Carry Over
-              <br /> PR Previous Period
-            </div>
-          ),
-          accessor: 'carryOverPrPreviousePeriod',
-          Cell: ({ row }: CellProps<AssetGroupSummary>) => {
-            return row.values.carryOverPrPreviousePeriod?.toLocaleString(
-              'id-Id'
-            );
-          },
-          minWidth: 180,
-        },
-        {
-          Header: () => (
-            <div>
-              Carry Over
-              <br /> Plan Previous Period
-            </div>
-          ),
-          accessor: 'carryOverPlanPreviousePeriod',
-          Cell: ({ row }: CellProps<AssetGroupSummary>) => {
-            return row.values.carryOverPlanPreviousePeriod?.toLocaleString(
-              'id-Id'
-            );
-          },
-          minWidth: 200,
-        },
-        {
-          Header: 'Total',
-          accessor: 'totalMb',
-          Cell: ({ row }: CellProps<AssetGroupSummary>) => {
-            return row.values.totalMb?.toLocaleString('id-Id');
-          },
-          minWidth: 150,
-        },
-      ],
-    },
-    {
-      Header: () => (
-        <div>
-          MB VS OL FY
-          <br /> Current Period
-        </div>
-      ),
-      id: 'mbVsOl',
-      columns: [
-        {
-          id: 'mbVsOlFyCurrentPeriod',
-          accessor: 'mbVsOlFyCurrentPeriod',
-          Cell: ({ row }: CellProps<AssetGroupSummary>) => {
-            return row.values.mbVsOlFyCurrentPeriod?.toLocaleString('id-Id');
-          },
-          minWidth: 250,
-        },
-        {
-          id: 'mbVsOlFyCurrentPeriodPercentage',
-          accessor: 'mbVsOlFyCurrentPeriodPercentage',
-          Cell: ({ row }: CellProps<AssetGroupSummary>) => {
-            return row.values.mbVsOlFyCurrentPeriodPercentage?.toLocaleString(
-              'id-Id'
-            );
-          },
-          minWidth: 250,
-        },
-      ],
-    },
-    {
-      Header: 'Action',
-      accessor: 'districtCode',
-      Cell: ({ cell }: CellProps<AssetGroupSummary>) => {
-        return (
-          <InterveneModal
-            onSend={(data) => handleIntervene(data)}
-            interveneData={{
-              districtCode: cell.row.values.districtCode,
-              totalAmount: cell.row.values.totalMb,
-            }}
-          />
-        );
+        ],
       },
-      minWidth: 140,
-    },
-  ];
-
-  const totalAmountAllDistrict = dataSummaryHook?.data?.items
-    .filter((item) => item.totalMb)
-    .map((item) => item.totalMb)
-    .reduce((prevValue, currentValue) => prevValue + currentValue, 0) as number;
+      {
+        Header: 'Adjustment Plan Capex Current Period',
+        columns: [
+          {
+            Header: 'Outstanding PR + PO',
+            accessor: 'adjustmentOutstandingPrPo',
+            Cell: ({ row }: CellProps<AssetGroupSummary>) => {
+              return (
+                row.values.adjustmentOutstandingPrPo?.toLocaleString('id-Id') ||
+                ''
+              );
+            },
+          },
+          {
+            Header: 'Outstanding Plan Budgets',
+            accessor: 'adjustmentOutstandingBudgets',
+            Cell: ({ row }: CellProps<AssetGroupSummary>) => {
+              return (
+                row.values.adjustmentOutstandingBudgets?.toLocaleString(
+                  'id-Id'
+                ) || ''
+              );
+            },
+          },
+          {
+            Header: 'Total',
+            accessor: 'totalAdjustmentCurrentPeriod',
+            Cell: ({ row }: CellProps<AssetGroupSummary>) => {
+              return (
+                row.values.totalAdjustmentCurrentPeriod?.toLocaleString(
+                  'id-Id'
+                ) || ''
+              );
+            },
+          },
+        ],
+      },
+      {
+        Header: 'Outstanding',
+        columns: [
+          {
+            Header: () => (
+              <div>
+                Plan S2 Current Period
+                <br /> (Incl OS PR-PO + Budgtes)
+              </div>
+            ),
+            accessor: 'outstandingPlanS2CurrentPeriod',
+            Cell: ({ row }: CellProps<AssetGroupSummary>) => {
+              return (
+                row.values.outstandingPlanS2CurrentPeriod?.toLocaleString(
+                  'id-Id'
+                ) || ''
+              );
+            },
+          },
+        ],
+      },
+      {
+        Header: 'Estimate',
+        columns: [
+          {
+            Header: () => (
+              <div>
+                Outlook
+                <br /> FY Current Period
+              </div>
+            ),
+            accessor: 'estimaterOutlookFyCurrentPeriod',
+            Cell: ({ row }: CellProps<AssetGroupSummary>) => {
+              return (
+                row.values.estimaterOutlookFyCurrentPeriod?.toLocaleString(
+                  'id-Id'
+                ) || ''
+              );
+            },
+          },
+        ],
+      },
+      {
+        Header: 'MB',
+        columns: [
+          {
+            Header: () => (
+              <div>
+                Approval
+                <br /> Capex
+              </div>
+            ),
+            accessor: 'approvalCapex',
+            Cell: ({ row }: CellProps<AssetGroupSummary>) => {
+              return row.values.approvalCapex?.toLocaleString('id-Id') || '';
+            },
+          },
+          {
+            Header: () => (
+              <div>
+                Carry Over
+                <br /> PR Previous Period
+              </div>
+            ),
+            accessor: 'carryOverPrPreviousePeriod',
+            Cell: ({ row }: CellProps<AssetGroupSummary>) => {
+              return (
+                row.values.carryOverPrPreviousePeriod?.toLocaleString(
+                  'id-Id'
+                ) || ''
+              );
+            },
+          },
+          {
+            Header: () => (
+              <div>
+                Carry Over
+                <br /> Plan Previous Period
+              </div>
+            ),
+            accessor: 'carryOverPlanPreviousePeriod',
+            Cell: ({ row }: CellProps<AssetGroupSummary>) => {
+              return (
+                row.values.carryOverPlanPreviousePeriod?.toLocaleString(
+                  'id-Id'
+                ) || ''
+              );
+            },
+          },
+          {
+            Header: 'Total',
+            accessor: 'totalMb',
+            Cell: ({ row }: CellProps<AssetGroupSummary>) => {
+              return row.values.totalMb?.toLocaleString('id-Id') || '';
+            },
+          },
+        ],
+      },
+      {
+        Header: () => (
+          <div>
+            MB VS OL FY
+            <br /> Current Period
+          </div>
+        ),
+        id: 'mbVsOl',
+        columns: [
+          {
+            id: 'mbVsOlFyCurrentPeriod',
+            accessor: 'mbVsOlFyCurrentPeriod',
+            Cell: ({ row }: CellProps<AssetGroupSummary>) => {
+              return (
+                row.values.mbVsOlFyCurrentPeriod?.toLocaleString('id-Id') || ''
+              );
+            },
+          },
+          {
+            id: 'mbVsOlFyCurrentPeriodPercentage',
+            accessor: 'mbVsOlFyCurrentPeriodPercentage',
+            Cell: ({ row }: CellProps<AssetGroupSummary>) => {
+              return (
+                row.values.mbVsOlFyCurrentPeriodPercentage
+                  ?.toLocaleString('id-Id')
+                  .concat('%') || ''
+              );
+            },
+          },
+        ],
+      },
+      {
+        Header: 'Action',
+        accessor: 'isCategory',
+        Cell: ({ row }: CellProps<Summary>) => {
+          return (
+            (!row.values.isCategory && (
+              <InterveneModal
+                onSend={(data) => handleIntervene(data)}
+                interveneData={{
+                  districtCode: row.original.districtCode,
+                  totalAmount: row.original.totalMb,
+                }}
+              />
+            )) ||
+            ''
+          );
+        },
+        minWidth: 140,
+      },
+    ],
+    [handleIntervene]
+  );
 
   return (
     <>
@@ -360,22 +450,21 @@ const SummaryByAssetGroup: NextPage = () => {
         </Panel>
         <Panel>
           <Row>
-            {dataSummaryHook.data && (
-              <DataTable
-                columns={columns}
-                data={dataSummaryHook.data}
-                classThead="text-nowrap"
-                classTable="table-admin striped-sticky"
-                addOns={
-                  <InterveneModal
-                    onSend={(data) => handleIntervene(data)}
-                    interveneData={{
-                      totalAmount: totalAmountAllDistrict,
-                    }}
-                  />
-                }
-              />
-            )}
+            <SimpleTable
+              columns={columns}
+              items={parsedDataHook.summaryArr}
+              isLoading={dataSummaryHook.isFetching}
+              classTable="table-admin striped--summary summary-sticky"
+              classThead="text-nowrap"
+              addOns={
+                <InterveneModal
+                  onSend={(data) => handleIntervene(data)}
+                  interveneData={{
+                    totalAmount: parsedDataHook.totalAmountAllDistrict,
+                  }}
+                />
+              }
+            />
           </Row>
         </Panel>
       </DetailLayout>

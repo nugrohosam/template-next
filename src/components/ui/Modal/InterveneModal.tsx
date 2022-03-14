@@ -2,6 +2,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import Input from 'components/form/Input';
 import SingleSelect from 'components/form/SingleSelect';
 import ModalBox from 'components/ui/Modal';
+import { Currency } from 'constants/currency';
 import { InterveneData, InterveneField } from 'modules/summary/entities';
 import React, { useEffect } from 'react';
 import {
@@ -13,6 +14,7 @@ import {
   Row,
 } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
+import { formatMoney } from 'utils/helpers';
 import * as yup from 'yup';
 
 interface InterveneModalProps {
@@ -51,10 +53,11 @@ const InterveneModal: React.FC<InterveneModalProps> = ({
   useEffect(() => {
     if (watchForm.intervene) {
       if (watchForm.type === 'PERCENTAGE') {
+        const percentageValue =
+          interveneData.totalAmount * (watchForm.intervene / 100);
         setValue(
           'amountLimitation',
-          interveneData.totalAmount -
-            watchForm.intervene / (interveneData.totalAmount * 100)
+          interveneData.totalAmount - percentageValue
         );
       } else {
         setValue(
@@ -104,7 +107,7 @@ const InterveneModal: React.FC<InterveneModalProps> = ({
               <FormLabel className="required">Total Amount</FormLabel>
               <FormControl
                 type="text"
-                value={interveneData.totalAmount}
+                value={formatMoney(interveneData.totalAmount, Currency.Idr)}
                 disabled
               />
             </FormGroup>

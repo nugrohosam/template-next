@@ -1,4 +1,4 @@
-import { Paginate, PaginateParams, ResponseError } from 'modules/common/types';
+import { ResponseError } from 'modules/common/types';
 import {
   useMutation,
   UseMutationResult,
@@ -10,12 +10,11 @@ import { fetchAssetGroupSummary, interveneSummaryAssetGroup } from './api';
 import { AssetGroupSummary, InterveneField } from './entities';
 
 export const useFetchAssetGroupSummary = (
-  idAssetGroup: string,
-  params: PaginateParams
-): UseQueryResult<Paginate<AssetGroupSummary>, ResponseError> => {
+  idAssetGroup: string
+): UseQueryResult<AssetGroupSummary, ResponseError> => {
   return useQuery(
-    ['asset-group-summary', idAssetGroup, params],
-    () => fetchAssetGroupSummary(idAssetGroup, params),
+    ['asset-group-summary', idAssetGroup],
+    () => fetchAssetGroupSummary(idAssetGroup),
     { enabled: !!idAssetGroup }
   );
 };

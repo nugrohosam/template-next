@@ -21,6 +21,7 @@ export type ItemOfBudgetPlanItem = {
 
 export interface BudgetPlanItemForm {
   idCapexBudgetPlan: string;
+  idBudgetPlanItemGroup: string;
   outstandingPlanPaymentAttachment?: string | null;
   outstandingRetentionAttachment?: string | null;
   isBuilding: boolean;

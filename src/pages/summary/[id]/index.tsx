@@ -1,11 +1,15 @@
 import Panel from 'components/form/Panel';
+import { customStyles } from 'components/form/SingleSelect';
 import { PathBreadcrumb } from 'components/ui/Breadcrumb';
 import DetailLayout from 'components/ui/DetailLayout';
 import InterveneModal from 'components/ui/Modal/InterveneModal';
 import Loader from 'components/ui/Table/Loader';
 import SimpleTable from 'components/ui/Table/SimpleTable';
 import { PeriodeType } from 'constants/period';
+import { useAssetGroupOptions } from 'modules/assetGroup/helpers';
 import { useFetchAssetGroupDetail } from 'modules/assetGroup/hook';
+import { useDecodeToken } from 'modules/custom/useDecodeToken';
+import { useDistrictOptions } from 'modules/custom/useDistrictOptions';
 import {
   AssetGroupSummary,
   InterveneField,
@@ -13,13 +17,15 @@ import {
   TotalSummaryData,
 } from 'modules/summary/entities';
 import {
+  useFetchActiveBudgetPlan,
   useFetchAssetGroupSummary,
   useInterveneSummaryAssetGroup,
 } from 'modules/summary/hook';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Col, Row } from 'react-bootstrap';
+import Select from 'react-select';
 import { CellProps, Column } from 'react-table';
 import { toast } from 'react-toastify';
 import { showErrorMessage } from 'utils/helpers';
@@ -38,9 +44,29 @@ const breadCrumb: PathBreadcrumb[] = [
 const SummaryByAssetGroup: NextPage = () => {
   const router = useRouter();
   const id = router.query.id as string;
+  const [profile] = useDecodeToken();
+  const [districtOptions] = useDistrictOptions();
+  const assetGroupOptions = useAssetGroupOptions();
 
+  const [districts, setDistricts] = useState('');
   const assetGroupDetailHook = useFetchAssetGroupDetail(id);
-  const dataSummaryHook = useFetchAssetGroupSummary(id);
+  const { data: dataActiveBudgetPlanHook } = useFetchActiveBudgetPlan({
+    departmentCode: profile?.job_group as string,
+    districtCode: profile?.district_code as string,
+    divisionCode: profile?.division as string,
+  });
+  const dataSummaryHook = useFetchAssetGroupSummary(id, {
+    year: dataActiveBudgetPlanHook?.periodYear as number,
+    period: dataActiveBudgetPlanHook?.periodType as PeriodeType,
+    districts,
+  });
+
+  const style = {
+    ...customStyles(),
+    menu: () => ({
+      zIndex: 99,
+    }),
+  };
 
   const parsingDataHook = (data: any) => {
     let summaryArr: any[] = [];
@@ -122,9 +148,8 @@ const SummaryByAssetGroup: NextPage = () => {
           ...data,
           assetGroupCode: assetGroupDetailHook.data?.assetGroupCode as string,
           amountLimitation: data.amountLimitation,
-          // TODO: year & period get from API
-          year: 2022,
-          period: PeriodeType.Mb,
+          year: dataActiveBudgetPlanHook?.periodYear as number,
+          period: dataActiveBudgetPlanHook?.periodType as PeriodeType,
         },
       },
       {
@@ -340,6 +365,13 @@ const SummaryByAssetGroup: NextPage = () => {
               return row.values.totalMb?.toLocaleString('id-Id') || '';
             },
           },
+          {
+            Header: 'Intervene',
+            accessor: 'intervene',
+            Cell: ({ row }: CellProps<AssetGroupSummary>) => {
+              return row.values.intervene?.toLocaleString('id-Id') || '';
+            },
+          },
         ],
       },
       {
@@ -352,6 +384,7 @@ const SummaryByAssetGroup: NextPage = () => {
         id: 'mbVsOl',
         columns: [
           {
+            Header: 'Amount',
             id: 'mbVsOlFyCurrentPeriod',
             accessor: 'mbVsOlFyCurrentPeriod',
             Cell: ({ row }: CellProps<AssetGroupSummary>) => {
@@ -361,6 +394,7 @@ const SummaryByAssetGroup: NextPage = () => {
             },
           },
           {
+            Header: '(%)',
             id: 'mbVsOlFyCurrentPeriodPercentage',
             accessor: 'mbVsOlFyCurrentPeriodPercentage',
             Cell: ({ row }: CellProps<AssetGroupSummary>) => {
@@ -404,33 +438,20 @@ const SummaryByAssetGroup: NextPage = () => {
         paths={breadCrumb}
       >
         <Panel>
-          {/* TODO: data di atas tabel summary masih hardcode */}
           {assetGroupDetailHook.isLoading && <Loader size="sm" />}
 
           <Row>
             <Col lg={6}>
               <h4 className="profile-detail__info--title mb-1">Year</h4>
-              <h3 className="profile-detail__info--subtitle">2022</h3>
+              <h3 className="profile-detail__info--subtitle">
+                {dataActiveBudgetPlanHook?.periodYear}
+              </h3>
             </Col>
             <Col lg={6}>
               <h4 className="profile-detail__info--title mb-1">Period</h4>
-              <h3 className="profile-detail__info--subtitle">MB</h3>
-            </Col>
-          </Row>
-
-          <br />
-          <Row>
-            <Col lg={6}>
-              <h4 className="profile-detail__info--title mb-1">
-                Summary Currency
-              </h4>
-              <h3 className="profile-detail__info--subtitle">USD</h3>
-            </Col>
-            <Col lg={6}>
-              <h4 className="profile-detail__info--title mb-1">
-                Currency Rate
-              </h4>
-              <h3 className="profile-detail__info--subtitle">14.500</h3>
+              <h3 className="profile-detail__info--subtitle">
+                {dataActiveBudgetPlanHook?.periodType}
+              </h3>
             </Col>
           </Row>
 
@@ -438,13 +459,35 @@ const SummaryByAssetGroup: NextPage = () => {
           <Row>
             <Col lg={6}>
               <h4 className="profile-detail__info--title mb-1">Asset Group</h4>
-              <h3 className="profile-detail__info--subtitle">
-                {assetGroupDetailHook?.data?.assetGroup}
-              </h3>
+              <Select
+                className="mb-2 mb-lg-0"
+                instanceId="assetGroup"
+                placeholder="Select Asset Group"
+                isClearable
+                value={assetGroupOptions.find((item) => item.value === id)}
+                options={assetGroupOptions}
+                styles={style}
+                onChange={(val) => {
+                  if (val) {
+                    router.push(`/summary/${val.value}`);
+                  }
+                }}
+              />
             </Col>
             <Col lg={6}>
               <h4 className="profile-detail__info--title mb-1">District</h4>
-              <h3 className="profile-detail__info--subtitle">District Code</h3>
+              <Select
+                instanceId="districts"
+                placeholder="Select District"
+                isMulti
+                isClearable
+                options={districtOptions}
+                selected={id}
+                styles={style}
+                onChange={(val) => {
+                  setDistricts(val.map((item) => item.value).join());
+                }}
+              />
             </Col>
           </Row>
         </Panel>

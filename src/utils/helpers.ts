@@ -95,6 +95,8 @@ export const parseMenuToUrl = (menu: string) => {
       ? '/overbudgets'
       : menu === 'reclass'
       ? '/reclass'
+      : menu === 'purchase request capex'
+      ? 'purchase-requests'
       : '/';
   return url;
 };

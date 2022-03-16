@@ -178,6 +178,7 @@ const NonBuildingUnbudgetModal: React.FC<UnbudgetModalProps> = ({
         ...initDefaultValues(),
         idAssetGroup: inPageUpdate.idAssetGroup,
         currency: inPageUpdate.currency,
+        currencyRate: currencyRate,
       });
     }
   };

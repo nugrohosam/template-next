@@ -367,7 +367,6 @@ const UpdateBudgetPlanItems: NextPage = () => {
       backButtonClick={router.back}
       title="Update Budget Plan Items"
     >
-      {JSON.stringify(errors)}
       <Panel>
         <Form onSubmit={handleSubmit(submitUpdateBudgetPlanItems)}>
           <Row>

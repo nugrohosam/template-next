@@ -192,6 +192,7 @@ const NonBuildingBudgetPlanItemModal: React.FC<
         ...initDefaultValues(),
         idAssetGroup: inPageUpdate.idAssetGroup,
         currency: inPageUpdate.currency,
+        currencyRate: currencyRate,
       });
     }
   };

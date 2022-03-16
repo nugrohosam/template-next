@@ -47,10 +47,10 @@ const IsBuildingBudgetPlanItemModal: React.FC<
   onSend,
   classButton,
   buttonTitle,
+  inPageUpdate,
   isEdit,
   myItem,
   title,
-  onClickModal,
 }) => {
   /**
    * Handle form
@@ -122,7 +122,6 @@ const IsBuildingBudgetPlanItemModal: React.FC<
   };
 
   const onModalOpened = () => {
-    onClickModal && onClickModal();
     setValue('currencyRate', currencyRate);
     if (isEdit) {
       reset({
@@ -139,6 +138,18 @@ const IsBuildingBudgetPlanItemModal: React.FC<
             );
             return foundMonth || prev;
           }) || [],
+      });
+    } else if (inPageUpdate) {
+      /**
+       * special condition when create item in update page,
+       * field idAssetGroup and currency will disable.
+       * Because the value will get from index 0 budget plan items
+       */
+      reset({
+        ...initDefaultValues(),
+        idAssetGroup: inPageUpdate.idAssetGroup,
+        currency: inPageUpdate.currency,
+        currencyRate: currencyRate,
       });
     }
   };
@@ -211,6 +222,7 @@ const IsBuildingBudgetPlanItemModal: React.FC<
               defaultValue=""
               placeholder="Asset Group"
               options={assetGroupOptions}
+              isDisabled={!!inPageUpdate || isEdit}
               error={errors.idAssetGroup?.message}
             />
           </FormGroup>
@@ -224,6 +236,7 @@ const IsBuildingBudgetPlanItemModal: React.FC<
               defaultValue=""
               placeholder="Currency"
               options={currencyOptions}
+              isDisabled={!!inPageUpdate || isEdit}
               error={errors.currency?.message}
             />
           </FormGroup>

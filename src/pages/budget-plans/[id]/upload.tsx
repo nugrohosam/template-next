@@ -90,7 +90,7 @@ const UploadBudgetPlanItem: NextPage = () => {
               disabled={mutationUploadBudgetPlanItems.isLoading}
               isLoading={mutationUploadBudgetPlanItems.isLoading}
             >
-              Upload
+              Submit
             </LoadingButton>
           </Col>
         </Form>

@@ -92,7 +92,7 @@ export const useBudgetPlanItemHelpers = () => {
   const handleUploadBudgetPlanItems = (data: UploadBudgetPlanItemUForm) => {
     const formData = new FormData();
     formData.append('file', data.file[0]);
-    formData.append('idBudgetPlan', data.idBudgetPlan);
+    formData.append('id_budget_plan', data.idBudgetPlan);
 
     return new Promise((resolve, reject) => {
       mutationUploadBudgetPlanItems.mutate(formData, {

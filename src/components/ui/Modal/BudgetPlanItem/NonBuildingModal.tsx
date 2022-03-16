@@ -56,6 +56,7 @@ const NonBuildingBudgetPlanItemModal: React.FC<
   isEdit,
   myItem,
   title,
+  onClickModal,
 }) => {
   /**
    * Handle form
@@ -76,6 +77,7 @@ const NonBuildingBudgetPlanItemModal: React.FC<
   const { fields } = useFieldArray({
     control,
     name: 'items',
+    keyName: 'key',
   });
   const {
     currency: watchCurrency,
@@ -162,6 +164,7 @@ const NonBuildingBudgetPlanItemModal: React.FC<
   };
 
   const onModalOpened = () => {
+    onClickModal && onClickModal();
     setValue('currencyRate', currencyRate);
     if (isEdit) {
       reset({

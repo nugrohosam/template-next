@@ -43,7 +43,15 @@ const schema = yup.object().shape({
 
 const IsBuildingBudgetPlanItemModal: React.FC<
   BudgetPlanItemModalProps & { title: string }
-> = ({ onSend, classButton, buttonTitle, isEdit, myItem, title }) => {
+> = ({
+  onSend,
+  classButton,
+  buttonTitle,
+  isEdit,
+  myItem,
+  title,
+  onClickModal,
+}) => {
   /**
    * Handle form
    */
@@ -63,6 +71,7 @@ const IsBuildingBudgetPlanItemModal: React.FC<
   const { fields } = useFieldArray({
     control,
     name: 'items',
+    keyName: 'key',
   });
   const {
     currency: watchCurrency,
@@ -113,6 +122,7 @@ const IsBuildingBudgetPlanItemModal: React.FC<
   };
 
   const onModalOpened = () => {
+    onClickModal && onClickModal();
     setValue('currencyRate', currencyRate);
     if (isEdit) {
       reset({
@@ -121,7 +131,7 @@ const IsBuildingBudgetPlanItemModal: React.FC<
         currency: myItem?.currency,
         currencyRate: myItem?.currencyRate,
         id: myItem?.id,
-        detail: myItem?.detail,
+        detail: myItem?.detail || '',
         items:
           initItems().map((prev) => {
             const foundMonth = myItem?.items.find(
@@ -211,6 +221,7 @@ const IsBuildingBudgetPlanItemModal: React.FC<
             <SingleSelect
               name="currency"
               control={control}
+              defaultValue=""
               placeholder="Currency"
               options={currencyOptions}
               error={errors.currency?.message}

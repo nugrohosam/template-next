@@ -13,4 +13,5 @@ export type Profile = {
   role: string;
   type: string;
   division: string;
+  user_id: string;
 };

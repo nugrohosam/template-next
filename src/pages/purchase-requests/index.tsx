@@ -142,8 +142,10 @@ const PurchaseRequestsIndex: NextPage = () => {
                       <Select
                         placeholder="Select Status"
                         isClearable
-                        // TODO: confirm statusnya apa aja
-                        options={overBudgetStatusOptions}
+                        options={[
+                          { label: 'DRAFT', value: 'DRAFT' },
+                          { label: 'SUBMIT', value: 'SUBMIT' },
+                        ]}
                         styles={{
                           ...customStyles(),
                           menu: () => ({

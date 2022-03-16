@@ -120,6 +120,7 @@ const CreateBudgetPlanItem: NextPage = () => {
             buttonTitle="Edit"
             myItem={row.values as BudgetPlanItemOfBudgetPlanItemForm}
             isBuilding={watchIsBuilding}
+            onClickModal={() => clearErrors()}
           ></BudgetPlanItemModal>
         </div>
       ),
@@ -360,6 +361,7 @@ const CreateBudgetPlanItem: NextPage = () => {
                   <BudgetPlanItemModal
                     isBuilding={watchIsBuilding}
                     onSend={append}
+                    onClickModal={() => clearErrors()}
                   />
                 </div>
               }

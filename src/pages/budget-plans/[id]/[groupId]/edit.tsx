@@ -153,6 +153,7 @@ const UpdateBudgetPlanItems: NextPage = () => {
               buttonTitle="Edit"
               myItem={row.values as BudgetPlanItemOfBudgetPlanItemForm}
               isBuilding={watchIsBuilding}
+              onClickModal={() => clearErrors()}
             ></BudgetPlanItemModal>
           </div>
         ),
@@ -357,7 +358,7 @@ const UpdateBudgetPlanItems: NextPage = () => {
         ),
       },
     ],
-    [update, watchIsBuilding]
+    [clearErrors, update, watchIsBuilding]
   );
 
   return (
@@ -389,6 +390,7 @@ const UpdateBudgetPlanItems: NextPage = () => {
                     <Checkbox
                       label="Is Building"
                       name="isBuilding"
+                      defaultValue=""
                       control={control}
                       disabled={true}
                     ></Checkbox>
@@ -402,6 +404,7 @@ const UpdateBudgetPlanItems: NextPage = () => {
                         currency: watchBudgetPlanItems[0]?.currency,
                       },
                     })}
+                    onClickModal={() => clearErrors()}
                   ></BudgetPlanItemModal>
                 </div>
               }

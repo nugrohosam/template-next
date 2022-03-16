@@ -43,7 +43,15 @@ const schema = yup.object().shape({
 
 const IsBuildingBudgetPlanItemModal: React.FC<
   BudgetPlanItemModalProps & { title: string }
-> = ({ onSend, classButton, buttonTitle, isEdit, myItem, title }) => {
+> = ({
+  onSend,
+  classButton,
+  buttonTitle,
+  inPageUpdate,
+  isEdit,
+  myItem,
+  title,
+}) => {
   /**
    * Handle form
    */
@@ -63,6 +71,7 @@ const IsBuildingBudgetPlanItemModal: React.FC<
   const { fields } = useFieldArray({
     control,
     name: 'items',
+    keyName: 'key',
   });
   const {
     currency: watchCurrency,
@@ -121,7 +130,7 @@ const IsBuildingBudgetPlanItemModal: React.FC<
         currency: myItem?.currency,
         currencyRate: myItem?.currencyRate,
         id: myItem?.id,
-        detail: myItem?.detail,
+        detail: myItem?.detail || '',
         items:
           initItems().map((prev) => {
             const foundMonth = myItem?.items.find(
@@ -129,6 +138,18 @@ const IsBuildingBudgetPlanItemModal: React.FC<
             );
             return foundMonth || prev;
           }) || [],
+      });
+    } else if (inPageUpdate) {
+      /**
+       * special condition when create item in update page,
+       * field idAssetGroup and currency will disable.
+       * Because the value will get from index 0 budget plan items
+       */
+      reset({
+        ...initDefaultValues(),
+        idAssetGroup: inPageUpdate.idAssetGroup,
+        currency: inPageUpdate.currency,
+        currencyRate: currencyRate,
       });
     }
   };
@@ -201,6 +222,7 @@ const IsBuildingBudgetPlanItemModal: React.FC<
               defaultValue=""
               placeholder="Asset Group"
               options={assetGroupOptions}
+              isDisabled={!!inPageUpdate || isEdit}
               error={errors.idAssetGroup?.message}
             />
           </FormGroup>
@@ -211,8 +233,10 @@ const IsBuildingBudgetPlanItemModal: React.FC<
             <SingleSelect
               name="currency"
               control={control}
+              defaultValue=""
               placeholder="Currency"
               options={currencyOptions}
+              isDisabled={!!inPageUpdate || isEdit}
               error={errors.currency?.message}
             />
           </FormGroup>

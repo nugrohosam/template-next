@@ -76,6 +76,7 @@ const NonBuildingBudgetPlanItemModal: React.FC<
   const { fields } = useFieldArray({
     control,
     name: 'items',
+    keyName: 'key',
   });
   const {
     currency: watchCurrency,
@@ -119,7 +120,12 @@ const NonBuildingBudgetPlanItemModal: React.FC<
   const assetGroupOptions = useAssetGroupOptions().filter(
     (item) => item.label !== 'Building'
   );
-  const catalogOptions = useCatalogOptions(watchIdAssetGroup);
+  const catalogOptions = useCatalogOptions(watchIdAssetGroup).filter((item) => {
+    if (!!inPageUpdate || isEdit) {
+      return item.primaryCurrency === watchCurrency;
+    }
+    return true;
+  });
 
   const changeCatalog = (idCapexCatalog: string) => {
     const found = catalogOptions.find((item) => item.id === idCapexCatalog);
@@ -189,6 +195,7 @@ const NonBuildingBudgetPlanItemModal: React.FC<
         ...initDefaultValues(),
         idAssetGroup: inPageUpdate.idAssetGroup,
         currency: inPageUpdate.currency,
+        currencyRate: currencyRate,
       });
     }
   };
@@ -277,7 +284,7 @@ const NonBuildingBudgetPlanItemModal: React.FC<
               placeholder="Asset Group"
               options={assetGroupOptions}
               error={errors.idAssetGroup?.message}
-              isDisabled={!!inPageUpdate}
+              isDisabled={!!inPageUpdate || isEdit}
               onChange={() => {
                 setValue('idCapexCatalog', '');
                 setValue('currency', null);
@@ -310,7 +317,7 @@ const NonBuildingBudgetPlanItemModal: React.FC<
               placeholder="Currency"
               options={currencyOptions}
               error={errors.currency?.message}
-              isDisabled={!!inPageUpdate}
+              isDisabled={true}
               onChange={(val) => changeCurrency(val.value as Currency)}
             />
           </FormGroup>
@@ -318,13 +325,10 @@ const NonBuildingBudgetPlanItemModal: React.FC<
         <Col lg={6}>
           <FormGroup>
             <FormLabel>Price/Unit</FormLabel>
-            <Input
-              name="pricePerUnit"
-              control={control}
-              defaultValue={0}
-              type="number"
+            <FormControl
+              type="text"
+              value={formatMoney(watchPricePerUnit, watchCurrency)}
               disabled
-              error={errors.pricePerUnit?.message}
             />
           </FormGroup>
         </Col>

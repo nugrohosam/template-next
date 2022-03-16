@@ -13,6 +13,7 @@ export interface BudgetPlanItemModalProps {
   isBuilding?: boolean;
   myItem?: BudgetPlanItemOfBudgetPlanItemForm;
   buttonTitle?: string;
+  onClickModal?: () => void;
 }
 
 const BudgetPlanItemModal: React.FC<BudgetPlanItemModalProps> = ({
@@ -23,6 +24,7 @@ const BudgetPlanItemModal: React.FC<BudgetPlanItemModalProps> = ({
   isBuilding = false,
   myItem,
   buttonTitle = '+ Add Item',
+  onClickModal,
 }) => {
   const props = {
     onSend,
@@ -33,6 +35,7 @@ const BudgetPlanItemModal: React.FC<BudgetPlanItemModalProps> = ({
     isBuilding,
     buttonTitle,
     title: `${isEdit ? 'Edit ' : 'Add'} Budget Plan Item`,
+    onClickModal,
   };
 
   return (

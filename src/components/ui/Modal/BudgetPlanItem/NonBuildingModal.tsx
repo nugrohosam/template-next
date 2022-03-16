@@ -314,7 +314,7 @@ const NonBuildingBudgetPlanItemModal: React.FC<
               placeholder="Currency"
               options={currencyOptions}
               error={errors.currency?.message}
-              isDisabled={!!inPageUpdate}
+              isDisabled={true}
               onChange={(val) => changeCurrency(val.value as Currency)}
             />
           </FormGroup>

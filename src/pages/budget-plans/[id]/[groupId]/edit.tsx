@@ -76,6 +76,8 @@ const UpdateBudgetPlanItems: NextPage = () => {
     outstandingPlanPaymentAttachmentFile:
       watchOutstandingPlanPaymentAttachmentFile,
     outstandingRetentionAttachmentFile: watchOutstandingRetentionAttachmentFile,
+    outstandingPlanPaymentAttachment: watchOutstandingPlanPaymentAttachment,
+    outstandingRetentionAttachment: watchOutstandingRetentionAttachment,
   } = watch();
 
   useEffect(() => {
@@ -431,7 +433,10 @@ const UpdateBudgetPlanItems: NextPage = () => {
                     <FileInput
                       name="outstandingPlanPaymentAttachmentFile"
                       control={control}
-                      placeholder="Upload Excel File"
+                      placeholder={
+                        watchOutstandingPlanPaymentAttachment ||
+                        'Upload Excel File'
+                      }
                       error={errors.outstandingPlanPaymentAttachment?.message}
                     />
                     <Button
@@ -464,7 +469,10 @@ const UpdateBudgetPlanItems: NextPage = () => {
                     <FileInput
                       name="outstandingRetentionAttachmentFile"
                       control={control}
-                      placeholder="Upload Excel File"
+                      placeholder={
+                        watchOutstandingRetentionAttachment ||
+                        'Upload Excel File'
+                      }
                       error={errors.outstandingRetentionAttachment?.message}
                     />
                     <Button

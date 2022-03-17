@@ -14,13 +14,15 @@ export enum BudgetPlanItemGroupStatus {
 
 export const BudgetPlanItemGroupStatusOptions = [
   { label: 'DRAFT', value: BudgetPlanItemGroupStatus.Draft },
+  { label: 'REVISE', value: BudgetPlanItemGroupStatus.Revise },
   {
     label: 'WAITING APPROVAL',
     value: BudgetPlanItemGroupStatus.WaitingApproval,
   },
-  { label: 'REJECT', value: BudgetPlanItemGroupStatus.Reject },
   {
     label: 'WAITING APPROVAL PIC ASSET HO',
     value: BudgetPlanItemGroupStatus.WaitingApprovalPicAssetHo,
   },
+  { label: 'FINAL', value: BudgetPlanItemGroupStatus.Final },
+  { label: 'REJECT', value: BudgetPlanItemGroupStatus.Reject },
 ];

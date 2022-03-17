@@ -46,7 +46,7 @@ const PurchaseRequestsIndex: NextPage = () => {
         Header: 'Estimate Price (USD)',
         accessor: 'estimatedPriceUsd',
         Cell: ({ row }: CellProps<PurchaseRequest>) =>
-          formatMoney(row.values.estimatedPriceUsd, Currency.Usd, '-'),
+          formatMoney(row.values.estimatedPriceUsd, Currency.Usd),
       },
       { Header: 'Requested By', accessor: 'requestedBy' },
       { Header: 'Supplier Option Code', accessor: 'supplierRecommendation' },

@@ -262,10 +262,18 @@ const EditPeriodActual: NextPage = () => {
     if (type === PicType.SITE) {
       setMyPicsSite((prev) => {
         const newPic = [...prev];
-        const findCheckedBudgetCode = newPic.find((x) => x.isBudgetCodeDefault);
+        const filterSameDistrict = newPic.filter(
+          (x) => x.districtCode === newPic[indexTo].districtCode
+        );
+        const findCheckedBudgetCode = filterSameDistrict.find(
+          (x) => x.isBudgetCodeDefault
+        );
         if (findCheckedBudgetCode) {
           newPic.forEach((val, index) => {
-            if (index !== indexTo) {
+            if (
+              index !== indexTo &&
+              val.districtCode === newPic[indexTo].districtCode
+            ) {
               newPic[index].isBudgetCodeDefault = false;
             }
           });
@@ -276,10 +284,18 @@ const EditPeriodActual: NextPage = () => {
     } else if (type === PicType.HO) {
       setMyPicsHo((prev) => {
         const newPic = [...prev];
-        const findCheckedBudgetCode = newPic.find((x) => x.isBudgetCodeDefault);
+        const filterSameDistrict = newPic.filter(
+          (x) => x.districtCode === newPic[indexTo].districtCode
+        );
+        const findCheckedBudgetCode = filterSameDistrict.find(
+          (x) => x.isBudgetCodeDefault
+        );
         if (findCheckedBudgetCode) {
           newPic.forEach((val, index) => {
-            if (index !== indexTo) {
+            if (
+              index !== indexTo &&
+              val.districtCode === newPic[indexTo].districtCode
+            ) {
               newPic[index].isBudgetCodeDefault = false;
             }
           });
@@ -426,11 +442,17 @@ const EditPeriodActual: NextPage = () => {
                           size="sm"
                           className="w-100"
                           disabled={myPicsHo.length <= 1}
-                          onClick={() =>
+                          onClick={() => {
                             setMyPicsHo((prev) =>
                               prev.filter((item, i) => i !== index)
-                            )
-                          }
+                            );
+                            reset(
+                              {},
+                              {
+                                keepIsValid: false,
+                              }
+                            );
+                          }}
                         >
                           Delete
                         </Button>
@@ -562,11 +584,17 @@ const EditPeriodActual: NextPage = () => {
                           size="sm"
                           className="w-100"
                           disabled={myPicsSite.length <= 1}
-                          onClick={() =>
+                          onClick={() => {
                             setMyPicsSite((prev) =>
                               prev.filter((item, i) => i !== index)
-                            )
-                          }
+                            );
+                            reset(
+                              {},
+                              {
+                                keepIsValid: false,
+                              }
+                            );
+                          }}
                         >
                           Delete
                         </Button>

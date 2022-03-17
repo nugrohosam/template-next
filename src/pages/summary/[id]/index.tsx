@@ -6,8 +6,10 @@ import InterveneModal from 'components/ui/Modal/InterveneModal';
 import Loader from 'components/ui/Table/Loader';
 import SimpleTable from 'components/ui/Table/SimpleTable';
 import { PeriodeType } from 'constants/period';
+import { UserType } from 'constants/user';
 import { useAssetGroupOptions } from 'modules/assetGroup/helpers';
 import { useFetchAssetGroupDetail } from 'modules/assetGroup/hook';
+import { useFetchBudgetPeriod } from 'modules/budgetPeriod/hook';
 import { useDecodeToken } from 'modules/custom/useDecodeToken';
 import { useDistrictOptions } from 'modules/custom/useDistrictOptions';
 import {
@@ -17,7 +19,6 @@ import {
   TotalSummaryData,
 } from 'modules/summary/entities';
 import {
-  useFetchActiveBudgetPlan,
   useFetchAssetGroupSummary,
   useInterveneSummaryAssetGroup,
 } from 'modules/summary/hook';
@@ -47,17 +48,16 @@ const SummaryByAssetGroup: NextPage = () => {
   const [profile] = useDecodeToken();
   const [districtOptions] = useDistrictOptions();
   const assetGroupOptions = useAssetGroupOptions();
+  const canIntervene = profile?.type === UserType.DeptPicAssetHoCapex;
 
   const [districts, setDistricts] = useState('');
   const assetGroupDetailHook = useFetchAssetGroupDetail(id);
-  const { data: dataActiveBudgetPlanHook } = useFetchActiveBudgetPlan({
-    departmentCode: profile?.job_group as string,
-    districtCode: profile?.district_code as string,
-    divisionCode: profile?.division as string,
-  });
+  const dataPeriodHook = useFetchBudgetPeriod({
+    search: canIntervene ? '' : profile?.district_code,
+  })?.data?.items[0];
   const dataSummaryHook = useFetchAssetGroupSummary(id, {
-    year: dataActiveBudgetPlanHook?.periodYear as number,
-    period: dataActiveBudgetPlanHook?.periodType as PeriodeType,
+    year: dataPeriodHook?.year as number,
+    period: dataPeriodHook?.type as PeriodeType,
     districts,
   });
 
@@ -148,8 +148,8 @@ const SummaryByAssetGroup: NextPage = () => {
           ...data,
           assetGroupCode: assetGroupDetailHook.data?.assetGroupCode as string,
           amountLimitation: data.amountLimitation,
-          year: dataActiveBudgetPlanHook?.periodYear as number,
-          period: dataActiveBudgetPlanHook?.periodType as PeriodeType,
+          year: dataPeriodHook?.year as number,
+          period: dataPeriodHook?.type as PeriodeType,
         },
       },
       {
@@ -412,7 +412,7 @@ const SummaryByAssetGroup: NextPage = () => {
         accessor: 'isCategory',
         Cell: ({ row }: CellProps<Summary>) => {
           return (
-            (!row.values.isCategory && (
+            (!row.values.isCategory && canIntervene && (
               <InterveneModal
                 onSend={(data) => handleIntervene(data)}
                 interveneData={{
@@ -427,7 +427,7 @@ const SummaryByAssetGroup: NextPage = () => {
         minWidth: 140,
       },
     ],
-    [handleIntervene]
+    [canIntervene, handleIntervene]
   );
 
   return (
@@ -444,13 +444,13 @@ const SummaryByAssetGroup: NextPage = () => {
             <Col lg={6}>
               <h4 className="profile-detail__info--title mb-1">Year</h4>
               <h3 className="profile-detail__info--subtitle">
-                {dataActiveBudgetPlanHook?.periodYear}
+                {dataPeriodHook?.year}
               </h3>
             </Col>
             <Col lg={6}>
               <h4 className="profile-detail__info--title mb-1">Period</h4>
               <h3 className="profile-detail__info--subtitle">
-                {dataActiveBudgetPlanHook?.periodType}
+                {dataPeriodHook?.type}
               </h3>
             </Col>
           </Row>
@@ -500,12 +500,14 @@ const SummaryByAssetGroup: NextPage = () => {
               classTable="table-admin striped--summary summary-sticky"
               classThead="text-nowrap"
               addOns={
-                <InterveneModal
-                  onSend={(data) => handleIntervene(data)}
-                  interveneData={{
-                    totalAmount: parsedDataHook.totalAmountAllDistrict,
-                  }}
-                />
+                canIntervene && (
+                  <InterveneModal
+                    onSend={(data) => handleIntervene(data)}
+                    interveneData={{
+                      totalAmount: parsedDataHook.totalAmountAllDistrict,
+                    }}
+                  />
+                )
               }
             />
           </Row>

@@ -1,11 +1,13 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import Input from 'components/form/Input';
 import SingleSelect, { customStyles } from 'components/form/SingleSelect';
+import { Currency } from 'constants/currency';
 import { PurchaseRequestItem } from 'modules/purchaseRequest/entities';
 import React from 'react';
 import { Col, FormControl, FormGroup, FormLabel, Row } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import Select from 'react-select';
+import { formatMoney } from 'utils/helpers';
 import * as yup from 'yup';
 
 import ModalBox from '..';
@@ -59,7 +61,10 @@ const PurchaseRequestItemModal: React.FC<PurchaseRequestItemModalProps> = ({
       .min(1, 'Price must be greater than 0')
       .max(
         available.priceUsd,
-        `Price can't be more than estimated price, available ${available.priceUsd}`
+        `Price can't be more than estimated price, available ${formatMoney(
+          available.priceUsd,
+          Currency.Usd
+        )}`
       ),
   });
 

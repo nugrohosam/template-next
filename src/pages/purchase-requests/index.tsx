@@ -3,8 +3,7 @@ import ButtonActions from 'components/ui/Button/ButtonActions';
 import LoadingButton from 'components/ui/Button/LoadingButton';
 import ContentLayout from 'components/ui/ContentLayout';
 import DataTable, { usePaginateParams } from 'components/ui/Table/DataTable';
-import { overBudgetStatusOptions } from 'constants/status';
-import { useDecodeToken } from 'modules/custom/useDecodeToken';
+import { Currency } from 'constants/currency';
 import { PurchaseRequest } from 'modules/purchaseRequest/entities';
 import { useFetchPurchaseRequests } from 'modules/purchaseRequest/hook';
 import { NextPage } from 'next';
@@ -13,6 +12,7 @@ import { useMemo, useState } from 'react';
 import { Button, Col, Row } from 'react-bootstrap';
 import Select from 'react-select';
 import { CellProps, Column, SortingRule } from 'react-table';
+import { formatMoney } from 'utils/helpers';
 
 const PurchaseRequestsIndex: NextPage = () => {
   const [selectedRow, setSelectedRow] = useState<Record<string, boolean>>({});
@@ -56,6 +56,8 @@ const PurchaseRequestsIndex: NextPage = () => {
       {
         Header: 'Estimate Price (USD)',
         accessor: 'estimatedPriceUsd',
+        Cell: ({ row }: CellProps<PurchaseRequest>) =>
+          formatMoney(row.values.estimatedPriceUsd, Currency.Usd, '-'),
       },
       {
         Header: 'Requested By',
@@ -75,11 +77,13 @@ const PurchaseRequestsIndex: NextPage = () => {
       },
       {
         Header: 'Actions',
+        accessor: 'id',
         Cell: ({ cell }: CellProps<PurchaseRequest>) => {
           return (
             <ButtonActions
               hrefDetail={`/purchase-requests/${cell.row.values.id}/detail`}
               hrefEdit={`/purchase-requests/${cell.row.values.id}/edit`}
+              disableEdit={!(cell.row.values.status === 'DRAFT')}
               // TODO: add handle delete
               // onDelete
             />

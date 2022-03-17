@@ -3,8 +3,7 @@ import ButtonActions from 'components/ui/Button/ButtonActions';
 import LoadingButton from 'components/ui/Button/LoadingButton';
 import ContentLayout from 'components/ui/ContentLayout';
 import DataTable, { usePaginateParams } from 'components/ui/Table/DataTable';
-import { overBudgetStatusOptions } from 'constants/status';
-import { useDecodeToken } from 'modules/custom/useDecodeToken';
+import { Currency } from 'constants/currency';
 import { PurchaseRequest } from 'modules/purchaseRequest/entities';
 import { useFetchPurchaseRequests } from 'modules/purchaseRequest/hook';
 import { NextPage } from 'next';
@@ -13,6 +12,7 @@ import { useMemo, useState } from 'react';
 import { Button, Col, Row } from 'react-bootstrap';
 import Select from 'react-select';
 import { CellProps, Column, SortingRule } from 'react-table';
+import { formatMoney } from 'utils/helpers';
 
 const PurchaseRequestsIndex: NextPage = () => {
   const [selectedRow, setSelectedRow] = useState<Record<string, boolean>>({});
@@ -42,7 +42,12 @@ const PurchaseRequestsIndex: NextPage = () => {
       { Header: 'PR Number Ellipse', accessor: 'prNumberEllipse' },
       { Header: 'Currency', accessor: 'currency' },
       { Header: 'Quantity Required', accessor: 'quantityRequired' },
-      { Header: 'Estimate Price (USD)', accessor: 'estimatedPriceUsd' },
+      {
+        Header: 'Estimate Price (USD)',
+        accessor: 'estimatedPriceUsd',
+        Cell: ({ row }: CellProps<PurchaseRequest>) =>
+          formatMoney(row.values.estimatedPriceUsd, Currency.Usd, '-'),
+      },
       { Header: 'Requested By', accessor: 'requestedBy' },
       { Header: 'Supplier Option Code', accessor: 'supplierRecommendation' },
       {
@@ -52,11 +57,13 @@ const PurchaseRequestsIndex: NextPage = () => {
       { Header: 'Status', accessor: 'status' },
       {
         Header: 'Actions',
+        accessor: 'id',
         Cell: ({ cell }: CellProps<PurchaseRequest>) => {
           return (
             <ButtonActions
               hrefDetail={`/purchase-requests/${cell.row.values.id}/detail`}
               hrefEdit={`/purchase-requests/${cell.row.values.id}/edit`}
+              disableEdit={!(cell.row.values.status === 'DRAFT')}
               // TODO: add handle delete
               // onDelete
             />

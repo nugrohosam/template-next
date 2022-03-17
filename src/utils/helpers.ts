@@ -113,9 +113,11 @@ export const snakeCaseToCamelCase = (str: string) => {
 export const formatMoney = (
   nominal: string | number | null | undefined,
   currency: Currency | null | undefined,
-  defaultResult?: string | number
+  defaultResult?: string | number,
+  maximumFractionDigits?: number
 ) => {
   const emptyResult = defaultResult || 0;
+  const maxDigit = maximumFractionDigits || 2;
   if (!nominal || !currency) return emptyResult;
 
   let total;
@@ -124,7 +126,9 @@ export const formatMoney = (
       total = nominal.toLocaleString('id-Id');
       break;
     case Currency.Usd:
-      total = nominal.toLocaleString('en-En');
+      total = nominal.toLocaleString('en-En', {
+        maximumFractionDigits: maxDigit,
+      });
       break;
     default:
       total = emptyResult;

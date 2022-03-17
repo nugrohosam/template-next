@@ -10,7 +10,7 @@ import PurchaseRequestItemModal from 'components/ui/Modal/PurchaseRequest/Purcha
 import SimpleTable from 'components/ui/Table/SimpleTable';
 import { Currency } from 'constants/currency';
 import { useAssetGroupOptions } from 'modules/assetGroup/helpers';
-import { useUploadAttachment } from 'modules/attachment/hook';
+import { useAttachmentHelpers } from 'modules/attachment/helpers';
 import { useFetchBudgetReferences } from 'modules/budgetReference/hook';
 import { useBudgetCodeOptions } from 'modules/custom/useBudgetCodeOptions';
 import { useCurrencyRate } from 'modules/custom/useCurrencyRate';
@@ -27,7 +27,7 @@ import {
   PurchaseRequestForm,
   PurchaseRequestItem,
 } from 'modules/purchaseRequest/entities';
-import { useCreatePurchaseRequest } from 'modules/purchaseRequest/hook';
+import { usePurchaseRequestHelpers } from 'modules/purchaseRequest/helpers';
 import { useUserOptions } from 'modules/user/helpers';
 import moment from 'moment';
 import { NextPage } from 'next';
@@ -45,11 +45,7 @@ import {
 import { FieldError, useFieldArray, useForm } from 'react-hook-form';
 import { CellProps, Column } from 'react-table';
 import { toast } from 'react-toastify';
-import {
-  formatMoney,
-  setValidationError,
-  showErrorMessage,
-} from 'utils/helpers';
+import { formatMoney, setValidationError } from 'utils/helpers';
 import * as yup from 'yup';
 
 const breadCrumb: PathBreadcrumb[] = [
@@ -145,63 +141,48 @@ const CreatePurchaseRequest: NextPage = () => {
     budgetAmountBalance: 0,
   });
 
-  const uploadAttachmentMutation = useUploadAttachment();
-  const handleUploadAttachment = (name: keyof PurchaseRequestForm) => {
-    const file = getValues(name);
-    const formData = new FormData();
-    formData.append('module', 'pr capex');
-    if (file) {
-      formData.append('attachment', (file as Array<File>)[0]);
-    }
-
-    uploadAttachmentMutation.mutate(formData, {
-      onSuccess: (data) => {
-        toast('Data uploaded!');
-        setValue('attachment', data.name);
+  const { handleUploadAttachment } = useAttachmentHelpers();
+  const uploadAttachment = (attachment: keyof PurchaseRequestForm) => {
+    const file = getValues(`${attachment}` as keyof PurchaseRequestForm);
+    handleUploadAttachment(file as File[], 'pr capex')
+      .then((result) => {
+        setValue(attachment, result.name);
         setIsAttachmentUploaded(true);
-      },
-      onError: (error) => {
-        setIsAttachmentUploaded(false);
+      })
+      .catch((error) => {
         setValidationError(error, setError);
-        toast(error.message, { autoClose: false });
-      },
-    });
+        setIsAttachmentUploaded(false);
+      });
   };
 
-  const createPurchaseRequestMutation = useCreatePurchaseRequest();
+  const { mutationCreatePurchaseRequest, handleCreatePurchaseRequest } =
+    usePurchaseRequestHelpers();
   const handleSubmitForm = (data: PurchaseRequestForm) => {
-    if (watch('attachment') && !isAttachmentUploaded) {
+    const file = watch('attachment');
+    if (
+      (file && !isAttachmentUploaded) ||
+      (typeof file !== 'string' && isAttachmentUploaded)
+    ) {
       toast('Upload the attachment file!', { type: 'error', autoClose: false });
     } else if (fields.length === 0) {
       toast('Minimum 1 item required!', { type: 'error', autoClose: false });
     } else {
-      createPurchaseRequestMutation.mutate(
-        {
-          ...data,
-          status: submitStatus,
-          supplierRecommendation: supplierRegistered
-            ? data.supplierRecommendation
-            : '',
-          supplierRecommendationName: supplierRegistered
-            ? ''
-            : data.supplierRecommendation,
-          estimatedPriceUsd: watchData().estimatedPrice,
-          currencyRate,
-          items: fields,
-        },
-        {
-          onSuccess: () => {
-            router.push(`/purchase-requests`);
-            toast('Data created!');
-          },
-          onError: (error) => {
-            console.error('Failed to create data', error);
-            setValidationError(error, setError);
-            toast(error.message, { type: 'error', autoClose: false });
-            showErrorMessage(error);
-          },
-        }
-      );
+      const dataSubmit = {
+        ...data,
+        status: submitStatus,
+        supplierRecommendation: supplierRegistered
+          ? data.supplierRecommendation
+          : '',
+        supplierRecommendationName: supplierRegistered
+          ? ''
+          : data.supplierRecommendation,
+        estimatedPriceUsd: watchData().estimatedPrice,
+        currencyRate,
+        items: fields,
+      };
+      handleCreatePurchaseRequest(dataSubmit)
+        .then(() => router.push(`/purchase-requests`))
+        .catch((error) => setValidationError(error, setError));
     }
   };
 
@@ -212,7 +193,6 @@ const CreatePurchaseRequest: NextPage = () => {
       prDate: moment(new Date()).format('YYYY-MM-DD'),
       requestedBy: profile?.user_id,
       estimatedPriceUsd: 0,
-      status: 'DRAFT',
     });
   }, [profile, reset]);
 
@@ -279,7 +259,7 @@ const CreatePurchaseRequest: NextPage = () => {
               uomOptions,
               mnemonicOptions,
               availableQty: watchData().availableQty,
-              availableUsd: watchData().availableUsd.toFixed(2),
+              availableUsd: watchData().availableUsd,
             }}
           ></PurchaseRequestItemModal>
         </div>
@@ -737,7 +717,7 @@ const CreatePurchaseRequest: NextPage = () => {
                   className="mt-2 p-0 font-xs"
                   onClick={() => {
                     clearErrors('attachment');
-                    handleUploadAttachment('attachment');
+                    uploadAttachment('attachment');
                   }}
                 >
                   <p>Upload</p>
@@ -781,7 +761,7 @@ const CreatePurchaseRequest: NextPage = () => {
                   uomOptions,
                   mnemonicOptions,
                   availableQty: watchData().availableQty,
-                  availableUsd: watchData().availableUsd.toFixed(2),
+                  availableUsd: watchData().availableUsd,
                 }}
               />
             </Col>
@@ -791,8 +771,11 @@ const CreatePurchaseRequest: NextPage = () => {
               variant="primary"
               type="submit"
               className="mr-2"
-              isLoading={createPurchaseRequestMutation.isLoading}
-              disabled={!isValid || createPurchaseRequestMutation.isLoading}
+              isLoading={
+                mutationCreatePurchaseRequest.isLoading &&
+                submitStatus === 'DRAFT'
+              }
+              disabled={!isValid || mutationCreatePurchaseRequest.isLoading}
               onClick={() => setSubmitStatus('DRAFT')}
             >
               Save
@@ -800,8 +783,11 @@ const CreatePurchaseRequest: NextPage = () => {
             <LoadingButton
               variant="green"
               type="submit"
-              isLoading={createPurchaseRequestMutation.isLoading}
-              disabled={!isValid || createPurchaseRequestMutation.isLoading}
+              isLoading={
+                mutationCreatePurchaseRequest.isLoading &&
+                submitStatus === 'SUBMIT'
+              }
+              disabled={!isValid || mutationCreatePurchaseRequest.isLoading}
               onClick={() => setSubmitStatus('SUBMIT')}
             >
               Submit

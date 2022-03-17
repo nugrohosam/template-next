@@ -11,13 +11,13 @@ import { useAssetGroupOptions } from 'modules/assetGroup/helpers';
 import { useFetchAssetGroupDetail } from 'modules/assetGroup/hook';
 import { useFetchBudgetPeriod } from 'modules/budgetPeriod/hook';
 import { useDecodeToken } from 'modules/custom/useDecodeToken';
-import { useDistrictOptions } from 'modules/custom/useDistrictOptions';
 import {
   AssetGroupSummary,
   InterveneField,
   Summary,
   TotalSummaryData,
 } from 'modules/summary/entities';
+import { useGroupedDistrictOptions } from 'modules/summary/helpers';
 import {
   useFetchAssetGroupSummary,
   useInterveneSummaryAssetGroup,
@@ -33,8 +33,8 @@ import { showErrorMessage } from 'utils/helpers';
 
 const breadCrumb: PathBreadcrumb[] = [
   {
-    label: 'Asset Group',
-    link: '/master-capex/asset-groups',
+    label: 'Asset Group Summary',
+    link: '/summary',
   },
   {
     label: 'Summary',
@@ -46,8 +46,8 @@ const SummaryByAssetGroup: NextPage = () => {
   const router = useRouter();
   const id = router.query.id as string;
   const [profile] = useDecodeToken();
-  const [districtOptions] = useDistrictOptions();
   const assetGroupOptions = useAssetGroupOptions();
+  const groupedDistrictOptions = useGroupedDistrictOptions();
   const canIntervene = profile?.type === UserType.DeptPicAssetHoCapex;
 
   const [districts, setDistricts] = useState('');
@@ -463,7 +463,6 @@ const SummaryByAssetGroup: NextPage = () => {
                 className="mb-2 mb-lg-0"
                 instanceId="assetGroup"
                 placeholder="Select Asset Group"
-                isClearable
                 value={assetGroupOptions.find((item) => item.value === id)}
                 options={assetGroupOptions}
                 styles={style}
@@ -481,7 +480,7 @@ const SummaryByAssetGroup: NextPage = () => {
                 placeholder="Select District"
                 isMulti
                 isClearable
-                options={districtOptions}
+                options={groupedDistrictOptions}
                 selected={id}
                 styles={style}
                 onChange={(val) => {

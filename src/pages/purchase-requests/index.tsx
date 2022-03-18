@@ -57,7 +57,6 @@ const PurchaseRequestsIndex: NextPage = () => {
       { Header: 'Status', accessor: 'status' },
       {
         Header: 'Actions',
-        accessor: 'id',
         Cell: ({ cell }: CellProps<PurchaseRequest>) => {
           return (
             <ButtonActions

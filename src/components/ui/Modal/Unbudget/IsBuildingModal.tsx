@@ -27,10 +27,11 @@ const initDefaultValues = () => ({
   detail: '',
   pricePerUnit: 0,
   idCapexCatalog: null,
-  currencyRate: 10000, // TODO: currenctRate masih dummy
+  currencyRate: 0,
   items: [...Array(12).keys()].map((item) => ({
     month: item + 1,
     quantity: 0,
+    amount: '',
   })),
 });
 

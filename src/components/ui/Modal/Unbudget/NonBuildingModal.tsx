@@ -30,7 +30,7 @@ const initDefaultValues = () => ({
   detail: null,
   totalAmount: 0,
   totalAmountUsd: 0,
-  currencyRate: 10000, // TODO: currenctRate masih dummy
+  currencyRate: 0,
   items: [...Array(12).keys()].map((item) => ({
     month: item + 1,
     amount: 0,

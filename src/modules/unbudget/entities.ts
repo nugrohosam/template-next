@@ -51,7 +51,7 @@ export type UnbudgetItem = {
 export type ItemOfUnbudgetItem = {
   month: number;
   quantity: number;
-  amount: number;
+  amount: number | string;
 };
 
 export interface UnbudgetForm {

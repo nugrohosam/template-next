@@ -381,31 +381,28 @@ const SummaryByAssetGroup: NextPage = () => {
             <br /> Current Period
           </div>
         ),
-        id: 'mbVsOl',
-        columns: [
-          {
-            Header: 'Amount',
-            id: 'mbVsOlFyCurrentPeriod',
-            accessor: 'mbVsOlFyCurrentPeriod',
-            Cell: ({ row }: CellProps<AssetGroupSummary>) => {
-              return (
-                row.values.mbVsOlFyCurrentPeriod?.toLocaleString('id-Id') || ''
-              );
-            },
-          },
-          {
-            Header: '(%)',
-            id: 'mbVsOlFyCurrentPeriodPercentage',
-            accessor: 'mbVsOlFyCurrentPeriodPercentage',
-            Cell: ({ row }: CellProps<AssetGroupSummary>) => {
-              return (
-                row.values.mbVsOlFyCurrentPeriodPercentage
-                  ?.toLocaleString('id-Id')
-                  .concat('%') || ''
-              );
-            },
-          },
-        ],
+        accessor: 'mbVsOlFyCurrentPeriod',
+        Cell: ({ row }: CellProps<AssetGroupSummary>) => {
+          return (
+            row.values.mbVsOlFyCurrentPeriod?.toLocaleString('id-Id') || ''
+          );
+        },
+      },
+      {
+        Header: () => (
+          <div>
+            MB VS OL FY
+            <br /> Current Period (%)
+          </div>
+        ),
+        accessor: 'mbVsOlFyCurrentPeriodPercentage',
+        Cell: ({ row }: CellProps<AssetGroupSummary>) => {
+          return (
+            row.values.mbVsOlFyCurrentPeriodPercentage
+              ?.toLocaleString('id-Id')
+              .concat('%') || ''
+          );
+        },
       },
       {
         Header: 'Action',

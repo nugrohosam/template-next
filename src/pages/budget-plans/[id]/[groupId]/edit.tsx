@@ -392,7 +392,7 @@ const UpdateBudgetPlanItems: NextPage = () => {
                     <Checkbox
                       label="Is Building"
                       name="isBuilding"
-                      defaultValue=""
+                      defaultValue={false}
                       control={control}
                       disabled={true}
                     ></Checkbox>

@@ -198,9 +198,7 @@ const SummaryByAssetGroup: NextPage = () => {
             Header: 'Outstanding PR + PO',
             accessor: 'outstandingPrPo',
             Cell: ({ row }: CellProps<AssetGroupSummary>) => {
-              return (
-                row.values.actualYtdCurrentPeriod?.toLocaleString('id-Id') || ''
-              );
+              return row.values.outstandingPrPo?.toLocaleString('id-Id') || '';
             },
           },
           {

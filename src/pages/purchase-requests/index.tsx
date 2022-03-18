@@ -37,44 +37,24 @@ const PurchaseRequestsIndex: NextPage = () => {
 
   const columns = useMemo<Column<PurchaseRequest>[]>(
     () => [
-      {
-        Header: 'PR Number',
-        accessor: 'prNumber',
-      },
-      {
-        Header: 'PR Number Ellipse',
-        accessor: 'prNumberEllipse',
-      },
-      {
-        Header: 'Currency',
-        accessor: 'currency',
-      },
-      {
-        Header: 'Quantity Required',
-        accessor: 'quantityRequired',
-      },
+      { Header: 'ID', accessor: 'id' },
+      { Header: 'PR Number', accessor: 'prNumber' },
+      { Header: 'PR Number Ellipse', accessor: 'prNumberEllipse' },
+      { Header: 'Currency', accessor: 'currency' },
+      { Header: 'Quantity Required', accessor: 'quantityRequired' },
       {
         Header: 'Estimate Price (USD)',
         accessor: 'estimatedPriceUsd',
         Cell: ({ row }: CellProps<PurchaseRequest>) =>
-          formatMoney(row.values.estimatedPriceUsd, Currency.Usd, '-'),
+          formatMoney(row.values.estimatedPriceUsd, Currency.Usd),
       },
-      {
-        Header: 'Requested By',
-        accessor: 'requestedBy',
-      },
-      {
-        Header: 'Supplier Option Code',
-        accessor: 'supplierRecommendation',
-      },
+      { Header: 'Requested By', accessor: 'requestedBy' },
+      { Header: 'Supplier Option Code', accessor: 'supplierRecommendation' },
       {
         Header: 'Supplier Option Name',
         accessor: 'supplierRecommendationName',
       },
-      {
-        Header: 'Status',
-        accessor: 'status',
-      },
+      { Header: 'Status', accessor: 'status' },
       {
         Header: 'Actions',
         accessor: 'id',
@@ -111,6 +91,7 @@ const PurchaseRequestsIndex: NextPage = () => {
             classThead="text-nowrap"
             isLoading={dataHook.isLoading}
             disabledRowIds={disabledRowIds}
+            hiddenColumns={['id']}
             actions={
               <>
                 <LoadingButton

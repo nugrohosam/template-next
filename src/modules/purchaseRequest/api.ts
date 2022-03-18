@@ -1,7 +1,11 @@
 import { Paginate, PaginateParams, ResponseData } from 'modules/common/types';
 import axios from 'utils/axios';
 
-import { PurchaseRequest, PurchaseRequestForm } from './entities';
+import {
+  PurchaseRequest,
+  PurchaseRequestDetail,
+  PurchaseRequestForm,
+} from './entities';
 
 export const fetchPurchaseRequests = async (
   params: PaginateParams
@@ -9,6 +13,15 @@ export const fetchPurchaseRequests = async (
   const result = await axios.get<ResponseData<Paginate<PurchaseRequest>>>(
     'v1/purchaserequests',
     { params }
+  );
+  return result.data.data;
+};
+
+export const fetchPurchaseRequestDetail = async (
+  idPurchaseRequest: string
+): Promise<PurchaseRequestDetail> => {
+  const result = await axios.get<ResponseData<PurchaseRequestDetail>>(
+    `v1/purchaserequests/${idPurchaseRequest}`
   );
   return result.data.data;
 };

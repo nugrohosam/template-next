@@ -90,8 +90,7 @@ const UnbudgetDetails: NextPage = () => {
       Header: 'Detail',
       accessor: 'detail',
       minWidth: 300,
-      Cell: ({ row }: CellProps<UnbudgetItem>) =>
-        row.values.catalog?.detail || '-',
+      Cell: ({ row }: CellProps<UnbudgetItem>) => row.values.detail || '-',
     },
     {
       Header: 'Asset Group',

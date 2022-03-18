@@ -112,7 +112,9 @@ const NonBuildingUnbudgetModal: React.FC<UnbudgetModalProps> = ({
     setValue('currencyRate', currencyRate);
   }, [currencyRate, setValue]);
 
-  const assetGroupOptions = useAssetGroupOptions();
+  const assetGroupOptions = useAssetGroupOptions().filter(
+    (item) => item.label !== 'Building'
+  );
   const catalogOptions = useCatalogOptions(watchIdAssetGroup);
 
   const changeCatalog = (idCapexCatalog: string) => {

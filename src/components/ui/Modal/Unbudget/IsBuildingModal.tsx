@@ -93,7 +93,9 @@ const IsBuildingUnbudgetModal: React.FC<UnbudgetModalProps> = ({
     setValue('currencyRate', currencyRate);
   }, [currencyRate, setValue]);
 
-  const assetGroupOptions = useAssetGroupOptions();
+  const assetGroupOptions = useAssetGroupOptions().filter(
+    (item) => item.label === 'Building'
+  );
 
   const totalAmount = (currency: Currency) => {
     if (!watchCurrency) return 0;

@@ -10,6 +10,7 @@ import {
   createPurchaseRequest,
   fetchPurchaseRequestDetail,
   fetchPurchaseRequests,
+  updatePurchaseRequest,
 } from './api';
 import {
   PurchaseRequest,
@@ -41,4 +42,19 @@ export const useCreatePurchaseRequest = (): UseMutationResult<
   PurchaseRequestForm
 > => {
   return useMutation(createPurchaseRequest);
+};
+
+export interface UpdatePurchaseRequestparams {
+  idPurchaseRequest: string;
+  data: PurchaseRequestForm;
+}
+
+export const useUpdatePurchaseRequest = (): UseMutationResult<
+  PurchaseRequest,
+  ResponseError,
+  UpdatePurchaseRequestparams
+> => {
+  return useMutation(({ idPurchaseRequest, data }) =>
+    updatePurchaseRequest(idPurchaseRequest, data)
+  );
 };

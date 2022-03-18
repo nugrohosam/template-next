@@ -35,3 +35,14 @@ export const createPurchaseRequest = async (
   );
   return result.data.data;
 };
+
+export const updatePurchaseRequest = async (
+  idPurchaseRequest: string,
+  data: PurchaseRequestForm
+): Promise<PurchaseRequest> => {
+  const result = await axios.put<ResponseData<PurchaseRequest>>(
+    `v1/purchaserequests/${idPurchaseRequest}`,
+    data
+  );
+  return result.data.data;
+};

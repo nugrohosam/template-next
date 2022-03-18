@@ -15,19 +15,6 @@ export type PurchaseRequest = {
   statusPo: string;
 };
 
-export type PurchaseRequestItem = {
-  item: string;
-  description_1: string;
-  description_2: string;
-  description_3: string;
-  description_4: string;
-  partNo: string;
-  mnemonic: string;
-  uom: string;
-  quantity: number;
-  priceUsd: number;
-};
-
 export type PurchaseRequestForm = {
   idCapexAssetGroup: string;
   idBudgetReference: string;
@@ -50,7 +37,7 @@ export type PurchaseRequestForm = {
   authorizedBy: string;
   materialGroup: string;
   picAsset: string;
-  warrantyHoldPayment: boolean;
+  warrantyHoldPayment: string;
   uom: string;
   districtCodePembebanan: string;
   attachment?: string | Array<File> | null;
@@ -58,7 +45,7 @@ export type PurchaseRequestForm = {
   budgetAmountBalance: number;
   currencyRate: number;
   status: string;
-  items: PurchaseRequestItem[];
+  items: ItemOfPurchaseRequest[];
 };
 
 export type PurchaseRequestDetail = PurchaseRequest & {

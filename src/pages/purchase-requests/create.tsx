@@ -24,8 +24,8 @@ import { useSupplierOptions } from 'modules/custom/useSupplierOptions';
 import { useUomOptions } from 'modules/custom/useUomOptions';
 import { useWarehouseOptions } from 'modules/custom/useWarehouseOptions';
 import {
+  ItemOfPurchaseRequest,
   PurchaseRequestForm,
-  PurchaseRequestItem,
 } from 'modules/purchaseRequest/entities';
 import { usePurchaseRequestHelpers } from 'modules/purchaseRequest/helpers';
 import { useUserOptions } from 'modules/user/helpers';
@@ -244,16 +244,16 @@ const CreatePurchaseRequest: NextPage = () => {
     name: 'items',
   });
 
-  const columns: Column<PurchaseRequestItem>[] = [
+  const columns: Column<ItemOfPurchaseRequest>[] = [
     {
       Header: 'Actions',
-      Cell: ({ row }: CellProps<PurchaseRequestItem>) => (
+      Cell: ({ row }: CellProps<ItemOfPurchaseRequest>) => (
         <div style={{ minWidth: 100 }}>
           <PurchaseRequestItemModal
             onSend={(data) => update(row.index, data)}
             isEdit={true}
             buttonTitle="Edit"
-            myItem={row.values as PurchaseRequestItem}
+            myItem={row.values as ItemOfPurchaseRequest}
             itemData={{
               description1: budgetRefDetail.description,
               uomOptions,
@@ -266,10 +266,10 @@ const CreatePurchaseRequest: NextPage = () => {
       ),
     },
     { Header: 'Item', accessor: 'item' },
-    { Header: 'Description 1', accessor: 'description_1' },
-    { Header: 'Description 2', accessor: 'description_2' },
-    { Header: 'Description 3', accessor: 'description_3' },
-    { Header: 'Description 4', accessor: 'description_4' },
+    { Header: 'Description 1', accessor: 'description1' },
+    { Header: 'Description 2', accessor: 'description2' },
+    { Header: 'Description 3', accessor: 'description3' },
+    { Header: 'Description 4', accessor: 'description4' },
     { Header: 'Part No', accessor: 'partNo' },
     { Header: 'Mnemonic', accessor: 'mnemonic' },
     { Header: 'Uom', accessor: 'uom' },
@@ -277,7 +277,7 @@ const CreatePurchaseRequest: NextPage = () => {
     {
       Header: 'Price (USD)',
       accessor: 'priceUsd',
-      Cell: ({ row }: CellProps<PurchaseRequestItem>) =>
+      Cell: ({ row }: CellProps<ItemOfPurchaseRequest>) =>
         formatMoney(row.values.priceUsd, Currency.Usd, '-'),
     },
   ];

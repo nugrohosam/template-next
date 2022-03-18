@@ -2,12 +2,17 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import Input from 'components/form/Input';
 import SingleSelect from 'components/form/SingleSelect';
 import { Currency, currencyOptions } from 'constants/currency';
+import { UserDistrict } from 'constants/user';
 import { useAssetGroupOptions } from 'modules/assetGroup/helpers';
 import {
   BudgetPlanItemOfBudgetPlanItemForm,
   ItemOfBudgetPlanItem,
 } from 'modules/budgetPlanItem/entities';
 import { useCurrencyRate } from 'modules/custom/useCurrencyRate';
+import { useDecodeToken } from 'modules/custom/useDecodeToken';
+import { useDistrictOptions } from 'modules/custom/useDistrictOptions';
+import { useNoiDivisionOptions } from 'modules/noi/division/helpers';
+import { permissionUserHelpers } from 'modules/user/helpers';
 import moment from 'moment';
 import React, { useEffect, useMemo } from 'react';
 import { Col, FormControl, FormGroup, FormLabel, Row } from 'react-bootstrap';
@@ -39,6 +44,8 @@ const schema = yup.object().shape({
   idAssetGroup: yup.string().required(),
   currency: yup.string().required().nullable(),
   detail: yup.string().required().nullable(),
+  districtCode: yup.string().required(),
+  departmentCode: yup.string().required(),
 });
 
 const IsBuildingBudgetPlanItemModal: React.FC<
@@ -52,6 +59,8 @@ const IsBuildingBudgetPlanItemModal: React.FC<
   myItem,
   title,
 }) => {
+  const [profile] = useDecodeToken();
+
   /**
    * Handle form
    */
@@ -62,6 +71,7 @@ const IsBuildingBudgetPlanItemModal: React.FC<
     watch,
     reset,
     setValue,
+    resetField,
   } = useForm<BudgetPlanItemOfBudgetPlanItemForm>({
     mode: 'onChange',
     resolver: yupResolver(schema),
@@ -77,6 +87,7 @@ const IsBuildingBudgetPlanItemModal: React.FC<
     currency: watchCurrency,
     items: watchItems,
     currencyRate: watchCurrencyRate,
+    districtCode: watchDistrictCode,
   } = watch();
 
   const handleSubmitForm = (data: BudgetPlanItemOfBudgetPlanItemForm) => {
@@ -101,6 +112,10 @@ const IsBuildingBudgetPlanItemModal: React.FC<
     setValue('currencyRate', currencyRate);
   }, [currencyRate, setValue]);
 
+  const [districtOptions] = useDistrictOptions();
+  const { noiDivisionOptions } = useNoiDivisionOptions({
+    district: watchDistrictCode,
+  });
   const assetGroupOptions = useAssetGroupOptions().filter(
     (item) => item.label === 'Building'
   );
@@ -121,8 +136,9 @@ const IsBuildingBudgetPlanItemModal: React.FC<
     return 0;
   };
 
+  const { isUserJiep } = permissionUserHelpers();
+
   const onModalOpened = () => {
-    setValue('currencyRate', currencyRate);
     if (isEdit) {
       reset({
         idAssetGroup: myItem?.idAssetGroup,
@@ -131,6 +147,8 @@ const IsBuildingBudgetPlanItemModal: React.FC<
         currencyRate: myItem?.currencyRate,
         id: myItem?.id,
         detail: myItem?.detail || '',
+        districtCode: myItem?.districtCode,
+        departmentCode: myItem?.departmentCode,
         items:
           initItems().map((prev) => {
             const foundMonth = myItem?.items.find(
@@ -151,6 +169,12 @@ const IsBuildingBudgetPlanItemModal: React.FC<
         currency: inPageUpdate.currency,
         currencyRate: currencyRate,
       });
+    }
+
+    if (!watchCurrencyRate) setValue('currencyRate', currencyRate);
+    if (profile && !isUserJiep(profile?.district_code)) {
+      setValue('districtCode', profile?.district_code);
+      setValue('departmentCode', profile?.job_group);
     }
   };
 
@@ -200,6 +224,35 @@ const IsBuildingBudgetPlanItemModal: React.FC<
       onClikModal={onModalOpened}
     >
       <Row>
+        <Col lg={6}>
+          <FormGroup>
+            <FormLabel>District</FormLabel>
+            <SingleSelect
+              name="districtCode"
+              control={control}
+              defaultValue=""
+              placeholder="District"
+              options={districtOptions}
+              error={errors.districtCode?.message}
+              isDisabled={!isUserJiep(profile?.district_code)}
+              onChange={() => resetField('departmentCode')}
+            />
+          </FormGroup>
+        </Col>
+        <Col lg={6}>
+          <FormGroup>
+            <FormLabel>Department</FormLabel>
+            <SingleSelect
+              name="departmentCode"
+              control={control}
+              defaultValue=""
+              placeholder="Department"
+              options={noiDivisionOptions}
+              isDisabled={!isUserJiep(profile?.district_code)}
+              error={errors.departmentCode?.message}
+            />
+          </FormGroup>
+        </Col>
         <Col lg={6}>
           <FormGroup>
             <FormLabel>Kurs</FormLabel>

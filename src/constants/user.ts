@@ -4,3 +4,7 @@ export enum UserType {
   DeptPicAssetHoCapex = 'dept pic asset ho capex',
   PicCapex = 'pic capex',
 }
+
+export enum UserDistrict {
+  Jiep = 'JIEP',
+}

@@ -30,6 +30,7 @@ import {
 import { usePurchaseRequestHelpers } from 'modules/purchaseRequest/helpers';
 import { useFetchPurchaseRequestDetail } from 'modules/purchaseRequest/hook';
 import { useUserOptions } from 'modules/user/helpers';
+import moment from 'moment';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -140,13 +141,16 @@ const EditPurchaseRequest: NextPage = () => {
   const [selectedRow, setSelectedRow] = useState<Record<string, boolean>>({});
   const [isAttachmentUploaded, setIsAttachmentUploaded] = useState(false);
   const [submitStatus, setSubmitStatus] = useState('DRAFT');
-  const [supplierRegistered, setSupplierRegistered] = useState(
-    dataHook?.supplierRecommendation ? true : false
-  );
+  const [supplierRegistered, setSupplierRegistered] = useState<boolean>();
   const [budgetRefDetail, setBudgetRefDetail] = useState({
     description: '',
     currency: '',
     budgetAmountBalance: 0,
+  });
+  const { fields, remove, replace, append, update } = useFieldArray({
+    control,
+    name: 'items',
+    keyName: 'key',
   });
 
   const { handleUploadAttachment } = useAttachmentHelpers();
@@ -195,8 +199,11 @@ const EditPurchaseRequest: NextPage = () => {
   };
 
   useEffect(() => {
+    setSupplierRegistered(dataHook?.supplierRecommendation ? true : false);
+  }, [dataHook?.supplierRecommendation]);
+  useEffect(() => {
     reset({
-      prDate: dataHook?.prDate,
+      prDate: moment(dataHook?.prDate).format('YYYY-MM-DD'),
       requestedBy: dataHook?.requestedBy,
       dateRequired: dataHook?.dateRequired,
       idCapexAssetGroup: dataHook?.assetGroup?.id,
@@ -228,7 +235,8 @@ const EditPurchaseRequest: NextPage = () => {
       currency: dataHook?.budgetReference?.currency || '-',
       budgetAmountBalance: dataHook?.budgetReference?.currentBalance as number,
     });
-  }, [reset, dataHook, supplierRegistered]);
+    replace(dataHook?.items.map((item) => item) || []);
+  }, [reset, dataHook, supplierRegistered, replace]);
 
   const watchData = () => {
     const watchForm = watch();
@@ -272,16 +280,6 @@ const EditPurchaseRequest: NextPage = () => {
       });
     }
   };
-
-  const { fields, remove, replace, append, update } = useFieldArray({
-    control,
-    name: 'items',
-    keyName: 'key',
-  });
-
-  useEffect(() => {
-    replace(dataHook?.items.map((item) => item) || []);
-  }, [dataHook?.items, replace]);
 
   const columns: Column<ItemOfPurchaseRequest>[] = [
     {
@@ -538,7 +536,7 @@ const EditPurchaseRequest: NextPage = () => {
                 <FormLabel className="required">
                   Supplier Recommendation
                 </FormLabel>
-                {/* TODO: ketika checkbox di klik, data item jadi tidak tampil */}
+                {/* TODO: saat checkbox diklik, field yg telah diubah valuenya ter-reset */}
                 {!supplierRegistered && (
                   <Input
                     name="supplierRecommendation"

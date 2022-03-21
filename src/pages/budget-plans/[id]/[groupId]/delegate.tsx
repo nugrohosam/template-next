@@ -23,7 +23,7 @@ const schema = yup.object().shape({
   attachment: yup.mixed().required(),
 });
 
-const UploadBudgetPlanItem: NextPage = () => {
+const DelegateBudgetPlanItem: NextPage = () => {
   const router = useRouter();
   const idBudgetPlan = router.query.id as string;
   const idBudgetPlanGroup = router.query.groupId as string;
@@ -120,7 +120,10 @@ const UploadBudgetPlanItem: NextPage = () => {
                 <FileInput
                   name="attachmentFile"
                   control={control}
-                  placeholder="Upload File"
+                  placeholder={
+                    dataHookBudgetPlanItemGroup.data?.delegateAttachment ||
+                    'Upload File'
+                  }
                   error={errors.attachment?.message}
                 />
                 <Button
@@ -165,7 +168,7 @@ const UploadBudgetPlanItem: NextPage = () => {
               disabled={mutationDelegateApproval.isLoading}
               isLoading={mutationDelegateApproval.isLoading}
             >
-              Upload
+              Submit
             </LoadingButton>
           </Col>
         </Form>
@@ -174,4 +177,4 @@ const UploadBudgetPlanItem: NextPage = () => {
   );
 };
 
-export default UploadBudgetPlanItem;
+export default DelegateBudgetPlanItem;

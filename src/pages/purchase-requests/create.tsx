@@ -24,8 +24,8 @@ import { useSupplierOptions } from 'modules/custom/useSupplierOptions';
 import { useUomOptions } from 'modules/custom/useUomOptions';
 import { useWarehouseOptions } from 'modules/custom/useWarehouseOptions';
 import {
+  ItemOfPurchaseRequest,
   PurchaseRequestForm,
-  PurchaseRequestItem,
 } from 'modules/purchaseRequest/entities';
 import { usePurchaseRequestHelpers } from 'modules/purchaseRequest/helpers';
 import { useUserOptions } from 'modules/user/helpers';
@@ -133,7 +133,6 @@ const CreatePurchaseRequest: NextPage = () => {
 
   const [selectedRow, setSelectedRow] = useState<Record<string, boolean>>({});
   const [submitStatus, setSubmitStatus] = useState('DRAFT');
-  const [isAttachmentUploaded, setIsAttachmentUploaded] = useState(false);
   const [supplierRegistered, setSupplierRegistered] = useState(true);
   const [budgetRefDetail, setBudgetRefDetail] = useState({
     description: '',
@@ -143,28 +142,16 @@ const CreatePurchaseRequest: NextPage = () => {
 
   const { handleUploadAttachment } = useAttachmentHelpers();
   const uploadAttachment = (attachment: keyof PurchaseRequestForm) => {
-    const file = getValues(`${attachment}` as keyof PurchaseRequestForm);
+    const file = getValues(`${attachment}File` as keyof PurchaseRequestForm);
     handleUploadAttachment(file as File[], 'pr capex')
-      .then((result) => {
-        setValue(attachment, result.name);
-        setIsAttachmentUploaded(true);
-      })
-      .catch((error) => {
-        setValidationError(error, setError);
-        setIsAttachmentUploaded(false);
-      });
+      .then((result) => setValue(attachment, result.name))
+      .catch((error) => setValidationError(error, setError));
   };
 
   const { mutationCreatePurchaseRequest, handleCreatePurchaseRequest } =
     usePurchaseRequestHelpers();
   const handleSubmitForm = (data: PurchaseRequestForm) => {
-    const file = watch('attachment');
-    if (
-      (file && !isAttachmentUploaded) ||
-      (typeof file !== 'string' && isAttachmentUploaded)
-    ) {
-      toast('Upload the attachment file!', { type: 'error', autoClose: false });
-    } else if (fields.length === 0) {
+    if (fields.length === 0) {
       toast('Minimum 1 item required!', { type: 'error', autoClose: false });
     } else {
       const dataSubmit = {
@@ -180,6 +167,7 @@ const CreatePurchaseRequest: NextPage = () => {
         currencyRate,
         items: fields,
       };
+      delete dataSubmit.attachmentFile;
       handleCreatePurchaseRequest(dataSubmit)
         .then(() => router.push(`/purchase-requests`))
         .catch((error) => setValidationError(error, setError));
@@ -244,16 +232,16 @@ const CreatePurchaseRequest: NextPage = () => {
     name: 'items',
   });
 
-  const columns: Column<PurchaseRequestItem>[] = [
+  const columns: Column<ItemOfPurchaseRequest>[] = [
     {
       Header: 'Actions',
-      Cell: ({ row }: CellProps<PurchaseRequestItem>) => (
+      Cell: ({ row }: CellProps<ItemOfPurchaseRequest>) => (
         <div style={{ minWidth: 100 }}>
           <PurchaseRequestItemModal
             onSend={(data) => update(row.index, data)}
             isEdit={true}
             buttonTitle="Edit"
-            myItem={row.values as PurchaseRequestItem}
+            myItem={row.values as ItemOfPurchaseRequest}
             itemData={{
               description1: budgetRefDetail.description,
               uomOptions,
@@ -266,10 +254,10 @@ const CreatePurchaseRequest: NextPage = () => {
       ),
     },
     { Header: 'Item', accessor: 'item' },
-    { Header: 'Description 1', accessor: 'description_1' },
-    { Header: 'Description 2', accessor: 'description_2' },
-    { Header: 'Description 3', accessor: 'description_3' },
-    { Header: 'Description 4', accessor: 'description_4' },
+    { Header: 'Description 1', accessor: 'description1' },
+    { Header: 'Description 2', accessor: 'description2' },
+    { Header: 'Description 3', accessor: 'description3' },
+    { Header: 'Description 4', accessor: 'description4' },
     { Header: 'Part No', accessor: 'partNo' },
     { Header: 'Mnemonic', accessor: 'mnemonic' },
     { Header: 'Uom', accessor: 'uom' },
@@ -277,7 +265,7 @@ const CreatePurchaseRequest: NextPage = () => {
     {
       Header: 'Price (USD)',
       accessor: 'priceUsd',
-      Cell: ({ row }: CellProps<PurchaseRequestItem>) =>
+      Cell: ({ row }: CellProps<ItemOfPurchaseRequest>) =>
         formatMoney(row.values.priceUsd, Currency.Usd, '-'),
     },
   ];
@@ -707,7 +695,7 @@ const CreatePurchaseRequest: NextPage = () => {
               <FormGroup>
                 <FormLabel>Attachment File</FormLabel>
                 <FileInput
-                  name="attachment"
+                  name="attachmentFile"
                   control={control}
                   placeholder="Upload Attachment File"
                   error={(errors.attachment as FieldError)?.message}
@@ -715,6 +703,7 @@ const CreatePurchaseRequest: NextPage = () => {
                 <Button
                   variant="link"
                   className="mt-2 p-0 font-xs"
+                  disabled={!!!watch('attachmentFile')}
                   onClick={() => {
                     clearErrors('attachment');
                     uploadAttachment('attachment');

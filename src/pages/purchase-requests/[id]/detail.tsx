@@ -5,6 +5,7 @@ import Loader from 'components/ui/Table/Loader';
 import SimpleTable from 'components/ui/Table/SimpleTable';
 import { ItemOfPurchaseRequest } from 'modules/purchaseRequest/entities';
 import { useFetchPurchaseRequestDetail } from 'modules/purchaseRequest/hook';
+import moment from 'moment';
 import { NextPage } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -55,7 +56,7 @@ const PurchaseRequestDetails: NextPage = () => {
           <Col lg={6}>
             <h4 className="profile-detail__info--title mb-1">PR Date</h4>
             <h3 className="profile-detail__info--subtitle">
-              {dataHook?.data?.prDate || '-'}
+              {moment(dataHook?.data?.prDate).format('YYYY-MM-DD') || '-'}
             </h3>
           </Col>
           <Col lg={6}>

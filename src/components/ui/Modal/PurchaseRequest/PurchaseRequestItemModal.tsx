@@ -2,7 +2,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import Input from 'components/form/Input';
 import SingleSelect, { customStyles } from 'components/form/SingleSelect';
 import { Currency } from 'constants/currency';
-import { PurchaseRequestItem } from 'modules/purchaseRequest/entities';
+import { ItemOfPurchaseRequest } from 'modules/purchaseRequest/entities';
 import React from 'react';
 import { Col, FormControl, FormGroup, FormLabel, Row } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
@@ -13,11 +13,11 @@ import * as yup from 'yup';
 import ModalBox from '..';
 
 export interface PurchaseRequestItemModalProps {
-  onSend: (data: PurchaseRequestItem) => void;
+  onSend: (data: ItemOfPurchaseRequest) => void;
   classButton?: string;
   isEdit?: boolean;
   buttonTitle?: string;
-  myItem?: PurchaseRequestItem;
+  myItem?: ItemOfPurchaseRequest;
   itemData: any;
 }
 
@@ -39,9 +39,9 @@ const PurchaseRequestItemModal: React.FC<PurchaseRequestItemModalProps> = ({
   };
   const schema = yup.object().shape({
     item: yup.string().required(`Item can't be empty!`),
-    description_2: yup.string().required(`Description 2 can't be empty!`),
-    description_3: yup.string().required(`Description 3 can't be empty!`),
-    description_4: yup.string().required(`Description 4 can't be empty!`),
+    description2: yup.string().required(`Description 2 can't be empty!`),
+    description3: yup.string().required(`Description 3 can't be empty!`),
+    description4: yup.string().required(`Description 4 can't be empty!`),
     partNo: yup.string().required(`Part No can't be empty!`),
     mnemonic: yup.string().required(`Mnemonic can't be empty!`),
     uom: yup.string().required(`UOM can't be empty!`),
@@ -73,13 +73,13 @@ const PurchaseRequestItemModal: React.FC<PurchaseRequestItemModalProps> = ({
     control,
     reset,
     formState: { errors, isValid },
-  } = useForm<PurchaseRequestItem>({
+  } = useForm<ItemOfPurchaseRequest>({
     mode: 'onChange',
     resolver: yupResolver(schema),
   });
 
-  const handleSubmitForm = (data: PurchaseRequestItem) => {
-    data.description_1 = itemData.description1;
+  const handleSubmitForm = (data: ItemOfPurchaseRequest) => {
+    data.description1 = itemData.description1;
     onSend(data);
     reset({});
   };
@@ -87,10 +87,11 @@ const PurchaseRequestItemModal: React.FC<PurchaseRequestItemModalProps> = ({
   const onModalOpened = () => {
     if (isEdit) {
       reset({
+        id: myItem?.id,
         item: myItem?.item,
-        description_2: myItem?.description_2,
-        description_3: myItem?.description_3,
-        description_4: myItem?.description_4,
+        description2: myItem?.description2,
+        description3: myItem?.description3,
+        description4: myItem?.description4,
         partNo: myItem?.partNo,
         mnemonic: myItem?.mnemonic,
         uom: myItem?.uom,
@@ -140,11 +141,11 @@ const PurchaseRequestItemModal: React.FC<PurchaseRequestItemModalProps> = ({
             <FormLabel className="required">Description 2</FormLabel>
             <Input
               placeholder="Description 2"
-              name="description_2"
+              name="description2"
               control={control}
               defaultValue=""
               type="text"
-              error={errors.description_2?.message}
+              error={errors.description2?.message}
             />
           </FormGroup>
         </Col>
@@ -155,11 +156,11 @@ const PurchaseRequestItemModal: React.FC<PurchaseRequestItemModalProps> = ({
             <FormLabel className="required">Description 3</FormLabel>
             <Input
               placeholder="Description 3"
-              name="description_3"
+              name="description3"
               control={control}
               defaultValue=""
               type="text"
-              error={errors.description_3?.message}
+              error={errors.description3?.message}
             />
           </FormGroup>
         </Col>
@@ -168,11 +169,11 @@ const PurchaseRequestItemModal: React.FC<PurchaseRequestItemModalProps> = ({
             <FormLabel className="required">Description 4</FormLabel>
             <Input
               placeholder="Description 4"
-              name="description_4"
+              name="description4"
               control={control}
               defaultValue=""
               type="text"
-              error={errors.description_4?.message}
+              error={errors.description4?.message}
             />
           </FormGroup>
         </Col>

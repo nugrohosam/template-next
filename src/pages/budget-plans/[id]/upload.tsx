@@ -48,7 +48,7 @@ const UploadBudgetPlanItem: NextPage = () => {
     useBudgetPlanItemHelpers();
   const submitForm = (data: UploadBudgetPlanItemUForm) => {
     handleUploadBudgetPlanItems({ ...data, idBudgetPlan: idBudgetPlan })
-      .then((result) => router.push(`/budget-plans/${idBudgetPlan}`))
+      .then((result) => router.push(`/budget-plans/${idBudgetPlan}/detail`))
       .catch((error) => setValidationError(error, setError));
   };
 

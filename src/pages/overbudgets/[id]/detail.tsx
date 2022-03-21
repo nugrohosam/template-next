@@ -5,26 +5,24 @@ import ApproveModal from 'components/ui/Modal/ApproveModal';
 import RejectModal from 'components/ui/Modal/RejectModal';
 import ReviseModal from 'components/ui/Modal/ReviseModal';
 import AuditTimeline from 'components/ui/Timeline/AuditTimeline';
-import { Currency } from 'constants/currency';
-import { OverBudgetStatus } from 'constants/status';
-import { UserType } from 'constants/user';
 import { ApprovalField } from 'modules/approval/entities';
 import { useAttachmentHelpers } from 'modules/attachment/helpers';
 import { ResourceType } from 'modules/audit/parent/entities';
 import { useFetchAudits } from 'modules/audit/parent/hook';
 import { useDecodeToken } from 'modules/custom/useDecodeToken';
+import { OverbudgetStatus } from 'modules/overbudget/constant';
 import {
-  useApprovalOverbudgets,
-  useFetchOverBudgetDetail,
-} from 'modules/overbudget/hook';
+  permissionOverbudgetHelpers,
+  useOverbudgetHelpers,
+} from 'modules/overbudget/helpers';
+import { useFetchOverbudgetDetail } from 'modules/overbudget/hook';
 import { NextPage } from 'next';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { Button, Col, Row } from 'react-bootstrap';
-import { toast } from 'react-toastify';
-import { formatMoney, showErrorMessage } from 'utils/helpers';
+import { formatMoney } from 'utils/helpers';
 
-const DetailOverBudget: NextPage = () => {
+const DetailOverbudget: NextPage = () => {
   const breadCrumb: PathBreadcrumb[] = [
     {
       label: 'Overbudgets',
@@ -39,11 +37,12 @@ const DetailOverBudget: NextPage = () => {
   const router = useRouter();
   const id = router.query.id as string;
   const [profile] = useDecodeToken();
-  const dataHook = useFetchOverBudgetDetail(id);
+  const dataHook = useFetchOverbudgetDetail(id);
+
   const { handleDownloadAttachment } = useAttachmentHelpers();
-  const dataEditable =
-    dataHook?.data?.status === OverBudgetStatus.DRAFT ||
-    dataHook?.data?.status === OverBudgetStatus.REVISE;
+  const { userCanApproveData, canEdit } = permissionOverbudgetHelpers(
+    profile?.type
+  );
 
   const auditHook = useFetchAudits({
     resourceId: id,
@@ -54,30 +53,15 @@ const DetailOverBudget: NextPage = () => {
     pageSize: 10,
   });
 
-  const approvalOverbudgetMutation = useApprovalOverbudgets();
-  const handleApprovalOverbudgets = (
-    data: ApprovalField,
-    idOverbudgets: string
-  ) => {
-    approvalOverbudgetMutation.mutate(
-      {
-        idOverbudgets: [idOverbudgets],
-        status: data.status,
-        remark: data.notes,
-      },
-      {
-        onSuccess: () => {
-          dataHook.refetch();
-          toast('Data approved!');
-        },
-        onError: (error) => {
-          console.log('Failed to approve data', error);
-          toast(error.message, { autoClose: false });
-          showErrorMessage(error);
-        },
-      }
-    );
+  const { handleApprovalOverbudgets } = useOverbudgetHelpers();
+  const approvalOverbudget = async (data: ApprovalField) => {
+    handleApprovalOverbudgets({
+      idOverbudgets: [id],
+      status: data?.status,
+      remark: data?.notes,
+    });
   };
+
   const currency = dataHook?.data?.budgetReference.currency;
 
   return (
@@ -99,7 +83,7 @@ const DetailOverBudget: NextPage = () => {
               Current Balance
             </h4>
             <h3 className="profile-detail__info--subtitle">
-              {dataHook?.data?.currentBalance}
+              {formatMoney(dataHook?.data?.currentBalance, currency)}
             </h3>
           </Col>
         </Row>
@@ -129,7 +113,7 @@ const DetailOverBudget: NextPage = () => {
             <h3 className="profile-detail__info--subtitle">
               {formatMoney(
                 dataHook?.data?.budgetReference.pricePerUnit,
-                Currency.Idr
+                currency
               )}
             </h3>
           </Col>
@@ -140,16 +124,13 @@ const DetailOverBudget: NextPage = () => {
               Additional Budget/Unit
             </h4>
             <h3 className="profile-detail__info--subtitle">
-              {formatMoney(
-                dataHook?.data?.additionalBudgetPerUnit,
-                Currency.Idr
-              )}
+              {formatMoney(dataHook?.data?.additionalBudgetPerUnit, currency)}
             </h3>
           </Col>
           <Col lg={6}>
             <h4 className="profile-detail__info--title mb-1">Over Budget</h4>
             <h3 className="profile-detail__info--subtitle">
-              {formatMoney(dataHook?.data?.overBudget, Currency.Idr)}
+              {formatMoney(dataHook?.data?.overBudget, currency)}
             </h3>
           </Col>
         </Row>
@@ -197,30 +178,20 @@ const DetailOverBudget: NextPage = () => {
         <br />
         <Row>
           <Col lg={12}>
-            {profile?.type !== UserType.ApprovalBudgetPlanCapex &&
-              dataEditable && (
-                <>
-                  <Link href={`/overbudgets/${id}/edit`} passHref>
-                    <Button variant="primary" className="float-right">
-                      Edit
-                    </Button>
-                  </Link>
-                </>
-              )}
-            {profile?.type === UserType.ApprovalBudgetPlanCapex && (
+            {canEdit(dataHook?.data?.status) && (
               <>
-                <ApproveModal
-                  onSend={(data) => handleApprovalOverbudgets(data, id)}
-                  classButton="mr-2"
-                />
-                <ReviseModal
-                  onSend={(data) => handleApprovalOverbudgets(data, id)}
-                  classButton="mr-2"
-                />
-                <RejectModal
-                  onSend={(data) => handleApprovalOverbudgets(data, id)}
-                  classButton="mr-2"
-                />
+                <Link href={`/overbudgets/${id}/edit`} passHref>
+                  <Button variant="primary" className="float-right">
+                    Edit
+                  </Button>
+                </Link>
+              </>
+            )}
+            {userCanApproveData && (
+              <>
+                <ApproveModal onSend={approvalOverbudget} classButton="mr-2" />
+                <ReviseModal onSend={approvalOverbudget} classButton="mr-2" />
+                <RejectModal onSend={approvalOverbudget} classButton="mr-2" />
               </>
             )}
           </Col>
@@ -228,11 +199,11 @@ const DetailOverBudget: NextPage = () => {
       </Panel>
       {auditHook.data?.items &&
         auditHook.data?.items.length > 0 &&
-        dataHook.data?.status !== OverBudgetStatus.DRAFT && (
+        dataHook.data?.status !== OverbudgetStatus.Draft && (
           <AuditTimeline audit={auditHook.data} />
         )}
     </DetailLayout>
   );
 };
 
-export default DetailOverBudget;
+export default DetailOverbudget;

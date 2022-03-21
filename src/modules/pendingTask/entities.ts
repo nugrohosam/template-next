@@ -1,21 +1,6 @@
-export type PendingTask = {
-  id: string;
-  budgetCode: string;
-  currency: string;
-  status: string;
-  item: number;
-  totalAmount: number;
-  totalAmountUsd: number;
-  outstandingPlanPaymentAttachment: string;
-  outstandingRetentionAttachment: string;
-  isBuilding: boolean;
-  workflowApprovalLevel: number;
-  workflowApprovalNrp: string[];
-  workflowApprovalPosition: string[];
-  workflowApprovalName: string[];
-  delegateApprovalNrp: string;
-  delegateApprovalPosition: string;
-  delegateApprovalName: string;
-  delegateAttachment: string;
-  createdAt: string;
+import { BudgetPlanItemGroup } from 'modules/budgetPlanItemGroup/entities';
+
+export type PendingTask = BudgetPlanItemGroup & {
+  assetGroup: string;
+  budgetPlanId: string;
 };

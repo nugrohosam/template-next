@@ -1,15 +1,21 @@
 import { customStyles } from 'components/form/SingleSelect';
 import ContentLayout from 'components/ui/ContentLayout';
 import ApproveModal from 'components/ui/Modal/ApproveModal';
+import RejectModal from 'components/ui/Modal/RejectModal';
+import ReviseModal from 'components/ui/Modal/ReviseModal';
 import DataTable, { usePaginateParams } from 'components/ui/Table/DataTable';
 import { Currency } from 'constants/currency';
 import { overBudgetStatusOptions } from 'constants/status';
 import { UserType } from 'constants/user';
 import { ApprovalField, ApprovalStatus } from 'modules/approval/entities';
 import { BudgetPlanItemGroupStatus } from 'modules/budgetPlanItemGroup/constant';
-import { BudgetPlanItemGroup } from 'modules/budgetPlanItemGroup/entities';
-import { useBudgetPlanItemGroupHelpers } from 'modules/budgetPlanItemGroup/helpers';
+import {
+  permissionBudgetPlanItemGroupHelpers,
+  useBudgetPlanItemGroupHelpers,
+} from 'modules/budgetPlanItemGroup/helpers';
+import { useAssetGroupOptions } from 'modules/custom/useAssetGroupOptions';
 import { useDecodeToken } from 'modules/custom/useDecodeToken';
+import { PendingTask } from 'modules/pendingTask/entities';
 import { useFetchPendingTaskBudgetPlanItemGroups } from 'modules/pendingTask/hook';
 import moment from 'moment';
 import { NextPage } from 'next';
@@ -17,6 +23,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { Badge, Button, Card, Col, Row } from 'react-bootstrap';
+import { BsFillEyeFill, BsPencilSquare } from 'react-icons/bs';
 import Select from 'react-select';
 import { CellProps, Column, SortingRule } from 'react-table';
 import { formatMoney, getAllIds } from 'utils/helpers';
@@ -42,39 +49,56 @@ const OverBudgetIndex: NextPage = () => {
         ? BudgetPlanItemGroupStatus.WaitingApprovalPicAssetHo
         : '',
   });
+  const [assetGroupOptions] = useAssetGroupOptions();
+
+  // permission
+  const { canApprove } = permissionBudgetPlanItemGroupHelpers(profile?.type);
+  const disableMultipleAction = (canAction: (item: string) => void) => {
+    const items =
+      Object.keys(selectedRow).map(
+        (index) => dataHook.data?.items[parseInt(index)].status
+      ) || [];
+
+    return !items.every((item) => canAction(item || ''));
+  };
 
   const { handleApprovalBudgetPlanItemGroup } = useBudgetPlanItemGroupHelpers();
-  const approveBudgetPlanItemGroup = (data: ApprovalField) => {
+  const handleMultipleApproval = (data?: ApprovalField) => {
     const ids = getAllIds(selectedRow, dataHook.data);
-    if (ids.length > 0) {
+    if (ids?.length > 0) {
       handleApprovalBudgetPlanItemGroup({
         idBudgetPlanItemGroups: ids,
-        status: data.status,
-      }).then(() => router.push(`/budget-plans/id/detail`));
+        status: data?.status as ApprovalStatus,
+        remark: data?.notes,
+      });
+
+      setSelectedRow({});
+      dataHook.refetch();
     }
   };
 
-  const columns: Column<BudgetPlanItemGroup>[] = [
+  const columns: Column<PendingTask>[] = [
     { Header: 'ID', accessor: 'id' },
     { Header: 'Budget Code', accessor: 'budgetCode', minWidth: 300 },
+    { Header: 'Asset Group', accessor: 'assetGroup', minWidth: 300 },
     { Header: 'Units', accessor: 'item', minWidth: 100 },
     { Header: 'Currency', accessor: 'currency' },
     {
       Header: 'Total USD',
       accessor: 'totalAmountUsd',
-      Cell: ({ row }: CellProps<BudgetPlanItemGroup>) =>
+      Cell: ({ row }: CellProps<PendingTask>) =>
         formatMoney(row.values.totalAmountUsd, Currency.Usd, '-'),
     },
     {
       Header: 'Total IDR',
       accessor: 'totalAmount',
-      Cell: ({ row }: CellProps<BudgetPlanItemGroup>) =>
+      Cell: ({ row }: CellProps<PendingTask>) =>
         formatMoney(row.values.totalAmount, Currency.Idr, '-'),
     },
     {
       Header: 'Status',
       accessor: 'status',
-      Cell: ({ row }: CellProps<BudgetPlanItemGroup>) => {
+      Cell: ({ row }: CellProps<PendingTask>) => {
         return (
           <Badge className="badge--status badge--status-blue">
             {row.values.status}
@@ -85,26 +109,34 @@ const OverBudgetIndex: NextPage = () => {
     {
       Header: 'Created At',
       accessor: 'createdAt',
-      Cell: ({ row }: CellProps<BudgetPlanItemGroup>) => {
+      Cell: ({ row }: CellProps<PendingTask>) => {
         return moment(row.values.createdAt).format('YYYY-MM-DD');
       },
     },
     {
       Header: 'Actions',
-      Cell: ({ cell }: CellProps<BudgetPlanItemGroup>) => {
+      accessor: 'budgetPlanId',
+      Cell: ({ cell }: CellProps<PendingTask>) => {
         return (
-          <div className="d-flex flex-column" style={{ minWidth: 110 }}>
-            <Link href={`/budget-plans/id/${cell.row.values.id}`} passHref>
-              <Button className="mb-1">Detail</Button>
+          <div className="d-flex">
+            <Link
+              href={`/budget-plans/${cell.row.values.budgetPlanId}/${cell.row.values.id}`}
+              passHref
+            >
+              <Button className="d-flex mr-2">
+                <BsFillEyeFill className="align-self-center" />
+              </Button>
             </Link>
-            <ApproveModal
-              onSend={(data) =>
-                handleApprovalBudgetPlanItemGroup({
-                  idBudgetPlanItemGroups: [cell.row.values.id],
-                  status: data.status,
-                })
-              }
-            />
+            {profile?.type === UserType.DeptPicAssetHoCapex && (
+              <Link
+                href={`/budget-plans/${cell.row.values.budgetPlanId}/${cell.row.values.id}/edit`}
+                passHref
+              >
+                <Button className="mr-2 d-flex" variant="info">
+                  <BsPencilSquare className="align-self-center" />
+                </Button>
+              </Link>
+            )}
           </div>
         );
       },
@@ -114,7 +146,7 @@ const OverBudgetIndex: NextPage = () => {
   return (
     <ContentLayout title="Pending Tasks">
       <div className="d-md-flex flex-row col-12 text-center">
-        <Col lg={3} className="mb-4">
+        <Col lg={4} className="mb-4">
           <Card>
             <Card.Body>
               <Card.Title>Total Planning (USD)</Card.Title>
@@ -122,7 +154,7 @@ const OverBudgetIndex: NextPage = () => {
             </Card.Body>
           </Card>
         </Col>
-        <Col lg={3} className="mb-4">
+        <Col lg={4} className="mb-4">
           <Card>
             <Card.Body>
               <Card.Title>Intervene (USD)</Card.Title>
@@ -142,8 +174,18 @@ const OverBudgetIndex: NextPage = () => {
             actions={
               <>
                 <ApproveModal
-                  onSend={(data) => approveBudgetPlanItemGroup(data)}
+                  disabledToggle={disableMultipleAction(canApprove)}
+                  onSend={(data) => handleMultipleApproval(data)}
                   classButton="mr-2"
+                />
+                <ReviseModal
+                  disabledToggle={disableMultipleAction(canApprove)}
+                  onSend={(data) => handleMultipleApproval(data)}
+                  classButton="mr-2"
+                />
+                <RejectModal
+                  disabledToggle={disableMultipleAction(canApprove)}
+                  onSend={(data) => handleMultipleApproval(data)}
                 />
               </>
             }
@@ -156,7 +198,7 @@ const OverBudgetIndex: NextPage = () => {
                       <Select
                         placeholder="Select Asset Group"
                         isClearable
-                        options={overBudgetStatusOptions}
+                        options={assetGroupOptions}
                         styles={{
                           ...customStyles(),
                           menu: () => ({
@@ -165,7 +207,7 @@ const OverBudgetIndex: NextPage = () => {
                         }}
                         onChange={(val) =>
                           setFiltersParams(
-                            'assetGroup',
+                            'idAssetGroup',
                             (val?.value as string) || ''
                           )
                         }

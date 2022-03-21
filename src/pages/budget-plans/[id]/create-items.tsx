@@ -110,6 +110,8 @@ const CreateBudgetPlanItem: NextPage = () => {
     { Header: 'ID Capex Catalog', accessor: 'idCapexCatalog' },
     { Header: 'ID Assey Group', accessor: 'idAssetGroup' },
     { Header: 'Currency Rate', accessor: 'currencyRate' },
+    { Header: 'District Code', accessor: 'districtCode' },
+    { Header: 'Department Code', accessor: 'departmentCode' },
     {
       Header: 'Actions',
       Cell: ({ row }: CellProps<BudgetPlanItemOfBudgetPlanItemForm>) => (
@@ -346,6 +348,8 @@ const CreateBudgetPlanItem: NextPage = () => {
                 'idCapexCatalog',
                 'idAssetGroup',
                 'currencyRate',
+                'districtCode',
+                'departmentCode',
               ]}
               onSelectedRowsChanged={(rows) => setSelectedRow(rows)}
               addOns={

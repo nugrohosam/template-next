@@ -14,6 +14,11 @@ import { ResourceType } from 'modules/audit/parent/entities';
 import { useFetchAudits } from 'modules/audit/parent/hook';
 import { useFetchBudgetPlanDetail } from 'modules/budgetPlan/hook';
 import { getValueItemByMonth } from 'modules/budgetPlanItem/helpers';
+import {
+  BuildingAttachment,
+  BuildingAttachmentType,
+} from 'modules/budgetPlanItemGroup/entities';
+import { useFetchBuildingAttachments } from 'modules/budgetPlanItemGroup/hook';
 import { useDecodeToken } from 'modules/custom/useDecodeToken';
 import { UnbudgetItem } from 'modules/unbudget/entities';
 import {
@@ -65,6 +70,18 @@ const UnbudgetDetails: NextPage = () => {
   const dataHookBudgetPlanDetail = useFetchBudgetPlanDetail(
     dataHookUnbudgetDetail.data?.idCapexBudgetPlan as string
   );
+  const dataHookOutstandingPlanPayment = useFetchBuildingAttachments(
+    dataHookUnbudgetDetail.data?.id as string,
+    { ...params, type: BuildingAttachmentType.OutstandingPlanPayment },
+    dataHookUnbudgetDetail?.data?.isBuilding || false
+  );
+
+  const dataHookOutstandingRetention = useFetchBuildingAttachments(
+    dataHookUnbudgetDetail.data?.id as string,
+    { ...params, type: BuildingAttachmentType.OutstandingRetention },
+    dataHookUnbudgetDetail?.data?.isBuilding || false
+  );
+
   const { handleDownloadAttachment } = useAttachmentHelpers();
   // handle actions
   const { handleApprovalUnbudgets } = useUnbudgetHelpers();
@@ -279,6 +296,24 @@ const UnbudgetDetails: NextPage = () => {
     },
   ];
 
+  const columnOutstanding: Column<BuildingAttachment>[] = [
+    { Header: 'District', accessor: 'districtCode', minWidth: 150 },
+    { Header: 'Detail', accessor: 'detail', minWidth: 300 },
+    { Header: 'Currency', accessor: 'currency', minWidth: 150 },
+    {
+      Header: 'Currency Period (IDR)',
+      accessor: 'currentPeriodIdr',
+      minWidth: 250,
+    },
+    {
+      Header: 'Currency Period (USD)',
+      accessor: 'currentPeriodUsd',
+      minWidth: 250,
+    },
+    { Header: 'MB 2022 (IDR)', accessor: 'mbIdr', minWidth: 200 },
+    { Header: 'MB 2022 (USD)', accessor: 'mbUsd', minWidth: 200 },
+  ];
+
   return (
     <DetailLayout
       paths={breadCrumb}
@@ -458,6 +493,68 @@ const UnbudgetDetails: NextPage = () => {
           )}
         </Row>
       </Panel>
+
+      {dataHookUnbudgetDetail.data?.isBuilding && (
+        <>
+          <div className="mt-3">
+            <Panel>
+              <Row>
+                <Col lg={12} className="d-md-flex mb-32 align-items-center">
+                  <h3 className="mb-3 mb-md-0 text__blue">
+                    Outstanding Plan Payment
+                  </h3>
+                </Col>
+
+                {dataHookOutstandingPlanPayment.data && (
+                  <DataTable
+                    columns={columnOutstanding}
+                    data={dataHookOutstandingPlanPayment.data}
+                    isLoading={dataHookOutstandingPlanPayment.isFetching}
+                    selectedSort={selectedSort}
+                    paginateParams={params}
+                    onSelectedSortChanged={(sort) => {
+                      setSelectedSort(sort);
+                      setSortingRules(sort);
+                    }}
+                    onSearch={(keyword) => setSearch(keyword)}
+                    onPageSizeChanged={(pageSize) => setPageSize(pageSize)}
+                    onChangePage={(page) => setPageNumber(page)}
+                  ></DataTable>
+                )}
+              </Row>
+            </Panel>
+          </div>
+
+          <div className="mt-3">
+            <Panel>
+              <Row>
+                <Col lg={12} className="d-md-flex mb-32 align-items-center">
+                  <h3 className="mb-3 mb-md-0 text__blue">
+                    Outstanding Retention
+                  </h3>
+                </Col>
+
+                {dataHookOutstandingRetention.data && (
+                  <DataTable
+                    columns={columnOutstanding}
+                    data={dataHookOutstandingRetention.data}
+                    isLoading={dataHookOutstandingRetention.isFetching}
+                    selectedSort={selectedSort}
+                    paginateParams={params}
+                    onSelectedSortChanged={(sort) => {
+                      setSelectedSort(sort);
+                      setSortingRules(sort);
+                    }}
+                    onSearch={(keyword) => setSearch(keyword)}
+                    onPageSizeChanged={(pageSize) => setPageSize(pageSize)}
+                    onChangePage={(page) => setPageNumber(page)}
+                  ></DataTable>
+                )}
+              </Row>
+            </Panel>
+          </div>
+        </>
+      )}
     </DetailLayout>
   );
 };

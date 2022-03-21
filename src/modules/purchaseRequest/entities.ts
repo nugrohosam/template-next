@@ -40,12 +40,15 @@ export type PurchaseRequestForm = {
   warrantyHoldPayment: string;
   uom: string;
   districtCodePembebanan: string;
-  attachment?: string | Array<File> | null;
+  attachment?: string | null;
   budgetQtyBalance: number;
   budgetAmountBalance: number;
   currencyRate: number;
   status: string;
   items: ItemOfPurchaseRequest[];
+
+  // save file
+  attachmentFile?: File[] | null;
 };
 
 export type PurchaseRequestDetail = PurchaseRequest & {

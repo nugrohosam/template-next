@@ -139,7 +139,6 @@ const EditPurchaseRequest: NextPage = () => {
   });
 
   const [selectedRow, setSelectedRow] = useState<Record<string, boolean>>({});
-  const [isAttachmentUploaded, setIsAttachmentUploaded] = useState(false);
   const [submitStatus, setSubmitStatus] = useState('DRAFT');
   const [supplierRegistered, setSupplierRegistered] = useState<boolean>();
   const [budgetRefDetail, setBudgetRefDetail] = useState({
@@ -152,32 +151,31 @@ const EditPurchaseRequest: NextPage = () => {
     name: 'items',
     keyName: 'key',
   });
+  const {
+    attachment: watchAttachment,
+    attachmentFile: watchAttachmentFile,
+    quantityRequired: watchQuantityRequired,
+  } = watch();
 
-  const { handleUploadAttachment } = useAttachmentHelpers();
+  const { handleUploadAttachment, handleDownloadAttachment } =
+    useAttachmentHelpers();
   const uploadAttachment = (attachment: keyof PurchaseRequestForm) => {
-    const file = getValues(`${attachment}` as keyof PurchaseRequestForm);
+    const file = getValues(`${attachment}File` as keyof PurchaseRequestForm);
     handleUploadAttachment(file as File[], 'pr capex')
-      .then((result) => {
-        setValue(attachment, result.name);
-        setIsAttachmentUploaded(true);
-      })
-      .catch((error) => {
-        setValidationError(error, setError);
-        setIsAttachmentUploaded(false);
-      });
+      .then((result) => setValue(attachment, result.name))
+      .catch((error) => setValidationError(error, setError));
   };
 
   const { mutationUpdatePurchaseRequest, handleUpdatePurchaseRequest } =
     usePurchaseRequestHelpers();
   const handleSubmitForm = (data: PurchaseRequestForm) => {
-    const file = watch('attachment');
-    if (
-      (file && !isAttachmentUploaded) ||
-      (typeof file !== 'string' && isAttachmentUploaded)
-    ) {
-      toast('Upload the attachment file!', { type: 'error', autoClose: false });
-    } else if (fields.length === 0) {
+    if (fields.length === 0) {
       toast('Minimum 1 item required!', { type: 'error', autoClose: false });
+    } else if (watchData().totalQtyItems > watchQuantityRequired) {
+      toast(`Item's total quantity can't be more than quantity required`, {
+        type: 'error',
+        autoClose: false,
+      });
     } else {
       const dataSubmit = {
         ...data,
@@ -192,6 +190,7 @@ const EditPurchaseRequest: NextPage = () => {
         currencyRate,
         items: fields,
       };
+      delete dataSubmit.attachmentFile;
       handleUpdatePurchaseRequest({ idPurchaseRequest, data: dataSubmit })
         .then(() => router.push(`/purchase-requests`))
         .catch((error) => setValidationError(error, setError));
@@ -205,7 +204,7 @@ const EditPurchaseRequest: NextPage = () => {
     reset({
       prDate: moment(dataHook?.prDate).format('YYYY-MM-DD'),
       requestedBy: dataHook?.requestedBy,
-      dateRequired: dataHook?.dateRequired,
+      dateRequired: moment(dataHook?.dateRequired).format('YYYY-MM-DD'),
       idCapexAssetGroup: dataHook?.assetGroup?.id,
       districtCode: dataHook?.districtCode,
       departmentCode: dataHook?.departmentCode,
@@ -215,7 +214,7 @@ const EditPurchaseRequest: NextPage = () => {
       warehouse: dataHook?.warehouse,
       budgetQtyBalance: dataHook?.budgetQtyBalance,
       currency: dataHook?.currency,
-      supplierRecommendation: supplierRegistered
+      supplierRecommendation: dataHook?.supplierRecommendation
         ? dataHook?.supplierRecommendation
         : dataHook?.supplierRecommendationName,
       budgetAmountBalance: dataHook?.budgetAmountBalance,
@@ -229,6 +228,7 @@ const EditPurchaseRequest: NextPage = () => {
       warrantyHoldPayment: dataHook?.warrantyHoldPayment,
       uom: dataHook?.uom,
       districtCodePembebanan: dataHook?.districtCodePembebanan,
+      attachment: dataHook?.attachment,
     });
     setBudgetRefDetail({
       description: dataHook?.budgetReference?.description || '-',
@@ -236,7 +236,7 @@ const EditPurchaseRequest: NextPage = () => {
       budgetAmountBalance: dataHook?.budgetReference?.currentBalance as number,
     });
     replace(dataHook?.items.map((item) => item) || []);
-  }, [reset, dataHook, supplierRegistered, replace]);
+  }, [reset, dataHook, replace]);
 
   const watchData = () => {
     const watchForm = watch();
@@ -260,7 +260,7 @@ const EditPurchaseRequest: NextPage = () => {
       .reduce((previousValue, currentValue) => previousValue + currentValue, 0);
     const availableUsd = estimatedPrice - totalUsdItems;
 
-    return { estimatedPrice, availableQty, availableUsd };
+    return { estimatedPrice, availableQty, availableUsd, totalQtyItems };
   };
 
   const budgetCodeSelected = (id: string) => {
@@ -536,7 +536,6 @@ const EditPurchaseRequest: NextPage = () => {
                 <FormLabel className="required">
                   Supplier Recommendation
                 </FormLabel>
-                {/* TODO: saat checkbox diklik, field yg telah diubah valuenya ter-reset */}
                 {!supplierRegistered && (
                   <Input
                     name="supplierRecommendation"
@@ -745,14 +744,29 @@ const EditPurchaseRequest: NextPage = () => {
               <FormGroup>
                 <FormLabel>Attachment File</FormLabel>
                 <FileInput
-                  name="attachment"
+                  name="attachmentFile"
                   control={control}
                   placeholder="Upload Attachment File"
                   error={(errors.attachment as FieldError)?.message}
                 />
+                {watchAttachment && (
+                  <Button
+                    variant="link"
+                    className="p-0 font-xs d-block"
+                    onClick={() =>
+                      handleDownloadAttachment({
+                        fileName: dataHook?.attachment as string,
+                        module: 'pr capex',
+                      })
+                    }
+                  >
+                    <p className="text-left mb-0">{watchAttachment}</p>
+                  </Button>
+                )}
                 <Button
                   variant="link"
                   className="mt-2 p-0 font-xs"
+                  disabled={!!!watchAttachmentFile}
                   onClick={() => {
                     clearErrors('attachment');
                     uploadAttachment('attachment');

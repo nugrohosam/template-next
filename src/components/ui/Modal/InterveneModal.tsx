@@ -30,7 +30,10 @@ const InterveneModal: React.FC<InterveneModalProps> = ({
 }) => {
   const schema = yup.object().shape({
     remark: yup.string().required(`Remark can't be empty!`),
-    intervene: yup.string().required(`Value can't be empty!`),
+    intervene: yup
+      .number()
+      .typeError(`Value can't be empty!`)
+      .required(`Value can't be empty!`),
     type: yup.string().required(),
     amountLimitation: yup.string().required(),
   });
@@ -40,6 +43,7 @@ const InterveneModal: React.FC<InterveneModalProps> = ({
     control,
     setValue,
     watch,
+    reset,
     formState: { errors, isValid },
   } = useForm<InterveneField>({
     mode: 'onChange',
@@ -48,6 +52,11 @@ const InterveneModal: React.FC<InterveneModalProps> = ({
       amountLimitation: 0,
     },
   });
+
+  const handleSubmitForm = (data: InterveneField) => {
+    onSend(data);
+    reset({});
+  };
 
   const watchForm = watch();
   useEffect(() => {
@@ -83,7 +92,7 @@ const InterveneModal: React.FC<InterveneModalProps> = ({
       buttonVariant="orange"
       classButton={classButton}
       title={`Intervene ${modalTitle}`}
-      onSend={handleSubmit(onSend)}
+      onSend={handleSubmit(handleSubmitForm)}
       isError={!isValid}
     >
       <Form>
@@ -149,11 +158,9 @@ const InterveneModal: React.FC<InterveneModalProps> = ({
               <FormLabel className="required">
                 Total Amount After Intervene
               </FormLabel>
-              <Input
-                name="amountLimitation"
-                control={control}
+              <FormControl
                 type="text"
-                defaultValue="0"
+                value={formatMoney(watch('amountLimitation'), Currency.Idr)}
                 disabled
               />
             </FormGroup>

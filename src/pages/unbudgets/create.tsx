@@ -10,6 +10,7 @@ import UnbudgetModal from 'components/ui/Modal/Unbudget/UnbudgetModal';
 import SimpleTable from 'components/ui/Table/SimpleTable';
 import { Currency } from 'constants/currency';
 import { PeriodeType } from 'constants/period';
+import { ValidationLabel } from 'constants/validation';
 import { useAttachmentHelpers } from 'modules/attachment/helpers';
 import { useFetchCurrentBudgetPlan } from 'modules/budgetPlan/hook';
 import { getValueItemByMonth } from 'modules/budgetPlanItem/helpers';
@@ -41,9 +42,18 @@ const breadCrumb: PathBreadcrumb[] = [
 ];
 
 const schema = yup.object().shape({
-  unbudgetBackground: yup.string().required(),
-  unbudgetImpactIfNotRealized: yup.string().required(),
-  unbudgetAttachment: yup.string().required(),
+  unbudgetBackground: yup
+    .string()
+    .required()
+    .label(ValidationLabel.UnbudgetBackground),
+  unbudgetImpactIfNotRealized: yup
+    .string()
+    .required()
+    .label(ValidationLabel.UnbudgetImpactIfNotRealized),
+  unbudgetAttachment: yup
+    .string()
+    .required()
+    .label(ValidationLabel.UnbudgetAttachment),
 });
 
 const CreateUnbudget: NextPage = () => {

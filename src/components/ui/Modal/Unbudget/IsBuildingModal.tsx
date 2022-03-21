@@ -27,10 +27,11 @@ const initDefaultValues = () => ({
   detail: '',
   pricePerUnit: 0,
   idCapexCatalog: null,
-  currencyRate: 10000, // TODO: currenctRate masih dummy
+  currencyRate: 0,
   items: [...Array(12).keys()].map((item) => ({
     month: item + 1,
     quantity: 0,
+    amount: '',
   })),
 });
 
@@ -93,7 +94,9 @@ const IsBuildingUnbudgetModal: React.FC<UnbudgetModalProps> = ({
     setValue('currencyRate', currencyRate);
   }, [currencyRate, setValue]);
 
-  const assetGroupOptions = useAssetGroupOptions();
+  const assetGroupOptions = useAssetGroupOptions().filter(
+    (item) => item.label === 'Building'
+  );
 
   const totalAmount = (currency: Currency) => {
     if (!watchCurrency) return 0;

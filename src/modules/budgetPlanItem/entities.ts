@@ -11,6 +11,9 @@ export type BudgetPlanItem = {
   totalAmountUsd: number;
   items: ItemOfBudgetPlanItem[];
   createdAt: string;
+  districtCode: string;
+  departmentCode: string;
+  detail: string;
 };
 
 export type ItemOfBudgetPlanItem = {
@@ -44,6 +47,8 @@ export interface BudgetPlanItemOfBudgetPlanItemForm {
   detail: string | null;
   id?: string;
   catalog?: Catalog;
+  districtCode: string;
+  departmentCode: string;
 }
 
 export interface UploadBudgetPlanItemUForm {

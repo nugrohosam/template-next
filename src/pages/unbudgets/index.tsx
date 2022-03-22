@@ -315,7 +315,7 @@ const UnbudgetList: NextPage = () => {
             selectedRows={selectedRow}
             hiddenColumns={['id']}
             paginateParams={params}
-            onSelectedRowsChanged={(rows) => console.log('rows ', rows)} // setSelectedRow(rows)
+            onSelectedRowsChanged={(rows) => setSelectedRow(rows)}
             onSelectedSortChanged={(sort) => {
               setSelectedSort(sort);
               setSortingRules(sort);

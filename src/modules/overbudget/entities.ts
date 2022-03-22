@@ -1,7 +1,8 @@
-import { OverBudgetStatus } from 'constants/status';
 import { BudgetReference } from 'modules/budgetReference/entities';
 
-export type OverBudget = {
+import { OverbudgetStatus } from './constant';
+
+export type Overbudget = {
   id: string;
   budgetReference: string;
   currentBalance: number;
@@ -10,7 +11,7 @@ export type OverBudget = {
   overBudget: number;
   background: string;
   impactIfNotRealized: string;
-  status: OverBudgetStatus;
+  status: OverbudgetStatus;
   workflowApprovalLevel: number;
   workflowApprovalNrp: Array<string>;
   workflowApprovalPosition: Array<string>;
@@ -18,21 +19,24 @@ export type OverBudget = {
   createdAt: string;
 };
 
-export type OverBudgetDetail = OverBudget & {
+export type OverbudgetDetail = Overbudget & {
   budgetReference: BudgetReference;
   attachment: string;
   workflowApprovalId: number;
 };
 
-export interface OverBudgetForm {
+export interface OverbudgetForm {
   idBudgetReference: string;
   currentBalance: number;
   additionalBudgetPerUnit: number;
   overbudget: number;
   background: string;
   impactIfNotRealized: string;
-  attachment: string | Array<File> | null;
-  status: OverBudgetStatus;
+  attachment: string;
+  status: OverbudgetStatus;
+
+  // save file
+  attachmentFile?: File[];
 }
 
 export type ApprovalOverbudgets = {
@@ -40,5 +44,3 @@ export type ApprovalOverbudgets = {
   status: string;
   remark?: string;
 };
-
-export type SubmitOverbudgets = Pick<ApprovalOverbudgets, 'idOverbudgets'>;

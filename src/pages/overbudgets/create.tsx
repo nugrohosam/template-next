@@ -6,12 +6,15 @@ import SingleSelect from 'components/form/SingleSelect';
 import { PathBreadcrumb } from 'components/ui/Breadcrumb';
 import LoadingButton from 'components/ui/Button/LoadingButton';
 import DetailLayout from 'components/ui/DetailLayout';
-import { OverBudgetStatus } from 'constants/status';
+import { Currency } from 'constants/currency';
+import { useAttachmentHelpers } from 'modules/attachment/helpers';
 import { useUploadAttachment } from 'modules/attachment/hook';
 import { useFetchBudgetReferences } from 'modules/budgetReference/hook';
 import { useBudgetCodeOptions } from 'modules/custom/useBudgetCodeOptions';
-import { OverBudgetForm } from 'modules/overbudget/entities';
-import { useCreateOverBudget } from 'modules/overbudget/hook';
+import { OverbudgetStatus } from 'modules/overbudget/constant';
+import { OverbudgetForm } from 'modules/overbudget/entities';
+import { useOverbudgetHelpers } from 'modules/overbudget/helpers';
+import { useCreateOverbudget } from 'modules/overbudget/hook';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -46,19 +49,26 @@ const breadCrumb: PathBreadcrumb[] = [
 
 const schema = yup.object().shape({
   idBudgetReference: yup.string().required(`Budget Code can't be empty`),
-  currentBalance: yup.string().required(`Current Balance can't be empty`),
+  currentBalance: yup
+    .number()
+    .typeError(`Current Balance can't be empty`)
+    .required(`Current Balance can't be empty`),
   additionalBudgetPerUnit: yup
-    .string()
+    .number()
+    .typeError(`Additional Budget/Unit can't be empty`)
     .required(`Additional Budget/Unit can't be empty`),
-  overbudget: yup.string().required(`Over Budget can't be empty`),
+  overbudget: yup
+    .number()
+    .typeError(`Over Budget can't be empty`)
+    .required(`Over Budget can't be empty`),
   background: yup.string().required(`Background can't be empty`),
   impactIfNotRealized: yup
     .string()
     .required(`Impact If Not Realized can't be empty`),
-  attachment: yup.mixed().required(`Attachment File can't be empty`),
+  attachmentFile: yup.mixed().required(`Attachment File can't be empty`),
 });
 
-const CreateOverBudget: NextPage = () => {
+const CreateOverbudget: NextPage = () => {
   const router = useRouter();
   const [budgetCodeOptions] = useBudgetCodeOptions();
 
@@ -74,7 +84,7 @@ const CreateOverBudget: NextPage = () => {
     pricePerUnit: '',
   });
   const [isAttachmentUploaded, setIsAttachmentUploaded] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState(OverBudgetStatus.DRAFT);
+  const [submitStatus, setSubmitStatus] = useState(OverbudgetStatus.Draft);
 
   const {
     handleSubmit,
@@ -85,55 +95,41 @@ const CreateOverBudget: NextPage = () => {
     setValue,
     watch,
     formState: { errors, isValid },
-  } = useForm<OverBudgetForm>({
+  } = useForm<OverbudgetForm>({
     mode: 'onChange',
     resolver: yupResolver(schema),
   });
 
-  const uploadAttachmentMutation = useUploadAttachment();
-  const handleUploadAttachment = (name: keyof OverBudgetForm) => {
-    const file = getValues(name);
-    const formData = new FormData();
-    formData.append('module', 'overbudget');
-    if (file) {
-      formData.append('attachment', (file as Array<File>)[0]);
-    }
+  const {
+    currentBalance: watchCurrentBalance,
+    overbudget: watchOverbudget,
+    additionalBudgetPerUnit: watchAdditionalBudgetPerUnit,
+    attachmentFile: watchAttachmentFile,
+  } = watch();
 
-    uploadAttachmentMutation.mutate(formData, {
-      onSuccess: (data) => {
-        toast('Data uploaded!');
-        setValue('attachment', data.name);
+  const { handleUploadAttachment } = useAttachmentHelpers();
+  const uploadAttachment = (attachment: keyof OverbudgetForm) => {
+    const file = getValues(`${attachment}File` as keyof OverbudgetForm);
+    handleUploadAttachment(file as File[], 'overbudget')
+      .then((result) => {
+        setValue(attachment, result.name);
         setIsAttachmentUploaded(true);
-      },
-      onError: (error) => {
-        setIsAttachmentUploaded(false);
+      })
+      .catch((error) => {
         setValidationError(error, setError);
-        toast(error.message, { autoClose: false });
-      },
-    });
+        setIsAttachmentUploaded(false);
+      });
   };
 
-  const createOverBudgetMutation = useCreateOverBudget();
-  const handleSubmitForm = (data: OverBudgetForm) => {
+  const { mutationCreateOverbudget, handleCreateOverbudget } =
+    useOverbudgetHelpers();
+  const handleSubmitForm = (data: OverbudgetForm) => {
     if (isAttachmentUploaded) {
-      createOverBudgetMutation.mutate(
-        {
-          ...data,
-          status: submitStatus,
-        },
-        {
-          onSuccess: () => {
-            router.push(`/overbudgets`);
-            toast('Data created!');
-          },
-          onError: (error) => {
-            console.error('Failed to create data', error);
-            setValidationError(error, setError);
-            toast(error.message, { type: 'error', autoClose: false });
-            showErrorMessage(error);
-          },
-        }
-      );
+      delete data.attachmentFile;
+      data.status = submitStatus;
+      handleCreateOverbudget(data)
+        .then(() => router.push(`/overbudgets`))
+        .catch((error) => setValidationError(error, setError));
     } else {
       toast('Upload the attachment file!', { type: 'error', autoClose: false });
     }
@@ -158,12 +154,14 @@ const CreateOverBudget: NextPage = () => {
     }
   };
 
-  const additionalBudget = watch('additionalBudgetPerUnit');
   useEffect(() => {
-    if (additionalBudget) {
-      setValue('overbudget', budgetRefDetail.quantity * additionalBudget);
+    if (watchAdditionalBudgetPerUnit) {
+      setValue(
+        'overbudget',
+        budgetRefDetail.quantity * watchAdditionalBudgetPerUnit
+      );
     }
-  });
+  }, [budgetRefDetail.quantity, setValue, watchAdditionalBudgetPerUnit]);
 
   return (
     <DetailLayout
@@ -192,14 +190,15 @@ const CreateOverBudget: NextPage = () => {
             <Col lg={6}>
               <FormGroup>
                 <FormLabel className="required">Current Balance</FormLabel>
-                <Input
-                  type="number"
-                  name="currentBalance"
-                  control={control}
-                  defaultValue=""
-                  placeholder="Current Balance"
+                <FormControl
                   disabled
-                  error={errors.currentBalance?.message}
+                  type="text"
+                  value={
+                    formatMoney(
+                      watchCurrentBalance,
+                      budgetRefDetail.currency as Currency
+                    ) || ''
+                  }
                 />
               </FormGroup>
             </Col>
@@ -251,13 +250,15 @@ const CreateOverBudget: NextPage = () => {
             <Col lg={6}>
               <FormGroup>
                 <FormLabel className="required">Over Budget</FormLabel>
-                <Input
-                  type="number"
-                  name="overbudget"
-                  control={control}
-                  defaultValue=""
+                <FormControl
                   disabled
-                  error={errors.overbudget?.message}
+                  type="text"
+                  value={
+                    formatMoney(
+                      watchOverbudget,
+                      budgetRefDetail.currency as Currency
+                    ) || '0'
+                  }
                 />
               </FormGroup>
             </Col>
@@ -301,7 +302,7 @@ const CreateOverBudget: NextPage = () => {
               <FormGroup>
                 <FormLabel className="required">Attachment File</FormLabel>
                 <FileInput
-                  name="attachment"
+                  name="attachmentFile"
                   control={control}
                   placeholder="Upload Attachment File"
                   error={(errors.attachment as FieldError)?.message}
@@ -309,9 +310,10 @@ const CreateOverBudget: NextPage = () => {
                 <Button
                   variant="link"
                   className="mt-2 p-0 font-xs"
+                  disabled={!!!watchAttachmentFile}
                   onClick={() => {
                     clearErrors('attachment');
-                    handleUploadAttachment('attachment');
+                    uploadAttachment('attachment');
                   }}
                 >
                   <p>Upload</p>
@@ -324,18 +326,24 @@ const CreateOverBudget: NextPage = () => {
               variant="primary"
               type="submit"
               className="mr-2"
-              isLoading={createOverBudgetMutation.isLoading}
-              disabled={!isValid || createOverBudgetMutation.isLoading}
-              onClick={() => setSubmitStatus(OverBudgetStatus.DRAFT)}
+              isLoading={
+                mutationCreateOverbudget.isLoading &&
+                submitStatus === OverbudgetStatus.Draft
+              }
+              disabled={!isValid || mutationCreateOverbudget.isLoading}
+              onClick={() => setSubmitStatus(OverbudgetStatus.Draft)}
             >
               Save
             </LoadingButton>
             <LoadingButton
               variant="green"
               type="submit"
-              isLoading={createOverBudgetMutation.isLoading}
-              disabled={!isValid || createOverBudgetMutation.isLoading}
-              onClick={() => setSubmitStatus(OverBudgetStatus.SUBMIT)}
+              isLoading={
+                mutationCreateOverbudget.isLoading &&
+                submitStatus === OverbudgetStatus.Submit
+              }
+              disabled={!isValid || mutationCreateOverbudget.isLoading}
+              onClick={() => setSubmitStatus(OverbudgetStatus.Submit)}
             >
               Submit
             </LoadingButton>
@@ -346,4 +354,4 @@ const CreateOverBudget: NextPage = () => {
   );
 };
 
-export default CreateOverBudget;
+export default CreateOverbudget;

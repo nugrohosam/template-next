@@ -6,13 +6,16 @@ import SingleSelect from 'components/form/SingleSelect';
 import { PathBreadcrumb } from 'components/ui/Breadcrumb';
 import LoadingButton from 'components/ui/Button/LoadingButton';
 import DetailLayout from 'components/ui/DetailLayout';
+import { Currency } from 'constants/currency';
 import { useAttachmentHelpers } from 'modules/attachment/helpers';
 import { useUploadAttachment } from 'modules/attachment/hook';
 import { useFetchBudgetReferences } from 'modules/budgetReference/hook';
 import { useBudgetCodeOptions } from 'modules/custom/useBudgetCodeOptions';
-import { OverBudgetForm } from 'modules/overbudget/entities';
+import { OverbudgetStatus } from 'modules/overbudget/constant';
+import { OverbudgetForm } from 'modules/overbudget/entities';
+import { useOverbudgetHelpers } from 'modules/overbudget/helpers';
 import {
-  useFetchOverBudgetDetail,
+  useFetchOverbudgetDetail,
   useUpdateOverbudget,
 } from 'modules/overbudget/hook';
 import { NextPage } from 'next';
@@ -49,23 +52,30 @@ const breadCrumb: PathBreadcrumb[] = [
 
 const schema = yup.object().shape({
   idBudgetReference: yup.string().required(`Budget Code can't be empty`),
-  currentBalance: yup.string().required(`Current Balance can't be empty`),
+  currentBalance: yup
+    .number()
+    .typeError(`Current Balance can't be empty`)
+    .required(`Current Balance can't be empty`),
   additionalBudgetPerUnit: yup
-    .string()
+    .number()
+    .typeError(`Additional Budget/Unit can't be empty`)
     .required(`Additional Budget/Unit can't be empty`),
-  overbudget: yup.string().required(`Over Budget can't be empty`),
+  overbudget: yup
+    .number()
+    .typeError(`Over Budget can't be empty`)
+    .required(`Over Budget can't be empty`),
   background: yup.string().required(`Background can't be empty`),
   impactIfNotRealized: yup
     .string()
     .required(`Impact If Not Realized can't be empty`),
 });
 
-const EditOverBudget: NextPage = () => {
+const EditOverbudget: NextPage = () => {
   const router = useRouter();
   const id = router.query.id as string;
   const [budgetCodeOptions] = useBudgetCodeOptions();
   const { handleDownloadAttachment } = useAttachmentHelpers();
-  const { data: dataHook } = useFetchOverBudgetDetail(id);
+  const { data: dataHook } = useFetchOverbudgetDetail(id);
 
   const budgetReferencesHook = useFetchBudgetReferences({
     pageNumber: 1,
@@ -79,6 +89,7 @@ const EditOverBudget: NextPage = () => {
     pricePerUnit: '',
   });
   const [isAttachmentUploaded, setIsAttachmentUploaded] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState(OverbudgetStatus.Draft);
 
   const {
     handleSubmit,
@@ -90,31 +101,30 @@ const EditOverBudget: NextPage = () => {
     setValue,
     watch,
     formState: { errors, isValid },
-  } = useForm<OverBudgetForm>({
+  } = useForm<OverbudgetForm>({
     mode: 'onChange',
     resolver: yupResolver(schema),
   });
 
-  const mutation = useUpdateOverbudget();
-  const handleSubmitForm = (data: OverBudgetForm) => {
-    if (watch('attachment') !== dataHook?.attachment && !isAttachmentUploaded) {
+  const {
+    currentBalance: watchCurrentBalance,
+    overbudget: watchOverbudget,
+    additionalBudgetPerUnit: watchAdditionalBudgetPerUnit,
+    attachmentFile: watchAttachmentFile,
+  } = watch();
+
+  const { mutationUpdateOverbudget, handleUpdateOverbudget } =
+    useOverbudgetHelpers();
+  const handleSubmitForm = (data: OverbudgetForm) => {
+    if (watchAttachmentFile && !isAttachmentUploaded) {
       toast('Upload the attachment file!', { type: 'error', autoClose: false });
     } else {
-      mutation.mutate(
-        { idOverbudget: id, data },
-        {
-          onSuccess: () => {
-            router.push('/overbudgets');
-            toast('Data updated!');
-          },
-          onError: (error) => {
-            console.log('Failed to update data', error);
-            setValidationError(error, setError);
-            toast(error.message, { autoClose: false });
-            showErrorMessage(error);
-          },
-        }
-      );
+      delete data.attachmentFile;
+      data.status = submitStatus;
+
+      handleUpdateOverbudget(id, data)
+        .then(() => router.push(`/overbudgets/${id}/detail`))
+        .catch((error) => setValidationError(error, setError));
     }
   };
 
@@ -140,27 +150,18 @@ const EditOverBudget: NextPage = () => {
     });
   }, [dataHook, reset]);
 
-  const uploadAttachmentMutation = useUploadAttachment();
-  const handleUploadAttachment = (name: keyof OverBudgetForm) => {
-    const file = getValues(name);
-    const formData = new FormData();
-    formData.append('module', 'overbudget');
-    if (file) {
-      formData.append('attachment', (file as Array<File>)[0]);
-    }
-
-    uploadAttachmentMutation.mutate(formData, {
-      onSuccess: (data) => {
-        toast('Data uploaded!');
-        setValue('attachment', data.name);
+  const { handleUploadAttachment } = useAttachmentHelpers();
+  const uploadAttachment = (attachment: keyof OverbudgetForm) => {
+    const file = getValues(`${attachment}File` as keyof OverbudgetForm);
+    handleUploadAttachment(file as File[], 'overbudget')
+      .then((result) => {
+        setValue(attachment, result.name);
         setIsAttachmentUploaded(true);
-      },
-      onError: (error) => {
-        setIsAttachmentUploaded(false);
+      })
+      .catch((error) => {
         setValidationError(error, setError);
-        toast(error.message, { autoClose: false });
-      },
-    });
+        setIsAttachmentUploaded(false);
+      });
   };
 
   const budgetCodeSelected = (id: string) => {
@@ -182,12 +183,14 @@ const EditOverBudget: NextPage = () => {
     }
   };
 
-  const additionalBudget = watch('additionalBudgetPerUnit');
   useEffect(() => {
-    if (additionalBudget) {
-      setValue('overbudget', budgetRefDetail.quantity * additionalBudget);
+    if (watchAdditionalBudgetPerUnit) {
+      setValue(
+        'overbudget',
+        budgetRefDetail.quantity * watchAdditionalBudgetPerUnit
+      );
     }
-  });
+  }, [budgetRefDetail.quantity, setValue, watchAdditionalBudgetPerUnit]);
 
   return (
     <DetailLayout
@@ -216,14 +219,15 @@ const EditOverBudget: NextPage = () => {
             <Col lg={6}>
               <FormGroup>
                 <FormLabel className="required">Current Balance</FormLabel>
-                <Input
-                  type="number"
-                  name="currentBalance"
-                  control={control}
-                  defaultValue=""
-                  placeholder="Current Balance"
+                <FormControl
                   disabled
-                  error={errors.currentBalance?.message}
+                  type="text"
+                  value={
+                    formatMoney(
+                      watchCurrentBalance,
+                      budgetRefDetail.currency as Currency
+                    ) || ''
+                  }
                 />
               </FormGroup>
             </Col>
@@ -275,13 +279,15 @@ const EditOverBudget: NextPage = () => {
             <Col lg={6}>
               <FormGroup>
                 <FormLabel className="required">Over Budget</FormLabel>
-                <Input
-                  type="number"
-                  name="overbudget"
-                  control={control}
-                  defaultValue=""
+                <FormControl
                   disabled
-                  error={errors.overbudget?.message}
+                  type="text"
+                  value={
+                    formatMoney(
+                      watchOverbudget,
+                      budgetRefDetail.currency as Currency
+                    ) || '0'
+                  }
                 />
               </FormGroup>
             </Col>
@@ -325,7 +331,7 @@ const EditOverBudget: NextPage = () => {
               <FormGroup>
                 <FormLabel>Attachment File</FormLabel>
                 <FileInput
-                  name="attachment"
+                  name="attachmentFile"
                   control={control}
                   placeholder="Upload Attachment File"
                   defaultValue={dataHook?.attachment}
@@ -335,26 +341,13 @@ const EditOverBudget: NextPage = () => {
                   <Button
                     variant="link"
                     className="mt-2 p-0 font-xs"
+                    disabled={!!!watchAttachmentFile}
                     onClick={() => {
                       clearErrors('attachment');
-                      handleUploadAttachment('attachment');
+                      uploadAttachment('attachment');
                     }}
                   >
                     <p>Upload</p>
-                  </Button>{' '}
-                  <div className="mt-1">|</div>
-                  <Button
-                    size="sm"
-                    variant="link"
-                    className="mt-2 p-0 font-xs"
-                    onClick={() =>
-                      handleDownloadAttachment({
-                        fileName: dataHook?.attachment || '',
-                        module: 'overbudget',
-                      })
-                    }
-                  >
-                    <p>{dataHook?.attachment}</p>
                   </Button>
                 </div>
               </FormGroup>
@@ -364,10 +357,27 @@ const EditOverBudget: NextPage = () => {
             <LoadingButton
               variant="primary"
               type="submit"
-              isLoading={mutation.isLoading}
-              disabled={!isValid || mutation.isLoading}
+              className="mr-2"
+              isLoading={
+                mutationUpdateOverbudget.isLoading &&
+                submitStatus === OverbudgetStatus.Draft
+              }
+              disabled={!isValid || mutationUpdateOverbudget.isLoading}
+              onClick={() => setSubmitStatus(OverbudgetStatus.Draft)}
             >
-              Update
+              Save
+            </LoadingButton>
+            <LoadingButton
+              variant="green"
+              type="submit"
+              isLoading={
+                mutationUpdateOverbudget.isLoading &&
+                submitStatus === OverbudgetStatus.Submit
+              }
+              disabled={!isValid || mutationUpdateOverbudget.isLoading}
+              onClick={() => setSubmitStatus(OverbudgetStatus.Submit)}
+            >
+              Submit
             </LoadingButton>
           </Col>
         </Form>
@@ -376,4 +386,4 @@ const EditOverBudget: NextPage = () => {
   );
 };
 
-export default EditOverBudget;
+export default EditOverbudget;

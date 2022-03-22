@@ -8,68 +8,67 @@ import {
 
 import {
   approvalOverbudgets,
-  createOverBudget,
-  deleteOverBudget,
-  DeleteOverBudgetParams,
-  fetchOverBudgetDetail,
-  fetchOverBudgets,
+  createOverbudget,
+  deleteOverbudget,
+  DeleteOverbudgetParams,
+  fetchOverbudgetDetail,
+  fetchOverbudgets,
   submitOverbudgets,
-  updateOverBudget,
+  updateOverbudget,
 } from './api';
 import {
   ApprovalOverbudgets,
-  OverBudget,
-  OverBudgetDetail,
-  OverBudgetForm,
-  SubmitOverbudgets,
+  Overbudget,
+  OverbudgetDetail,
+  OverbudgetForm,
 } from './entities';
 
-export const useFetchOverBudgets = (
+export const useFetchOverbudgets = (
   params: PaginateParams
-): UseQueryResult<Paginate<OverBudget>, ResponseError> => {
-  return useQuery(['overbudgets', params], () => fetchOverBudgets(params));
+): UseQueryResult<Paginate<Overbudget>, ResponseError> => {
+  return useQuery(['overbudgets', params], () => fetchOverbudgets(params));
 };
 
-export const useDeleteOverBudgets = (): UseMutationResult<
+export const useDeleteOverbudgets = (): UseMutationResult<
   null,
   ResponseError,
-  DeleteOverBudgetParams
+  DeleteOverbudgetParams
 > => {
   return useMutation(({ idOverbudgets, action }) =>
-    deleteOverBudget({ idOverbudgets, action })
+    deleteOverbudget({ idOverbudgets, action })
   );
 };
 
-export const useFetchOverBudgetDetail = (
-  idOverBudget: string
-): UseQueryResult<OverBudgetDetail> => {
+export const useFetchOverbudgetDetail = (
+  idOverbudget: string
+): UseQueryResult<OverbudgetDetail> => {
   return useQuery(
-    ['overbudget-detail', idOverBudget],
-    () => fetchOverBudgetDetail(idOverBudget),
-    { enabled: !!idOverBudget }
+    ['overbudget-detail', idOverbudget],
+    () => fetchOverbudgetDetail(idOverbudget),
+    { enabled: !!idOverbudget }
   );
 };
 
-export const useCreateOverBudget = (): UseMutationResult<
-  OverBudget,
+export const useCreateOverbudget = (): UseMutationResult<
+  Overbudget,
   ResponseError,
-  OverBudgetForm
+  OverbudgetForm
 > => {
-  return useMutation(createOverBudget);
+  return useMutation(createOverbudget);
 };
 
 interface UpdateOverbudgetparams {
   idOverbudget: string;
-  data: OverBudgetForm;
+  data: OverbudgetForm;
 }
 
 export const useUpdateOverbudget = (): UseMutationResult<
-  OverBudget,
+  Overbudget,
   ResponseError,
   UpdateOverbudgetparams
 > => {
   return useMutation(({ idOverbudget, data }) =>
-    updateOverBudget(idOverbudget, data)
+    updateOverbudget(idOverbudget, data)
   );
 };
 
@@ -84,7 +83,7 @@ export const useApprovalOverbudgets = (): UseMutationResult<
 export const useSubmitOverbudgets = (): UseMutationResult<
   null,
   ResponseError,
-  SubmitOverbudgets
+  string[]
 > => {
   return useMutation((data) => submitOverbudgets(data));
 };

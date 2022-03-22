@@ -3,29 +3,28 @@ import axios from 'utils/axios';
 
 import {
   ApprovalOverbudgets,
-  OverBudget,
-  OverBudgetDetail,
-  OverBudgetForm,
-  SubmitOverbudgets,
+  Overbudget,
+  OverbudgetDetail,
+  OverbudgetForm,
 } from './entities';
 
-export const fetchOverBudgets = async (
+export const fetchOverbudgets = async (
   params: PaginateParams
-): Promise<Paginate<OverBudget>> => {
-  const result = await axios.get<ResponseData<Paginate<OverBudget>>>(
+): Promise<Paginate<Overbudget>> => {
+  const result = await axios.get<ResponseData<Paginate<Overbudget>>>(
     'v1/overbudgets',
     { params }
   );
   return result.data.data;
 };
 
-export interface DeleteOverBudgetParams {
+export interface DeleteOverbudgetParams {
   idOverbudgets: string[];
   action: string;
 }
 
-export const deleteOverBudget = async (
-  deleteParams: DeleteOverBudgetParams
+export const deleteOverbudget = async (
+  deleteParams: DeleteOverbudgetParams
 ): Promise<null> => {
   const result = await axios.patch<ResponseData<null>>(
     'v1/overbudgets',
@@ -34,30 +33,30 @@ export const deleteOverBudget = async (
   return result.data.data;
 };
 
-export const fetchOverBudgetDetail = async (
-  idOverBudget: string
-): Promise<OverBudgetDetail> => {
-  const result = await axios.get<ResponseData<OverBudgetDetail>>(
-    `v1/overbudgets/${idOverBudget}`
+export const fetchOverbudgetDetail = async (
+  idOverbudget: string
+): Promise<OverbudgetDetail> => {
+  const result = await axios.get<ResponseData<OverbudgetDetail>>(
+    `v1/overbudgets/${idOverbudget}`
   );
   return result.data.data;
 };
 
-export const createOverBudget = async (
-  data: OverBudgetForm
-): Promise<OverBudget> => {
-  const result = await axios.post<ResponseData<OverBudget>>(
+export const createOverbudget = async (
+  data: OverbudgetForm
+): Promise<Overbudget> => {
+  const result = await axios.post<ResponseData<Overbudget>>(
     'v1/overbudgets',
     data
   );
   return result.data.data;
 };
 
-export const updateOverBudget = async (
+export const updateOverbudget = async (
   idOverbudget: string,
-  data: OverBudgetForm
-): Promise<OverBudget> => {
-  const result = await axios.put<ResponseData<OverBudget>>(
+  data: OverbudgetForm
+): Promise<Overbudget> => {
+  const result = await axios.put<ResponseData<Overbudget>>(
     `v1/overbudgets/${idOverbudget}`,
     data
   );
@@ -75,11 +74,11 @@ export const approvalOverbudgets = async (
 };
 
 export const submitOverbudgets = async (
-  data: SubmitOverbudgets
+  idOverbudgets: string[]
 ): Promise<null> => {
   const result = await axios.patch<ResponseData<null>>(
     'v1/overbudgets/submit',
-    data
+    { idOverbudgets }
   );
   return result.data.data;
 };

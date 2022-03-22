@@ -64,6 +64,7 @@ const EditPeriodActual: NextPage = () => {
     control,
     setError,
     reset,
+    unregister,
     formState: { errors, isValid },
   } = useForm<AssetGroupForm>({
     mode: 'onChange',
@@ -134,6 +135,7 @@ const EditPeriodActual: NextPage = () => {
           toast('Data updated!');
         },
         onError: (error) => {
+          unregister('pics');
           console.error('Failed to update data', error);
           setValidationError(error, setError);
           toast(error.message, { autoClose: false });
@@ -446,12 +448,6 @@ const EditPeriodActual: NextPage = () => {
                             setMyPicsHo((prev) =>
                               prev.filter((item, i) => i !== index)
                             );
-                            reset(
-                              {},
-                              {
-                                keepIsValid: false,
-                              }
-                            );
                           }}
                         >
                           Delete
@@ -587,12 +583,6 @@ const EditPeriodActual: NextPage = () => {
                           onClick={() => {
                             setMyPicsSite((prev) =>
                               prev.filter((item, i) => i !== index)
-                            );
-                            reset(
-                              {},
-                              {
-                                keepIsValid: false,
-                              }
                             );
                           }}
                         >

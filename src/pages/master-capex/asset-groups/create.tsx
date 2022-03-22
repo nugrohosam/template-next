@@ -58,7 +58,7 @@ const CreatePeriodActual: NextPage = () => {
     handleSubmit,
     control,
     setError,
-    reset,
+    unregister,
     formState: { errors, isValid },
   } = useForm<AssetGroupForm>({
     mode: 'onChange',
@@ -88,6 +88,7 @@ const CreatePeriodActual: NextPage = () => {
           toast('Data created!');
         },
         onError: (error) => {
+          unregister('pics');
           console.error('Failed to create data', error);
           setValidationError(error, setError);
           toast(error.message, { autoClose: false });
@@ -445,12 +446,6 @@ const CreatePeriodActual: NextPage = () => {
                             setMyPicsHo((prev) =>
                               prev.filter((item, i) => i !== index)
                             );
-                            reset(
-                              {},
-                              {
-                                keepIsValid: false,
-                              }
-                            );
                           }}
                         >
                           Delete
@@ -575,12 +570,6 @@ const CreatePeriodActual: NextPage = () => {
                           onClick={() => {
                             setMyPicsSite((prev) =>
                               prev.filter((item, i) => i !== index)
-                            );
-                            reset(
-                              {},
-                              {
-                                keepIsValid: false,
-                              }
                             );
                           }}
                         >

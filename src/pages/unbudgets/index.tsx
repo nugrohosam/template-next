@@ -22,7 +22,7 @@ import Link from 'next/link';
 import React, { useState } from 'react';
 import { Badge, Button, Col, Row } from 'react-bootstrap';
 import Select from 'react-select';
-import { CellProps, Column, SortingRule } from 'react-table';
+import { actions, CellProps, Column, SortingRule } from 'react-table';
 import { formatMoney, getAllIds } from 'utils/helpers';
 
 enum ActionUnbudget {
@@ -48,6 +48,11 @@ const UnbudgetList: NextPage = () => {
   const dataHookUnbudgets = useFetchUnbudgets(params);
 
   // handle actions
+  interface handleMultipleActionUnbudget {
+    action: ActionUnbudget;
+    dataApproval?: ApprovalField;
+    ids?: string[];
+  }
   const {
     mutationDeleteUnbudgets,
     handleDeleteUnbudgets,
@@ -57,23 +62,24 @@ const UnbudgetList: NextPage = () => {
     handleCancelUnbudgets,
     handleApprovalUnbudgets,
   } = useUnbudgetHelpers();
-  const handleMultipleActionUnbudget = async (
-    action: ActionUnbudget,
-    data?: ApprovalField
-  ) => {
-    const ids = getAllIds(selectedRow, dataHookUnbudgets.data);
+  const handleMultipleActionUnbudget = async ({
+    action,
+    dataApproval,
+    ids,
+  }: handleMultipleActionUnbudget) => {
+    if (!ids) ids = getAllIds(selectedRow, dataHookUnbudgets.data);
     if (ids?.length > 0) {
       if (action === ActionUnbudget.Submit) {
         await handleSubmitUnbudgets(ids);
       } else if (action === ActionUnbudget.Delete) {
-        await handleDeleteUnbudgets(ids);
+        if (confirm('Delete data?')) await handleDeleteUnbudgets(ids);
       } else if (action === ActionUnbudget.Cancel) {
-        await handleCancelUnbudgets(ids);
+        if (confirm('Cancel data?')) await handleCancelUnbudgets(ids);
       } else if (action === ActionUnbudget.Approval) {
         await handleApprovalUnbudgets({
           idUnbudgets: ids,
-          status: data?.status as ApprovalStatus,
-          remark: data?.notes,
+          status: dataApproval?.status as ApprovalStatus,
+          remark: dataApproval?.notes,
         });
       }
 
@@ -144,7 +150,12 @@ const UnbudgetList: NextPage = () => {
               hrefDetail={`/unbudgets/${row.values.id}/detail`}
               hrefEdit={`/unbudgets/${row.values.id}/edit`}
               disableEdit={!canEdit(row.values.status)}
-              onDelete={() => handleDeleteUnbudgets([row.values.id])}
+              onDelete={() =>
+                handleMultipleActionUnbudget({
+                  action: ActionUnbudget.Delete,
+                  ids: [row.values.id],
+                })
+              }
               disableDelete={!canDelete(row.values.status)}
             />
             <LoadingButton
@@ -155,7 +166,12 @@ const UnbudgetList: NextPage = () => {
                 !canCancel(row.values.status)
               }
               isLoading={mutationCancelUnbudgets.isLoading}
-              onClick={() => handleCancelUnbudgets([row.values.id])}
+              onClick={() =>
+                handleMultipleActionUnbudget({
+                  action: ActionUnbudget.Cancel,
+                  ids: [row.values.id],
+                })
+              }
             >
               Cancel
             </LoadingButton>
@@ -193,7 +209,9 @@ const UnbudgetList: NextPage = () => {
                       }
                       isLoading={mutationDeleteUnbudgets.isLoading}
                       onClick={() =>
-                        handleMultipleActionUnbudget(ActionUnbudget.Delete)
+                        handleMultipleActionUnbudget({
+                          action: ActionUnbudget.Delete,
+                        })
                       }
                     >
                       Delete
@@ -207,7 +225,9 @@ const UnbudgetList: NextPage = () => {
                       }
                       isLoading={mutationSubmitUnbudgets.isLoading}
                       onClick={() =>
-                        handleMultipleActionUnbudget(ActionUnbudget.Submit)
+                        handleMultipleActionUnbudget({
+                          action: ActionUnbudget.Submit,
+                        })
                       }
                     >
                       Submit
@@ -221,7 +241,9 @@ const UnbudgetList: NextPage = () => {
                       }
                       isLoading={mutationCancelUnbudgets.isLoading}
                       onClick={() =>
-                        handleMultipleActionUnbudget(ActionUnbudget.Cancel)
+                        handleMultipleActionUnbudget({
+                          action: ActionUnbudget.Cancel,
+                        })
                       }
                     >
                       Cancel
@@ -232,28 +254,28 @@ const UnbudgetList: NextPage = () => {
                   <>
                     <ApproveModal
                       onSend={(data) =>
-                        handleMultipleActionUnbudget(
-                          ActionUnbudget.Approval,
-                          data
-                        )
+                        handleMultipleActionUnbudget({
+                          action: ActionUnbudget.Approval,
+                          dataApproval: data,
+                        })
                       }
                       classButton="mr-2"
                     />
                     <ReviseModal
                       onSend={(data) =>
-                        handleMultipleActionUnbudget(
-                          ActionUnbudget.Approval,
-                          data
-                        )
+                        handleMultipleActionUnbudget({
+                          action: ActionUnbudget.Approval,
+                          dataApproval: data,
+                        })
                       }
                       classButton="mr-2"
                     />
                     <RejectModal
                       onSend={(data) =>
-                        handleMultipleActionUnbudget(
-                          ActionUnbudget.Approval,
-                          data
-                        )
+                        handleMultipleActionUnbudget({
+                          action: ActionUnbudget.Approval,
+                          dataApproval: data,
+                        })
                       }
                     />
                   </>

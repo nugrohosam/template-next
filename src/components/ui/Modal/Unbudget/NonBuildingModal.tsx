@@ -115,7 +115,12 @@ const NonBuildingUnbudgetModal: React.FC<UnbudgetModalProps> = ({
   const assetGroupOptions = useAssetGroupOptions().filter(
     (item) => item.label !== 'Building'
   );
-  const catalogOptions = useCatalogOptions(watchIdAssetGroup);
+  const catalogOptions = useCatalogOptions(watchIdAssetGroup).filter((item) => {
+    if (!!inPageUpdate) {
+      return item.primaryCurrency === watchCurrency;
+    }
+    return true;
+  });
 
   const changeCatalog = (idCapexCatalog: string) => {
     const found = catalogOptions.find((item) => item.id === idCapexCatalog);

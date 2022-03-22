@@ -5,7 +5,6 @@ import RejectModal from 'components/ui/Modal/RejectModal';
 import ReviseModal from 'components/ui/Modal/ReviseModal';
 import DataTable, { usePaginateParams } from 'components/ui/Table/DataTable';
 import { Currency } from 'constants/currency';
-import { overBudgetStatusOptions } from 'constants/status';
 import { UserType } from 'constants/user';
 import { ApprovalField, ApprovalStatus } from 'modules/approval/entities';
 import { BudgetPlanItemGroupStatus } from 'modules/budgetPlanItemGroup/constant';

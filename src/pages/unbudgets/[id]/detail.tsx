@@ -484,16 +484,10 @@ const UnbudgetDetails: NextPage = () => {
                 </Button>
               </Link>
             )}
-            {userCanApproveData && (
-              <div className="float-right">
-                <ApproveModal onSend={approvalUnbudget} classButton="mr-2" />
-                <ReviseModal onSend={approvalUnbudget} classButton="mr-2" />
-                <RejectModal onSend={approvalUnbudget} />
-              </div>
-            )}
           </Col>
         </Row>
       </Panel>
+
       <Panel>
         <Row>
           {dataHookUnbudgetItems.data && (
@@ -513,6 +507,19 @@ const UnbudgetDetails: NextPage = () => {
               onChangePage={(page) => setPageNumber(page)}
             ></DataTable>
           )}
+        </Row>
+
+        <br />
+        <Row>
+          <Col lg={12}>
+            {userCanApproveData && (
+              <div className="float-right">
+                <ApproveModal onSend={approvalUnbudget} classButton="mr-2" />
+                <ReviseModal onSend={approvalUnbudget} classButton="mr-2" />
+                <RejectModal onSend={approvalUnbudget} />
+              </div>
+            )}
+          </Col>
         </Row>
       </Panel>
 

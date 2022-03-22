@@ -2,7 +2,6 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import Input from 'components/form/Input';
 import SingleSelect from 'components/form/SingleSelect';
 import { Currency, currencyOptions } from 'constants/currency';
-import { UserDistrict } from 'constants/user';
 import { useAssetGroupOptions } from 'modules/assetGroup/helpers';
 import {
   BudgetPlanItemOfBudgetPlanItemForm,

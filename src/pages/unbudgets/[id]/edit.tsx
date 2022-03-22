@@ -430,28 +430,35 @@ const EditUnbudget: NextPage = () => {
                 />
               </FormGroup>
             </Col>
-            <Col lg={6}>
-              <FormGroup>
-                <FormLabel className="required">Unbudget Attachment</FormLabel>
-                <FileInput
-                  name="unbudgetAttachmentFile"
-                  control={control}
-                  placeholder="Upload New File"
-                  error={(errors.unbudgetAttachment as FieldError)?.message}
-                />
-                <Button
-                  variant="link"
-                  className="mt-2 p-0 font-xs"
-                  disabled={!!!watchUnbudgetAttachmentFile}
-                  onClick={() => {
-                    clearErrors('unbudgetAttachment');
-                    uploadAttachment('unbudgetAttachment');
-                  }}
-                >
-                  <p>Upload</p>
-                </Button>
-              </FormGroup>
-            </Col>
+            {dataHookUnbudgetDetail.data && (
+              <Col lg={6}>
+                <FormGroup>
+                  <FormLabel className="required">
+                    Unbudget Attachment
+                  </FormLabel>
+                  <FileInput
+                    name="unbudgetAttachmentFile"
+                    control={control}
+                    placeholder={
+                      dataHookUnbudgetDetail.data?.unbudgetAttachment ||
+                      'Upload File'
+                    }
+                    error={(errors.unbudgetAttachment as FieldError)?.message}
+                  />
+                  <Button
+                    variant="link"
+                    className="mt-2 p-0 font-xs"
+                    disabled={!!!watchUnbudgetAttachmentFile}
+                    onClick={() => {
+                      clearErrors('unbudgetAttachment');
+                      uploadAttachment('unbudgetAttachment');
+                    }}
+                  >
+                    <p>Upload</p>
+                  </Button>
+                </FormGroup>
+              </Col>
+            )}
           </Row>
 
           <br />
@@ -479,6 +486,7 @@ const EditUnbudget: NextPage = () => {
                       name="isBuilding"
                       control={control}
                       defaultValue={false}
+                      disabled
                     ></Checkbox>
                   </div>
                   <UnbudgetModal
@@ -520,7 +528,11 @@ const EditUnbudget: NextPage = () => {
                     <FileInput
                       name="outstandingPlanPaymentAttachmentFile"
                       control={control}
-                      placeholder="Upload New Excel File"
+                      placeholder={
+                        dataHookUnbudgetDetail.data
+                          ?.outstandingPlanPaymentAttachment ||
+                        'Upload Excel File'
+                      }
                       error={
                         (errors.outstandingPlanPaymentAttachment as FieldError)
                           ?.message
@@ -556,7 +568,11 @@ const EditUnbudget: NextPage = () => {
                     <FileInput
                       name="outstandingRetentionAttachmentFile"
                       control={control}
-                      placeholder="Upload New Excel File"
+                      placeholder={
+                        dataHookUnbudgetDetail.data
+                          ?.outstandingRetentionAttachment ||
+                        'Upload Excel File'
+                      }
                       error={
                         (errors.outstandingRetentionAttachment as FieldError)
                           ?.message

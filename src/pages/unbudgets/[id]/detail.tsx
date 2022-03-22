@@ -57,6 +57,9 @@ const UnbudgetDetails: NextPage = () => {
   const { params, setPageNumber, setPageSize, setSearch, setSortingRules } =
     usePaginateParams();
 
+  const paramsOutstandingPlanPayment = usePaginateParams();
+  const paramsOutstandingRetention = usePaginateParams();
+
   const dataHookUnbudgetDetail = useFetchUnbudgetDetail(idUnbudget);
   const dataHookUnbudgetItems = useFetchUnbudgetItems(idUnbudget, params);
   const auditHook = useFetchAudits({
@@ -72,7 +75,10 @@ const UnbudgetDetails: NextPage = () => {
   );
   const dataHookOutstandingPlanPayment = useFetchBuildingAttachments(
     dataHookUnbudgetDetail.data?.id as string,
-    { ...params, type: BuildingAttachmentType.OutstandingPlanPayment },
+    {
+      ...paramsOutstandingPlanPayment.params,
+      type: BuildingAttachmentType.OutstandingPlanPayment,
+    },
     dataHookUnbudgetDetail?.data?.isBuilding || false
   );
 
@@ -114,7 +120,7 @@ const UnbudgetDetails: NextPage = () => {
       accessor: 'assetGroup',
       Cell: ({ row }: CellProps<UnbudgetItem>) => (
         <div style={{ minWidth: 200 }}>
-          {row.values.catalog?.assetGroup?.assetGroup || '-'}
+          {row.values.assetGroup?.assetGroup || '-'}
         </div>
       ),
     },
@@ -123,7 +129,7 @@ const UnbudgetDetails: NextPage = () => {
       Header: 'Price/Unit',
       accessor: 'pricePerUnit',
       Cell: ({ row }: CellProps<UnbudgetItem>) =>
-        formatMoney(row.values.pricePerunit, Currency.Idr),
+        formatMoney(row.values.pricePerUnit, Currency.Idr),
     },
     {
       Header: 'Total USD',
@@ -304,14 +310,30 @@ const UnbudgetDetails: NextPage = () => {
       Header: 'Currency Period (IDR)',
       accessor: 'currentPeriodIdr',
       minWidth: 250,
+      Cell: ({ row }: CellProps<BuildingAttachment>) =>
+        formatMoney(row.values.currentPeriodIdr, Currency.Idr),
     },
     {
       Header: 'Currency Period (USD)',
       accessor: 'currentPeriodUsd',
       minWidth: 250,
+      Cell: ({ row }: CellProps<BuildingAttachment>) =>
+        formatMoney(row.values.currentPeriodUsd, Currency.Usd),
     },
-    { Header: 'MB 2022 (IDR)', accessor: 'mbIdr', minWidth: 200 },
-    { Header: 'MB 2022 (USD)', accessor: 'mbUsd', minWidth: 200 },
+    {
+      Header: 'MB 2022 (IDR)',
+      accessor: 'mbIdr',
+      minWidth: 200,
+      Cell: ({ row }: CellProps<BuildingAttachment>) =>
+        formatMoney(row.values.mbIdr, Currency.Idr),
+    },
+    {
+      Header: 'MB 2022 (USD)',
+      accessor: 'mbUsd',
+      minWidth: 200,
+      Cell: ({ row }: CellProps<BuildingAttachment>) =>
+        formatMoney(row.values.mbUsd, Currency.Usd),
+    },
   ];
 
   return (
@@ -510,15 +532,19 @@ const UnbudgetDetails: NextPage = () => {
                     columns={columnOutstanding}
                     data={dataHookOutstandingPlanPayment.data}
                     isLoading={dataHookOutstandingPlanPayment.isFetching}
-                    selectedSort={selectedSort}
-                    paginateParams={params}
-                    onSelectedSortChanged={(sort) => {
-                      setSelectedSort(sort);
-                      setSortingRules(sort);
-                    }}
-                    onSearch={(keyword) => setSearch(keyword)}
-                    onPageSizeChanged={(pageSize) => setPageSize(pageSize)}
-                    onChangePage={(page) => setPageNumber(page)}
+                    paginateParams={paramsOutstandingPlanPayment.params}
+                    onSelectedSortChanged={(sort) =>
+                      paramsOutstandingPlanPayment.setSortingRules(sort)
+                    }
+                    onSearch={(keyword) =>
+                      paramsOutstandingPlanPayment.setSearch(keyword)
+                    }
+                    onPageSizeChanged={(pageSize) =>
+                      paramsOutstandingPlanPayment.setPageSize(pageSize)
+                    }
+                    onChangePage={(page) =>
+                      paramsOutstandingPlanPayment.setPageNumber(page)
+                    }
                   ></DataTable>
                 )}
               </Row>
@@ -539,15 +565,19 @@ const UnbudgetDetails: NextPage = () => {
                     columns={columnOutstanding}
                     data={dataHookOutstandingRetention.data}
                     isLoading={dataHookOutstandingRetention.isFetching}
-                    selectedSort={selectedSort}
-                    paginateParams={params}
-                    onSelectedSortChanged={(sort) => {
-                      setSelectedSort(sort);
-                      setSortingRules(sort);
-                    }}
-                    onSearch={(keyword) => setSearch(keyword)}
-                    onPageSizeChanged={(pageSize) => setPageSize(pageSize)}
-                    onChangePage={(page) => setPageNumber(page)}
+                    paginateParams={paramsOutstandingRetention.params}
+                    onSelectedSortChanged={(sort) =>
+                      paramsOutstandingRetention.setSortingRules(sort)
+                    }
+                    onSearch={(keyword) =>
+                      paramsOutstandingRetention.setSearch(keyword)
+                    }
+                    onPageSizeChanged={(pageSize) =>
+                      paramsOutstandingRetention.setPageSize(pageSize)
+                    }
+                    onChangePage={(page) =>
+                      paramsOutstandingRetention.setPageNumber(page)
+                    }
                   ></DataTable>
                 )}
               </Row>

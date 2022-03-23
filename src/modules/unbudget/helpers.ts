@@ -187,6 +187,11 @@ export const permissionUnbudgetHelpers = (role: string | undefined) => {
     return statusAccess.includes(status as UnbudgetStatus);
   };
 
+  const canApproval = (status: string | undefined) => {
+    if (!userCanApproveData) return false;
+    return status?.includes(UnbudgetStatus.Waiting);
+  };
+
   return {
     userCanHandleData,
     userCanApproveData,
@@ -194,5 +199,6 @@ export const permissionUnbudgetHelpers = (role: string | undefined) => {
     canDelete,
     canCancel,
     canEdit,
+    canApproval,
   };
 };

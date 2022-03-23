@@ -101,6 +101,9 @@ const UnbudgetDetails: NextPage = () => {
       idUnbudgets: [idUnbudget],
       status: data?.status,
       remark: data?.notes,
+    }).then(() => {
+      dataHookUnbudgetDetail.refetch();
+      auditHook.refetch();
     });
   };
   const submitUnbudgets = () => {
@@ -111,7 +114,7 @@ const UnbudgetDetails: NextPage = () => {
   };
 
   // permisison
-  const { userCanApproveData, canEdit, canSubmit } = permissionUnbudgetHelpers(
+  const { canApproval, canEdit, canSubmit } = permissionUnbudgetHelpers(
     profile?.type
   );
 
@@ -523,7 +526,7 @@ const UnbudgetDetails: NextPage = () => {
         <br />
         <Row>
           <Col lg={12}>
-            {userCanApproveData && (
+            {canApproval(dataHookUnbudgetDetail?.data?.status) && (
               <div className="float-right">
                 <ApproveModal onSend={approvalUnbudget} classButton="mr-2" />
                 <ReviseModal onSend={approvalUnbudget} classButton="mr-2" />

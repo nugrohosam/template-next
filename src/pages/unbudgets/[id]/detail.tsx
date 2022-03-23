@@ -1,5 +1,6 @@
 import Panel from 'components/form/Panel';
 import { PathBreadcrumb } from 'components/ui/Breadcrumb';
+import LoadingButton from 'components/ui/Button/LoadingButton';
 import DetailLayout from 'components/ui/DetailLayout';
 import ApproveModal from 'components/ui/Modal/ApproveModal';
 import RejectModal from 'components/ui/Modal/RejectModal';
@@ -90,7 +91,11 @@ const UnbudgetDetails: NextPage = () => {
 
   const { handleDownloadAttachment } = useAttachmentHelpers();
   // handle actions
-  const { handleApprovalUnbudgets } = useUnbudgetHelpers();
+  const {
+    mutationSubmitUnbudgets,
+    handleSubmitUnbudgets,
+    handleApprovalUnbudgets,
+  } = useUnbudgetHelpers();
   const approvalUnbudget = (data: ApprovalField) => {
     handleApprovalUnbudgets({
       idUnbudgets: [idUnbudget],
@@ -98,9 +103,15 @@ const UnbudgetDetails: NextPage = () => {
       remark: data?.notes,
     });
   };
+  const submitUnbudgets = () => {
+    handleSubmitUnbudgets([idUnbudget]).then(() => {
+      dataHookUnbudgetDetail.refetch();
+      auditHook.refetch();
+    });
+  };
 
   // permisison
-  const { userCanApproveData, canEdit } = permissionUnbudgetHelpers(
+  const { userCanApproveData, canEdit, canSubmit } = permissionUnbudgetHelpers(
     profile?.type
   );
 
@@ -518,6 +529,17 @@ const UnbudgetDetails: NextPage = () => {
                 <ReviseModal onSend={approvalUnbudget} classButton="mr-2" />
                 <RejectModal onSend={approvalUnbudget} />
               </div>
+            )}
+            {canSubmit(dataHookUnbudgetDetail?.data?.status) && (
+              <LoadingButton
+                size="sm"
+                className="float-right"
+                disabled={mutationSubmitUnbudgets.isLoading}
+                isLoading={mutationSubmitUnbudgets.isLoading}
+                onClick={submitUnbudgets}
+              >
+                Submit
+              </LoadingButton>
             )}
           </Col>
         </Row>

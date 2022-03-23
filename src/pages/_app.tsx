@@ -5,7 +5,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import type { AppProps } from 'next/app';
 import { QueryClient, QueryClientProvider } from 'react-query';
 
-import Layout from '../components/ui/Layout';
+// import Layout from '../components/ui/Layout'; // use layout
 const MyApp: React.FC<AppProps> = ({ Component, pageProps }: AppProps) => {
   const queryClient = new QueryClient({
     defaultOptions: {
@@ -19,9 +19,9 @@ const MyApp: React.FC<AppProps> = ({ Component, pageProps }: AppProps) => {
   return (
     <>
       <QueryClientProvider client={queryClient}>
-        <Layout>
+        {/* <Layout> */}
           <Component {...pageProps} />
-        </Layout>
+        {/* </Layout> */}
       </QueryClientProvider>
     </>
   );

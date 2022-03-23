@@ -67,42 +67,6 @@ export const parseUndescoreString = (text: string) => {
   return text.replace('_', ' ');
 };
 
-export const parseMenuToUrl = (menu: string) => {
-  const url =
-    menu === 'asset groups'
-      ? '/master-capex/asset-groups'
-      : menu === 'catalogs'
-      ? '/master-capex/catalogs'
-      : menu === 'outstanding budgets'
-      ? '/master-capex/outstanding-budget'
-      : menu === 'budget plans'
-      ? '/budget-plans'
-      : menu === 'unbudgets'
-      ? '/unbudgets'
-      : menu === 'outstanding pr po'
-      ? '/outstanding-pr-po'
-      : menu === 'outstanding budgets'
-      ? '/outstanding-budgets'
-      : menu === 'actual YTD'
-      ? '/actual-ytd'
-      : menu === 'budget references capex'
-      ? '/budget-references'
-      : menu === 'budget periods'
-      ? '/master-capex/budget-periods'
-      : menu === 'summary'
-      ? '/summary'
-      : menu === 'overbudgets'
-      ? '/overbudgets'
-      : menu === 'reclass'
-      ? '/reclass'
-      : menu === 'purchase request capex'
-      ? '/purchase-requests'
-      : menu === 'pending task'
-      ? '/pending-tasks'
-      : '/';
-  return url;
-};
-
 // Ex: hello_world -> helloWorld
 export const snakeCaseToCamelCase = (str: string) => {
   return str
